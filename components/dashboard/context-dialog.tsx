@@ -59,24 +59,24 @@ export function ContextDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl">
+      <DialogContent className="sm:max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Additional Context</DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-sm">
             Provide context about yourself that Callio can use to personalize your briefings and
             answer questions. This could include your interests, current projects, preferences, or
             anything else you'd like Callio to know about you.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-2">
+        <div className="space-y-2 flex-1 overflow-hidden flex flex-col">
           <Label htmlFor="context">Your Context</Label>
           <Textarea
             id="context"
             value={context}
             onChange={(e) => setContext(e.target.value)}
             placeholder="Example: I'm a software engineer working on AI projects. I love hiking and photography. I'm currently learning Spanish and planning a trip to Barcelona in March. I'm interested in startup news and emerging technologies..."
-            className="min-h-[200px] resize-y"
+            className="min-h-[150px] sm:min-h-[200px] max-h-[300px] sm:max-h-[400px] resize-none overflow-y-auto flex-1"
             disabled={isLoading}
           />
           <p className="text-xs text-muted-foreground">
@@ -84,15 +84,16 @@ export function ContextDialog({
           </p>
         </div>
 
-        <DialogFooter className="gap-2">
+        <DialogFooter className="flex-row gap-2 sm:flex-row">
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={isLoading}
+            className="flex-1 sm:flex-initial"
           >
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={isLoading}>
+          <Button onClick={handleSave} disabled={isLoading} className="flex-1 sm:flex-initial">
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Save Context
           </Button>
