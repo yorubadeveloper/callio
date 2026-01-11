@@ -6,6 +6,7 @@ export interface User {
   location: string | null;
   timezone: string | null;
   is_active: boolean;
+  has_calendar_connected: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -18,7 +19,7 @@ export interface UserUpdate {
 }
 
 export interface CalendarTokenUpdate {
-  google_access_token: string;
-  google_refresh_token: string;
-  token_expires_at: string;
+  access_token: string;
+  refresh_token: string;
+  expires_at: string;
 }

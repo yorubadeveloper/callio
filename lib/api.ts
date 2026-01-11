@@ -80,9 +80,7 @@ export const users = {
   },
 
   getByEmail: async (email: string): Promise<User> => {
-    return fetchApi<User>("/users", {
-      params: { email },
-    });
+    return fetchApi<User>(`/users/email/${encodeURIComponent(email)}`);
   },
 
   update: async (userId: string, data: UserUpdate): Promise<User> => {

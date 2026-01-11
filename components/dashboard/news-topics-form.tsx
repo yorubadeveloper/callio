@@ -1,24 +1,44 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Newspaper, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { api } from "@/lib/api";
+import type { UserPreferences } from "@/types/preferences";
 
-export function NewsTopicsForm() {
+interface NewsTopicsFormProps {
+  userId?: string;
+  preferences: UserPreferences | null;
+  onUpdate: () => void;
+}
+
+export function NewsTopicsForm({ userId, preferences, onUpdate }: NewsTopicsFormProps) {
   const [topic1, setTopic1] = useState("");
   const [topic2, setTopic2] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    if (preferences) {
+      setTopic1(preferences.news_topic_1 || "");
+      setTopic2(preferences.news_topic_2 || "");
+    }
+  }, [preferences]);
+
   const handleSave = async () => {
+    if (!userId) return;
+
     setIsLoading(true);
     try {
-      // TODO: Save to backend
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await api.preferences.update(userId, {
+        news_topic_1: topic1 || null,
+        news_topic_2: topic2 || null,
+      });
       toast.success("News topics updated");
+      onUpdate();
     } catch (error) {
       toast.error("Failed to update news topics");
     } finally {

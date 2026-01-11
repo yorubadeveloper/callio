@@ -1,20 +1,40 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Settings } from "lucide-react";
 import { toast } from "sonner";
+import { api } from "@/lib/api";
+import type { UserPreferences } from "@/types/preferences";
 
-export function PreferencesForm() {
+interface PreferencesFormProps {
+  userId?: string;
+  preferences: UserPreferences | null;
+  onUpdate: () => void;
+}
+
+export function PreferencesForm({ userId, preferences: userPrefs, onUpdate }: PreferencesFormProps) {
   const [preferences, setPreferences] = useState({
     includeCalendar: true,
     includeWeather: true,
     includeNews: true,
   });
 
+  useEffect(() => {
+    if (userPrefs) {
+      setPreferences({
+        includeCalendar: userPrefs.include_calendar,
+        includeWeather: userPrefs.include_weather,
+        includeNews: userPrefs.include_news,
+      });
+    }
+  }, [userPrefs]);
+
   const handleToggle = async (key: keyof typeof preferences) => {
+    if (!userId) return;
+
     const newPreferences = {
       ...preferences,
       [key]: !preferences[key],
@@ -22,9 +42,13 @@ export function PreferencesForm() {
     setPreferences(newPreferences);
 
     try {
-      // TODO: Save to backend
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await api.preferences.update(userId, {
+        include_calendar: newPreferences.includeCalendar,
+        include_weather: newPreferences.includeWeather,
+        include_news: newPreferences.includeNews,
+      });
       toast.success("Preferences updated");
+      onUpdate();
     } catch (error) {
       // Revert on error
       setPreferences(preferences);

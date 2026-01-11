@@ -28,6 +28,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.refreshToken = account.refresh_token;
         token.expiresAt = account.expires_at;
       }
+      // Store email for later user creation
+      if (profile?.email) {
+        token.email = profile.email;
+      }
       return token;
     },
     async session({ session, token }) {
@@ -35,41 +39,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.accessToken = token.accessToken as string;
       session.refreshToken = token.refreshToken as string;
       session.expiresAt = token.expiresAt as number;
+      session.email = token.email as string;
       return session;
     },
-    async signIn({ account, profile }) {
-      // When user signs in, send tokens to backend
-      if (account && profile && profile.email) {
-        try {
-          const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
-          const apiKey = process.env.NEXT_PUBLIC_API_KEY || "";
-
-          // Check if user exists, if not create
-          const response = await fetch(`${apiUrl}/users`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-API-Key": apiKey,
-            },
-            body: JSON.stringify({
-              email: profile.email,
-              name: profile.name || "",
-              google_access_token: account.access_token,
-              google_refresh_token: account.refresh_token,
-              token_expires_at: account.expires_at
-                ? new Date(account.expires_at * 1000).toISOString()
-                : null,
-            }),
-          });
-
-          if (!response.ok && response.status !== 400) {
-            // 400 might mean user already exists, which is ok
-            console.error("Failed to create/update user in backend");
-          }
-        } catch (error) {
-          console.error("Error syncing user with backend:", error);
-        }
-      }
+    async signIn({ account, profile, user }) {
+      // Don't create user in backend on sign-in yet
+      // We'll create it after they provide phone number on first login
       return true;
     },
   },

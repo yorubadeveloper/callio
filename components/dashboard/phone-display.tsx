@@ -1,25 +1,40 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Phone, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { api } from "@/lib/api";
+import type { User } from "@/types/user";
 
-export function PhoneDisplay() {
+interface PhoneDisplayProps {
+  user: User | null;
+  onUpdate: () => void;
+}
+
+export function PhoneDisplay({ user, onUpdate }: PhoneDisplayProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [phoneNumber, setPhoneNumber] = useState("+1234567890");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    if (user?.phone_number) {
+      setPhoneNumber(user.phone_number);
+    }
+  }, [user]);
+
   const handleSave = async () => {
+    if (!user) return;
+
     setIsLoading(true);
     try {
-      // TODO: Save phone number to backend
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await api.users.update(user.id, { phone_number: phoneNumber });
       setIsEditing(false);
       toast.success("Phone number updated");
+      onUpdate();
     } catch (error) {
       toast.error("Failed to update phone number");
     } finally {
@@ -72,7 +87,9 @@ export function PhoneDisplay() {
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="text-lg font-mono">{phoneNumber}</div>
+            <div className="text-lg font-mono">
+              {phoneNumber || "No phone number set"}
+            </div>
             <Button size="sm" variant="outline" onClick={() => setIsEditing(true)}>
               Edit
             </Button>
