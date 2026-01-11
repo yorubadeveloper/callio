@@ -3,6 +3,7 @@ export interface UserPreferences {
   user_id: string;
   news_topic_1: string | null;
   news_topic_2: string | null;
+  additional_context: string | null;
   include_calendar: boolean;
   include_weather: boolean;
   include_news: boolean;
@@ -13,6 +14,7 @@ export interface UserPreferences {
 export interface PreferencesUpdate {
   news_topic_1?: string | null;
   news_topic_2?: string | null;
+  additional_context?: string | null;
   include_calendar?: boolean;
   include_weather?: boolean;
   include_news?: boolean;

@@ -6,6 +6,9 @@ import { PhoneDisplay } from "@/components/dashboard/phone-display";
 import { PreferencesForm } from "@/components/dashboard/preferences-form";
 import { NewsTopicsForm } from "@/components/dashboard/news-topics-form";
 import { PhoneSetupDialog } from "@/components/dashboard/phone-setup-dialog";
+import { ContextDialog } from "@/components/dashboard/context-dialog";
+import { Button } from "@/components/ui/button";
+import { FileText } from "lucide-react";
 import { api } from "@/lib/api";
 import type { User } from "@/types/user";
 import type { UserPreferences } from "@/types/preferences";
@@ -23,6 +26,7 @@ export function DashboardClient({ email, name, accessToken, refreshToken, expire
   const [isChecking, setIsChecking] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [preferences, setPreferences] = useState<UserPreferences | null>(null);
+  const [showContextDialog, setShowContextDialog] = useState(false);
 
   const loadUserData = async () => {
     try {
@@ -78,12 +82,32 @@ export function DashboardClient({ email, name, accessToken, refreshToken, expire
         onComplete={handleSetupComplete}
       />
 
+      <ContextDialog
+        open={showContextDialog}
+        onOpenChange={setShowContextDialog}
+        userId={user?.id}
+        currentContext={preferences?.additional_context}
+        onUpdate={loadUserData}
+      />
+
       <div className="w-full px-4 py-8 sm:py-16 space-y-8 max-w-6xl mx-auto">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground mt-1 text-sm sm:text-base">
-            Manage your daily briefing settings
-          </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold">Dashboard</h1>
+            <p className="text-muted-foreground mt-1 text-sm sm:text-base">
+              Manage your daily briefing settings
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowContextDialog(true)}
+            className="flex items-center gap-2"
+          >
+            <FileText className="h-4 w-4" />
+            <span className="hidden sm:inline">Provide Context</span>
+            <span className="sm:hidden">Context</span>
+          </Button>
         </div>
 
         <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
