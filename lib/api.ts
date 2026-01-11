@@ -63,8 +63,10 @@ async function fetchApi<T>(
 // Users API
 export const users = {
   create: async (data: {
+    phone_number?: string;
     email: string;
     name: string;
+    location?: string;
     google_access_token?: string;
     google_refresh_token?: string;
     token_expires_at?: string | null;
