@@ -5,6 +5,7 @@ import { CalendarStatus } from "@/components/dashboard/calendar-status";
 import { PhoneDisplay } from "@/components/dashboard/phone-display";
 import { PreferencesForm } from "@/components/dashboard/preferences-form";
 import { NewsTopicsForm } from "@/components/dashboard/news-topics-form";
+import { LanguageSelector } from "@/components/dashboard/language-selector";
 import { PhoneSetupDialog } from "@/components/dashboard/phone-setup-dialog";
 import { ContextDialog } from "@/components/dashboard/context-dialog";
 import { Button } from "@/components/ui/button";
@@ -121,6 +122,14 @@ export function DashboardClient({ email, name, accessToken, refreshToken, expire
             preferences={preferences}
             onUpdate={loadUserData}
           />
+          <LanguageSelector
+            userId={user?.id}
+            preferences={preferences}
+            onUpdate={loadUserData}
+          />
+        </div>
+
+        <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
           <PreferencesForm
             userId={user?.id}
             preferences={preferences}
