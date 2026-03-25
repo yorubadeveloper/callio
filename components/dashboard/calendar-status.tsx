@@ -9,19 +9,24 @@ import { useSession } from "next-auth/react";
 import { signIn } from "next-auth/react";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
+import type { User } from "@/types/user";
 
 interface CalendarStatusProps {
   userId?: string;
+  user?: User | null;
   onUpdate?: () => void;
 }
 
-export function CalendarStatus({ userId, onUpdate }: CalendarStatusProps) {
+export function CalendarStatus({ userId, user, onUpdate }: CalendarStatusProps) {
   const { data: session } = useSession();
-  const [isConnected, setIsConnected] = useState(!!session?.accessToken);
+  // Use backend's has_calendar_connected as source of truth
+  const isConnected = user?.has_calendar_connected ?? false;
   const [isLoading, setIsLoading] = useState(false);
 
   const handleConnect = async () => {
     setIsLoading(true);
+    // Re-auth with Google — the signIn callback in auth.ts will
+    // automatically sync the new tokens to the backend
     await signIn("google", { callbackUrl: "/dashboard" });
   };
 
@@ -34,7 +39,6 @@ export function CalendarStatus({ userId, onUpdate }: CalendarStatusProps) {
     setIsLoading(true);
     try {
       await api.users.disconnectCalendar(userId);
-      setIsConnected(false);
       toast.success("Calendar disconnected");
       onUpdate?.();
     } catch {

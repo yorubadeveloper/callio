@@ -6,6 +6,7 @@ declare module "next-auth" {
     refreshToken?: string;
     expiresAt?: number;
     email?: string;
+    needsTokenSync?: boolean;
   }
 }
 
@@ -15,5 +16,6 @@ declare module "next-auth/jwt" {
     refreshToken?: string;
     expiresAt?: number;
     email?: string;
+    needsTokenSync?: boolean;
   }
 }

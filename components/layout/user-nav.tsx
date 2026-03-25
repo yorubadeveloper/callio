@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { SignOut, Gear, User } from "@phosphor-icons/react/dist/ssr";
+import { SignOut, User } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 
 export function UserNav() {
@@ -51,12 +51,6 @@ export function UserNav() {
           <Link href="/dashboard" className="cursor-pointer">
             <User className="mr-2 h-4 w-4" />
             Dashboard
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/dashboard/account" className="cursor-pointer">
-            <Gear className="mr-2 h-4 w-4" />
-            Settings
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />

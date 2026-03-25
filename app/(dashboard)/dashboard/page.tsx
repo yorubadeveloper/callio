@@ -13,9 +13,6 @@ export default async function DashboardPage() {
     <DashboardClient
       email={session.email || session.user.email!}
       name={session.user.name || ""}
-      accessToken={session.accessToken}
-      refreshToken={session.refreshToken}
-      expiresAt={session.expiresAt}
     />
   );
 }

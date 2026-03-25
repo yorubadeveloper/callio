@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { CalendarStatus } from "@/components/dashboard/calendar-status";
 import { PhoneDisplay } from "@/components/dashboard/phone-display";
 import { PreferencesForm } from "@/components/dashboard/preferences-form";
 import { NewsTopicsForm } from "@/components/dashboard/news-topics-form";
 import { LanguageSelector } from "@/components/dashboard/language-selector";
 import { CallScheduleForm } from "@/components/dashboard/call-schedule-form";
-import { PhoneSetupDialog } from "@/components/dashboard/phone-setup-dialog";
 import { ContextDialog } from "@/components/dashboard/context-dialog";
 import { Button } from "@/components/ui/button";
 import { Article } from "@phosphor-icons/react/dist/ssr";
@@ -18,51 +17,52 @@ import type { UserPreferences } from "@/types/preferences";
 interface DashboardClientProps {
   email: string;
   name: string;
-  accessToken?: string;
-  refreshToken?: string;
-  expiresAt?: number;
 }
 
-export function DashboardClient({ email, name, accessToken, refreshToken, expiresAt }: DashboardClientProps) {
-  const [needsSetup, setNeedsSetup] = useState(false);
-  const [isChecking, setIsChecking] = useState(true);
+export function DashboardClient({ email, name }: DashboardClientProps) {
+  const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [preferences, setPreferences] = useState<UserPreferences | null>(null);
   const [showContextDialog, setShowContextDialog] = useState(false);
 
-  const loadUserData = async () => {
+  const loadUserData = useCallback(async () => {
     try {
-      // Try to get user by email
       const userData = await api.users.getByEmail(email);
       setUser(userData);
-      setNeedsSetup(false);
+
+      // Auto-detect and sync timezone on first load
+      if (userData.id) {
+        const browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        if (browserTz && userData.timezone !== browserTz) {
+          try {
+            await api.users.update(userData.id, { timezone: browserTz });
+          } catch {
+            // Non-critical, ignore
+          }
+        }
+      }
 
       // Load preferences
       try {
         const prefsData = await api.preferences.get(userData.id);
         setPreferences(prefsData);
-      } catch (error) {
-        console.log("No preferences found yet");
+      } catch {
+        // No preferences found yet
       }
-    } catch (error) {
-      // User doesn't exist, show setup dialog
-      setNeedsSetup(true);
+    } catch {
+      // User doesn't exist in backend yet — shouldn't happen with new flow
+      // but handle gracefully
+      setUser(null);
     } finally {
-      setIsChecking(false);
+      setIsLoading(false);
     }
-  };
+  }, [email]);
 
   useEffect(() => {
     loadUserData();
-  }, [email]);
+  }, [loadUserData]);
 
-  const handleSetupComplete = () => {
-    setNeedsSetup(false);
-    setIsChecking(true);
-    loadUserData();
-  };
-
-  if (isChecking) {
+  if (isLoading) {
     return (
       <div className="w-full px-6 py-12 space-y-8 max-w-6xl mx-auto">
         <div className="flex items-center justify-center py-12">
@@ -74,16 +74,6 @@ export function DashboardClient({ email, name, accessToken, refreshToken, expire
 
   return (
     <>
-      <PhoneSetupDialog
-        open={needsSetup}
-        email={email}
-        name={name}
-        accessToken={accessToken}
-        refreshToken={refreshToken}
-        expiresAt={expiresAt}
-        onComplete={handleSetupComplete}
-      />
-
       <ContextDialog
         open={showContextDialog}
         onOpenChange={setShowContextDialog}
@@ -112,7 +102,7 @@ export function DashboardClient({ email, name, accessToken, refreshToken, expire
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">
-          <CalendarStatus userId={user?.id} onUpdate={loadUserData} />
+          <CalendarStatus userId={user?.id} user={user} onUpdate={loadUserData} />
           <PhoneDisplay user={user} onUpdate={loadUserData} />
         </div>
 
