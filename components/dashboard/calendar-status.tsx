@@ -7,10 +7,17 @@ import { Badge } from "@/components/ui/badge";
 import { CalendarBlank, Check, X, Spinner } from "@phosphor-icons/react/dist/ssr";
 import { useSession } from "next-auth/react";
 import { signIn } from "next-auth/react";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
 
-export function CalendarStatus() {
+interface CalendarStatusProps {
+  userId?: string;
+  onUpdate?: () => void;
+}
+
+export function CalendarStatus({ userId, onUpdate }: CalendarStatusProps) {
   const { data: session } = useSession();
-  const [isConnected] = useState(!!session?.accessToken);
+  const [isConnected, setIsConnected] = useState(!!session?.accessToken);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleConnect = async () => {
@@ -19,10 +26,22 @@ export function CalendarStatus() {
   };
 
   const handleDisconnect = async () => {
+    if (!userId) {
+      toast.error("User not found");
+      return;
+    }
+
     setIsLoading(true);
-    // TODO: Implement disconnect logic
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsLoading(false);
+    try {
+      await api.users.disconnectCalendar(userId);
+      setIsConnected(false);
+      toast.success("Calendar disconnected");
+      onUpdate?.();
+    } catch {
+      toast.error("Failed to disconnect calendar");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

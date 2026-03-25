@@ -112,7 +112,7 @@ export function DashboardClient({ email, name, accessToken, refreshToken, expire
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">
-          <CalendarStatus />
+          <CalendarStatus userId={user?.id} onUpdate={loadUserData} />
           <PhoneDisplay user={user} onUpdate={loadUserData} />
         </div>
 
