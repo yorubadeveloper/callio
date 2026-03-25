@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Settings } from "lucide-react";
+import { Faders } from "@phosphor-icons/react/dist/ssr";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import type { UserPreferences } from "@/types/preferences";
@@ -60,18 +60,18 @@ export function PreferencesForm({ userId, preferences: userPrefs, onUpdate }: Pr
     <Card>
       <CardHeader>
         <div className="flex items-center gap-2">
-          <Settings className="h-5 w-5" />
-          <CardTitle>Briefing Preferences</CardTitle>
+          <Faders className="h-5 w-5" />
+          <CardTitle>Briefing Content</CardTitle>
         </div>
         <CardDescription>
           Choose what to include in your daily briefing
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6">
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <Label htmlFor="calendar">Calendar Events</Label>
-            <p className="text-sm text-muted-foreground">
+            <Label htmlFor="calendar" className="text-base font-medium">Calendar Events</Label>
+            <p className="text-sm text-muted-foreground font-light">
               Include today's calendar events
             </p>
           </div>
@@ -84,8 +84,8 @@ export function PreferencesForm({ userId, preferences: userPrefs, onUpdate }: Pr
 
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <Label htmlFor="weather">Weather</Label>
-            <p className="text-sm text-muted-foreground">
+            <Label htmlFor="weather" className="text-base font-medium">Weather</Label>
+            <p className="text-sm text-muted-foreground font-light">
               Include current weather forecast
             </p>
           </div>
@@ -98,8 +98,8 @@ export function PreferencesForm({ userId, preferences: userPrefs, onUpdate }: Pr
 
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <Label htmlFor="news">News Headlines</Label>
-            <p className="text-sm text-muted-foreground">
+            <Label htmlFor="news" className="text-base font-medium">News Headlines</Label>
+            <p className="text-sm text-muted-foreground font-light">
               Include news on your selected topics
             </p>
           </div>

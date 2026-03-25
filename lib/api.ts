@@ -1,5 +1,6 @@
 import type { User, UserUpdate, CalendarTokenUpdate } from "@/types/user";
 import type { UserPreferences, PreferencesUpdate } from "@/types/preferences";
+import type { CallSchedule, CallScheduleUpdate, CallLogList } from "@/types/schedule";
 import { ApiException } from "@/types/api";
 
 // Use Next.js API route as proxy (keeps API_KEY secure)
@@ -146,10 +147,38 @@ export const health = {
   },
 };
 
+// Schedule API
+export const schedule = {
+  get: async (userId: string): Promise<CallSchedule> => {
+    return fetchApi<CallSchedule>(`/schedule/${userId}`);
+  },
+
+  update: async (
+    userId: string,
+    data: CallScheduleUpdate
+  ): Promise<CallSchedule> => {
+    return fetchApi<CallSchedule>(`/schedule/${userId}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+  },
+
+  getLogs: async (
+    userId: string,
+    limit: number = 20,
+    offset: number = 0
+  ): Promise<CallLogList> => {
+    return fetchApi<CallLogList>(`/schedule/${userId}/logs`, {
+      params: { limit: String(limit), offset: String(offset) },
+    });
+  },
+};
+
 // Export all as api object
 export const api = {
   users,
   preferences,
   briefing,
   health,
+  schedule,
 };

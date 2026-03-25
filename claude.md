@@ -43,7 +43,7 @@ This project uses a **strict monochromatic design** - Black, White, and Grays on
 - **UI Components**: shadcn/ui
 - **Forms**: React Hook Form + Zod
 - **Authentication**: NextAuth.js (Google OAuth)
-- **Icons**: Lucide React
+- **Icons**: Phosphor Icons (`@phosphor-icons/react`, SSR imports from `@phosphor-icons/react/dist/ssr`)
 - **Notifications**: Sonner (toast)
 - **Theme**: next-themes (dark mode support)
 
@@ -217,7 +217,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 "use client";
 
 import * as React from "react";
-import { Moon, Sun } from "lucide-react";
+import { Sun, Moon } from "@phosphor-icons/react/dist/ssr";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 
@@ -231,8 +231,8 @@ export function ThemeToggle() {
       onClick={() => setTheme(theme === "light" ? "dark" : "light")}
       className="h-9 w-9"
     >
-      <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-      <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+      <Sun size={16} weight="fill" className="rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+      <Moon size={16} weight="fill" className="absolute rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
       <span className="sr-only">Toggle theme</span>
     </Button>
   );

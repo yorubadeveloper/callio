@@ -1,41 +1,42 @@
 const steps = [
   {
-    number: "1",
-    title: "Sign Up",
-    description: "Connect your Google Calendar and set preferences",
+    number: "01",
+    title: "Connect",
+    description: "Securely link your Google Calendar and personalize your preferences.",
   },
   {
-    number: "2",
-    title: "Customize",
-    description: "Choose news topics and add your location",
+    number: "02",
+    title: "Configure",
+    description: "Select news topics and set your location for precise updates.",
   },
   {
-    number: "3",
-    title: "Call & Listen",
-    description: "Dial your number to hear your briefing",
+    number: "03",
+    title: "Communicate",
+    description: "Call anytime or schedule a daily briefing. It's that simple.",
   },
 ];
 
 export function HowItWorks() {
   return (
-    <section className="border-t border-border bg-muted/30 py-24 w-full">
-      <div className="mx-auto max-w-5xl px-4">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-bold sm:text-4xl">
-            How It Works
+    <section className="py-32 w-full bg-muted/20">
+      <div className="mx-auto max-w-6xl px-6">
+        <div className="mx-auto max-w-2xl text-center mb-24">
+          <h2 className="text-3xl font-medium tracking-tight sm:text-4xl">
+            Seamless Integration
           </h2>
-          <p className="mt-4 text-muted-foreground">
-            Three simple steps to your daily briefing
-          </p>
         </div>
-        <div className="mx-auto mt-16 grid gap-8 sm:grid-cols-3">
+        <div className="grid gap-16 md:grid-cols-3">
           {steps.map((step) => (
-            <div key={step.number} className="flex flex-col items-center text-center">
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full border-2 border-foreground">
-                <span className="text-xl font-bold">{step.number}</span>
+            <div key={step.number} className="relative flex flex-col items-start space-y-4">
+              <span className="text-6xl font-thin text-muted-foreground/20 absolute -top-10 -left-4 select-none">
+                {step.number}
+              </span>
+              <div className="relative z-10 pt-2">
+                <h3 className="text-xl font-medium mb-2">{step.title}</h3>
+                <p className="text-base text-muted-foreground font-light leading-relaxed">
+                  {step.description}
+                </p>
               </div>
-              <h3 className="mb-2 text-lg font-semibold">{step.title}</h3>
-              <p className="text-sm text-muted-foreground">{step.description}</p>
             </div>
           ))}
         </div>

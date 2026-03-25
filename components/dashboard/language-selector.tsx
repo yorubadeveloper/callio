@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Languages } from "lucide-react";
+import { Translate } from "@phosphor-icons/react/dist/ssr";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import type { UserPreferences } from "@/types/preferences";
@@ -69,7 +69,7 @@ export function LanguageSelector({ userId, preferences, onUpdate }: LanguageSele
     <Card>
       <CardHeader>
         <div className="flex items-center gap-2">
-          <Languages className="h-5 w-5" />
+          <Translate className="h-5 w-5" />
           <CardTitle>Language</CardTitle>
         </div>
         <CardDescription>
@@ -78,7 +78,7 @@ export function LanguageSelector({ userId, preferences, onUpdate }: LanguageSele
       </CardHeader>
       <CardContent>
         <div className="space-y-2">
-          <Label htmlFor="language">Briefing Language</Label>
+          <Label htmlFor="language" className="text-base font-medium">Briefing Language</Label>
           <Select value={language} onValueChange={handleLanguageChange}>
             <SelectTrigger id="language">
               <SelectValue placeholder="Select language" />
@@ -91,7 +91,7 @@ export function LanguageSelector({ userId, preferences, onUpdate }: LanguageSele
               ))}
             </SelectContent>
           </Select>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-muted-foreground font-light">
             Callio will speak to you in the selected language during your briefings.
           </p>
         </div>

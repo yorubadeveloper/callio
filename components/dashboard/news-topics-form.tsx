@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Newspaper, Loader2 } from "lucide-react";
+import { NewspaperClipping, Spinner } from "@phosphor-icons/react/dist/ssr";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import type { UserPreferences } from "@/types/preferences";
@@ -50,14 +50,14 @@ export function NewsTopicsForm({ userId, preferences, onUpdate }: NewsTopicsForm
     <Card>
       <CardHeader>
         <div className="flex items-center gap-2">
-          <Newspaper className="h-5 w-5" />
+          <NewspaperClipping className="h-5 w-5" />
           <CardTitle>News Topics</CardTitle>
         </div>
         <CardDescription>
           Choose up to 2 topics for your daily news briefing
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6">
         <div className="space-y-2">
           <Label htmlFor="topic1">Topic 1</Label>
           <Input
@@ -78,11 +78,11 @@ export function NewsTopicsForm({ userId, preferences, onUpdate }: NewsTopicsForm
             disabled={isLoading}
           />
         </div>
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-muted-foreground font-light">
           Suggestions: AI, Tech, Startups, Crypto, Business, Politics, Sports
         </p>
-        <Button size="sm" onClick={handleSave} disabled={isLoading}>
-          {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        <Button size="sm" onClick={handleSave} disabled={isLoading} className="rounded-full">
+          {isLoading && <Spinner className="mr-2 h-4 w-4 animate-spin" />}
           Save Topics
         </Button>
       </CardContent>

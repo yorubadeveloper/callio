@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Phone, Loader2 } from "lucide-react";
+import { PhoneCall, Spinner } from "@phosphor-icons/react/dist/ssr";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import type { User } from "@/types/user";
@@ -46,7 +46,7 @@ export function PhoneDisplay({ user, onUpdate }: PhoneDisplayProps) {
     <Card>
       <CardHeader>
         <div className="flex items-center gap-2">
-          <Phone className="h-5 w-5" />
+          <PhoneCall className="h-5 w-5" />
           <CardTitle>Phone Number</CardTitle>
         </div>
         <CardDescription>
@@ -71,15 +71,16 @@ export function PhoneDisplay({ user, onUpdate }: PhoneDisplayProps) {
               </p>
             </div>
             <div className="flex gap-2">
-              <Button size="sm" onClick={handleSave} disabled={isLoading}>
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              <Button size="sm" onClick={handleSave} disabled={isLoading} className="rounded-full">
+                {isLoading && <Spinner className="mr-2 h-4 w-4 animate-spin" />}
                 Save
               </Button>
               <Button
                 size="sm"
-                variant="outline"
+                variant="ghost"
                 onClick={() => setIsEditing(false)}
                 disabled={isLoading}
+                className="rounded-full"
               >
                 Cancel
               </Button>
@@ -87,10 +88,10 @@ export function PhoneDisplay({ user, onUpdate }: PhoneDisplayProps) {
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="text-lg font-mono">
+            <div className="text-xl font-mono tracking-tight text-foreground">
               {phoneNumber || "No phone number set"}
             </div>
-            <Button size="sm" variant="outline" onClick={() => setIsEditing(true)}>
+            <Button size="sm" variant="outline" onClick={() => setIsEditing(true)} className="rounded-full">
               Edit
             </Button>
           </div>

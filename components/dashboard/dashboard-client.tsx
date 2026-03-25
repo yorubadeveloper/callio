@@ -6,10 +6,11 @@ import { PhoneDisplay } from "@/components/dashboard/phone-display";
 import { PreferencesForm } from "@/components/dashboard/preferences-form";
 import { NewsTopicsForm } from "@/components/dashboard/news-topics-form";
 import { LanguageSelector } from "@/components/dashboard/language-selector";
+import { CallScheduleForm } from "@/components/dashboard/call-schedule-form";
 import { PhoneSetupDialog } from "@/components/dashboard/phone-setup-dialog";
 import { ContextDialog } from "@/components/dashboard/context-dialog";
 import { Button } from "@/components/ui/button";
-import { FileText } from "lucide-react";
+import { Article } from "@phosphor-icons/react/dist/ssr";
 import { api } from "@/lib/api";
 import type { User } from "@/types/user";
 import type { UserPreferences } from "@/types/preferences";
@@ -63,9 +64,9 @@ export function DashboardClient({ email, name, accessToken, refreshToken, expire
 
   if (isChecking) {
     return (
-      <div className="w-full px-4 py-8 sm:py-16 space-y-8 max-w-6xl mx-auto">
+      <div className="w-full px-6 py-12 space-y-8 max-w-6xl mx-auto">
         <div className="flex items-center justify-center py-12">
-          <p className="text-muted-foreground">Loading...</p>
+          <p className="text-muted-foreground font-light">Loading...</p>
         </div>
       </div>
     );
@@ -91,11 +92,11 @@ export function DashboardClient({ email, name, accessToken, refreshToken, expire
         onUpdate={loadUserData}
       />
 
-      <div className="w-full px-4 py-8 sm:py-16 space-y-8 max-w-6xl mx-auto">
-        <div className="flex items-start justify-between gap-4">
+      <div className="w-full px-6 py-12 space-y-12 max-w-6xl mx-auto">
+        <div className="flex items-end justify-between gap-4 border-b border-border pb-6">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold">Dashboard</h1>
-            <p className="text-muted-foreground mt-1 text-sm sm:text-base">
+            <h1 className="text-3xl font-medium tracking-tight">Dashboard</h1>
+            <p className="text-muted-foreground mt-2 font-light">
               Manage your daily briefing settings
             </p>
           </div>
@@ -103,20 +104,19 @@ export function DashboardClient({ email, name, accessToken, refreshToken, expire
             variant="outline"
             size="sm"
             onClick={() => setShowContextDialog(true)}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 h-9 rounded-full px-4"
           >
-            <FileText className="h-4 w-4" />
-            <span className="hidden sm:inline">Provide Context</span>
-            <span className="sm:hidden">Context</span>
+            <Article className="h-4 w-4" />
+            <span className="hidden sm:inline">Context</span>
           </Button>
         </div>
 
-        <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
+        <div className="grid gap-6 lg:grid-cols-2">
           <CalendarStatus />
           <PhoneDisplay user={user} onUpdate={loadUserData} />
         </div>
 
-        <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
+        <div className="grid gap-6 lg:grid-cols-2">
           <NewsTopicsForm
             userId={user?.id}
             preferences={preferences}
@@ -129,12 +129,13 @@ export function DashboardClient({ email, name, accessToken, refreshToken, expire
           />
         </div>
 
-        <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
+        <div className="grid gap-6 lg:grid-cols-2">
           <PreferencesForm
             userId={user?.id}
             preferences={preferences}
             onUpdate={loadUserData}
           />
+          <CallScheduleForm userId={user?.id} />
         </div>
       </div>
     </>

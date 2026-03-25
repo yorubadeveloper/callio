@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { GoogleSignInButton } from "@/components/auth/google-signin-button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Phone } from "lucide-react";
+import { Phone } from "@phosphor-icons/react/dist/ssr";
 
 export default function SignInPage() {
   return (
@@ -10,7 +10,7 @@ export default function SignInPage() {
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-2">
             <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-foreground">
-              <Phone className="h-6 w-6" />
+              <Phone size={24} weight="light" />
             </div>
           </div>
           <CardTitle className="text-xl sm:text-2xl font-bold">Welcome to Callio</CardTitle>

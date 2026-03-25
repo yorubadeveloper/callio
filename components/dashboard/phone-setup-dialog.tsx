@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2 } from "lucide-react";
+import { Spinner } from "@phosphor-icons/react/dist/ssr";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 
@@ -93,7 +93,7 @@ export function PhoneSetupDialog({ open, email, name, accessToken, refreshToken,
               required
               disabled={isLoading}
             />
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground font-light">
               Use E.164 format (e.g., +1234567890)
             </p>
           </div>
@@ -108,13 +108,13 @@ export function PhoneSetupDialog({ open, email, name, accessToken, refreshToken,
               placeholder="New York"
               disabled={isLoading}
             />
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground font-light">
               For weather updates in your briefings
             </p>
           </div>
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          <Button type="submit" className="w-full rounded-full" disabled={isLoading}>
+            {isLoading && <Spinner className="mr-2 h-4 w-4 animate-spin" />}
             Complete Setup
           </Button>
         </form>

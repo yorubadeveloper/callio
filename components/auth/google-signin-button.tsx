@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { Spinner } from "@phosphor-icons/react/dist/ssr";
 
 export function GoogleSignInButton() {
   const [isLoading, setIsLoading] = useState(false);
@@ -20,7 +20,7 @@ export function GoogleSignInButton() {
       className="w-full"
       disabled={isLoading}
     >
-      {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+      {isLoading && <Spinner size={16} className="mr-2 animate-spin" />}
       Sign in with Google
     </Button>
   );

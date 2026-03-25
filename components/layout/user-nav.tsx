@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, Settings, User } from "lucide-react";
+import { SignOut, Gear, User } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 
 export function UserNav() {
@@ -55,7 +55,7 @@ export function UserNav() {
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/dashboard/account" className="cursor-pointer">
-            <Settings className="mr-2 h-4 w-4" />
+            <Gear className="mr-2 h-4 w-4" />
             Settings
           </Link>
         </DropdownMenuItem>
@@ -67,7 +67,7 @@ export function UserNav() {
             signOut({ callbackUrl: "/" });
           }}
         >
-          <LogOut className="mr-2 h-4 w-4" />
+          <SignOut className="mr-2 h-4 w-4" />
           Sign out
         </DropdownMenuItem>
       </DropdownMenuContent>
