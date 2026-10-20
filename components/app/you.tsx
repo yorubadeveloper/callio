@@ -1,18 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { Bell, CaretRight, DownloadSimple, PlugsConnected, SignOut, Trash, X } from "@phosphor-icons/react";
+import { CaretRight, DownloadSimple, PlugsConnected, SignOut, Trash, X } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { LANGUAGES } from "@/lib/languages";
 import { api, ApiError } from "@/lib/api";
-import { disablePush, enablePush, pushEnabled, pushSupported } from "@/lib/push";
 import type { Detail, Tone, User } from "@/lib/types";
 import { CookieSettingsButton } from "@/components/analytics/analytics";
 import { CityInput } from "./city-input";
+import { NotificationSetup } from "./notification-setup";
 import { TimezoneSelect } from "./select-menu";
 import { btn, Chip, Field, inputClass, PageTitle, Segmented, Sheet } from "./ui";
 import { Spinner } from "@/components/brand/logo-loader";
@@ -277,46 +277,11 @@ export function YouView({ user: initial }: { user: User }) {
 }
 
 function Notifications() {
-  const [on, setOn] = useState<boolean | null>(null);
-  const [supported, setSupported] = useState(true);
-  const [busy, setBusy] = useState(false);
-  useEffect(() => {
-    void pushEnabled().then((v) => {
-      setSupported(pushSupported());
-      setOn(v);
-    });
-  }, []);
   return (
     <section>
       <h2 className="text-[13px] font-semibold uppercase tracking-wider text-ink-soft">Notifications</h2>
-      <div className="mt-3 rounded-[24px] bg-plate p-5 ring-1 ring-line">
-        <p className="flex items-center gap-2 text-[15px] font-semibold">
-          <Bell weight="fill" className="text-amber" /> Let agents ring you
-        </p>
-        <p className="mt-1 text-[14px] text-ink-soft">
-          {supported
-            ? "For scheduled calls and reminders, even when Callio is closed."
-            : "This browser can't show call notifications. On iPhone, add Callio to your Home Screen first."}
-        </p>
-        {supported && on !== null && (
-          <button
-            type="button"
-            disabled={busy}
-            onClick={async () => {
-              setBusy(true);
-              if (on) {
-                await disablePush();
-                setOn(false);
-              } else {
-                setOn((await enablePush()) === "granted");
-              }
-              setBusy(false);
-            }}
-            className={cn(on ? btn.soft : btn.primary, "mt-4 h-11")}
-          >
-            {busy && <Spinner />} {on ? "Turn off" : "Turn on"}
-          </button>
-        )}
+      <div className="mt-3">
+        <NotificationSetup />
       </div>
     </section>
   );

@@ -34,6 +34,20 @@ const jetbrains = JetBrains_Mono({
 const description =
   "Personal AI voice agents with names, voices and memory. They call you with what matters, answer when you call, and get things done for you. Free to start.";
 
+// CSS width, height and pixel ratio of the iPhones with a launch screen in public/splash.
+const SPLASH: [number, number, number][] = [
+  [440, 956, 3],
+  [402, 874, 3],
+  [430, 932, 3],
+  [393, 852, 3],
+  [428, 926, 3],
+  [390, 844, 3],
+  [375, 812, 3],
+  [414, 896, 3],
+  [414, 896, 2],
+  [375, 667, 2],
+];
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://callio.site"),
   title: {
@@ -69,7 +83,16 @@ export const metadata: Metadata = {
   },
   robots: { index: true, follow: true },
   formatDetection: { telephone: false },
-  appleWebApp: { capable: true, title: "Callio", statusBarStyle: "default" },
+  appleWebApp: {
+    capable: true,
+    title: "Callio",
+    statusBarStyle: "default",
+    // iPhone launch screens: the logo on Callio's background instead of a white flash.
+    startupImage: SPLASH.map(([w, h, dpr]) => ({
+      url: `/splash/${w * dpr}x${h * dpr}.png`,
+      media: `(device-width: ${w}px) and (device-height: ${h}px) and (-webkit-device-pixel-ratio: ${dpr}) and (orientation: portrait)`,
+    })),
+  },
   icons: { apple: "/brand/apple-touch-icon.png" },
 };
 
