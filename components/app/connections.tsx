@@ -2,11 +2,21 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { CalendarBlank, CheckCircle } from "@phosphor-icons/react";
+import {
+  CalendarBlank,
+  CheckCircle,
+  EnvelopeSimple,
+  MicrosoftOutlookLogo,
+  NotionLogo,
+  SpotifyLogo,
+  WhatsappLogo,
+  CheckSquare,
+  type Icon,
+} from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { api, ApiError } from "@/lib/api";
 import type { User } from "@/lib/types";
-import { btn } from "./ui";
+import { btn, PageTitle } from "./ui";
 import { Spinner } from "@/components/brand/logo-loader";
 
 const RESULT: Record<string, { tone: "good" | "bad"; text: string }> = {
@@ -19,8 +29,80 @@ const RESULT: Record<string, { tone: "good" | "bad"; text: string }> = {
   cancelled: { tone: "bad", text: "No problem. You can connect your calendar whenever you like." },
 };
 
-/** Optional data sources, connected separately from sign-in and removable any time. */
-export function Connections({ user, result }: { user: User; result?: string }) {
+const SOON: { name: string; what: string; icon: Icon; tint: string }[] = [
+  {
+    name: "Gmail",
+    what: "Hear what's important in your inbox, and send quick replies.",
+    icon: EnvelopeSimple,
+    tint: "bg-coral/25",
+  },
+  {
+    name: "Outlook Calendar",
+    what: "Your work calendar, for briefings and moving meetings.",
+    icon: MicrosoftOutlookLogo,
+    tint: "bg-peri/30",
+  },
+  {
+    name: "WhatsApp",
+    what: "Call your agent from WhatsApp, anywhere in the world.",
+    icon: WhatsappLogo,
+    tint: "bg-teal/25",
+  },
+  { name: "Notion", what: "Read and add to your notes and to-do lists.", icon: NotionLogo, tint: "bg-ink/[0.08]" },
+  { name: "Todoist", what: "Add tasks by voice and hear what's due.", icon: CheckSquare, tint: "bg-coral/20" },
+  { name: "Spotify", what: "Play something to match your mood after a call.", icon: SpotifyLogo, tint: "bg-teal/20" },
+];
+
+/** Apps and data sources agents can use. Each connects separately from sign-in and can be removed any time. */
+export function ConnectionsView({ user, result }: { user: User; result?: string }) {
+  const connected = Boolean(user.integrations?.google_calendar?.connected);
+  return (
+    <>
+      <PageTitle
+        title="Connections"
+        subtitle="Apps your agents can use for you. Connect only what you want, and remove it any time."
+      />
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <section>
+          <h2 className="text-[13px] font-semibold uppercase tracking-wider text-ink-soft">
+            {connected ? "Connected" : "Available now"}
+          </h2>
+          <div className="mt-3">
+            <GoogleCalendar user={user} result={result} />
+          </div>
+        </section>
+        <section>
+          <h2 className="text-[13px] font-semibold uppercase tracking-wider text-ink-soft">Coming soon</h2>
+          <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+            {SOON.map((app) => (
+              <li key={app.name} className="flex items-start gap-3 rounded-[22px] bg-plate p-4 ring-1 ring-line">
+                <span className={cn("grid size-10 shrink-0 place-items-center rounded-2xl text-[20px]", app.tint)}>
+                  <app.icon weight="fill" />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-[15px] font-semibold">{app.name}</p>
+                  <p className="mt-0.5 text-[13px] leading-snug text-ink-soft">{app.what}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-4 text-[13px] text-ink-soft">
+            Want something else connected?{" "}
+            <a
+              href="mailto:hello@callio.site?subject=Connection%20request"
+              className="font-semibold text-ink underline-offset-4 hover:underline"
+            >
+              Tell us
+            </a>
+            .
+          </p>
+        </section>
+      </div>
+    </>
+  );
+}
+
+function GoogleCalendar({ user, result }: { user: User; result?: string }) {
   const router = useRouter();
   const calendar = user.integrations?.google_calendar;
   const [busy, setBusy] = useState(false);
@@ -33,7 +115,7 @@ export function Connections({ user, result }: { user: User; result?: string }) {
     try {
       const { url } = await api<{ url: string }>("/integrations/google-calendar/start", {
         method: "POST",
-        body: { return_to: "/app/you" },
+        body: { return_to: "/app/connections" },
       });
       window.location.assign(url);
     } catch (err) {
@@ -47,7 +129,7 @@ export function Connections({ user, result }: { user: User; result?: string }) {
     setError(null);
     try {
       await api("/integrations/google-calendar", { method: "DELETE" });
-      router.replace("/app/you");
+      router.replace("/app/connections");
       router.refresh();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Couldn't disconnect. Try again.");
@@ -57,8 +139,7 @@ export function Connections({ user, result }: { user: User; result?: string }) {
   };
 
   return (
-    <section id="connections">
-      <h2 className="text-[13px] font-semibold uppercase tracking-wider text-ink-soft">Connections</h2>
+    <div id="google-calendar">
       {message && (
         <p
           role="status"
@@ -70,7 +151,7 @@ export function Connections({ user, result }: { user: User; result?: string }) {
           {message.text}
         </p>
       )}
-      <div className="mt-3 rounded-[24px] bg-plate p-5 ring-1 ring-line">
+      <div className={cn("rounded-[24px] bg-plate p-5 ring-1 ring-line", message && "mt-3")}>
         <div className="flex items-start gap-3">
           <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-peri/30 text-[22px]">
             <CalendarBlank weight="fill" />
@@ -112,6 +193,6 @@ export function Connections({ user, result }: { user: User; result?: string }) {
           Disconnecting deletes our access straight away.
         </p>
       </div>
-    </section>
+    </div>
   );
 }

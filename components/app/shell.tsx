@@ -12,6 +12,7 @@ import {
   type Icon,
   Monitor,
   SidebarSimple,
+  PlugsConnected,
   UserCircle,
   UsersThree,
 } from "@phosphor-icons/react";
@@ -42,6 +43,7 @@ const GROUPS: { label: string; items: NavItem[] }[] = [
     items: [
       { href: "/app/memory", label: "Memory", icon: Brain, tab: true },
       { href: "/app/tasks", label: "Tasks", icon: Monitor },
+      { href: "/app/connections", label: "Connections", icon: PlugsConnected },
     ],
   },
   {

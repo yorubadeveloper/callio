@@ -106,7 +106,6 @@ export function MemoryBoard({
         <div className="space-y-8">
           {agents.map((a) => (
             <div key={a.id}>
-              {" "}
               <MemoryList
                 title={`Only ${a.name} knows`}
                 items={memories.filter((m) => m.agent_id === a.id)}

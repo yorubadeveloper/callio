@@ -6,9 +6,10 @@ import { cn } from "@/lib/utils";
 import { AgentFace } from "@/components/landing/agent-face";
 import type { HairStyle } from "@/components/landing/agents";
 import { agentProfile } from "@/lib/agents/catalog";
-import { PERSONALITIES, VOICES } from "@/lib/agents/personalize";
+import { PERSONALITIES } from "@/lib/agents/personalize";
 import type { AgentLook, PersonalityId } from "@/lib/types";
 import { Field, inputClass } from "./ui";
+import { VoicePicker } from "./voice-preview";
 
 export interface AgentDraft {
   template: string;
@@ -113,26 +114,9 @@ export function AgentEditor({ draft, onChange }: { draft: AgentDraft; onChange: 
 
       <div>
         <p className="text-[14px] font-semibold text-ink">Voice</p>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {VOICES.map((v) => (
-            <button
-              key={v.id}
-              type="button"
-              aria-pressed={draft.voice === v.id}
-              onClick={() => set({ voice: v.id })}
-              className={cn(
-                "flex min-h-11 flex-col items-start justify-center rounded-2xl px-3.5 py-2 text-left transition-all active:scale-[0.97]",
-                draft.voice === v.id ? "bg-ink text-page" : "bg-ink/[0.06] text-ink hover:bg-ink/10",
-              )}
-            >
-              <span className="text-[14px] font-semibold leading-tight">{v.id}</span>
-              <span
-                className={cn("text-[12px] leading-tight", draft.voice === v.id ? "text-page/70" : "text-ink-soft")}
-              >
-                {v.hint}
-              </span>
-            </button>
-          ))}
+        <p className="mt-0.5 text-[13px] text-ink-soft">Tap a voice to hear it.</p>
+        <div className="mt-3">
+          <VoicePicker value={draft.voice} onChange={(voice) => set({ voice })} />
         </div>
       </div>
 
