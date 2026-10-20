@@ -20,13 +20,13 @@ type StepId = (typeof STEPS)[number];
 
 export const GOALS = [
   { id: "mornings", label: "Start my day right", template: "laura" },
-  { id: "meetings", label: "Be ready for meetings", template: "juno" },
+  { id: "meetings", label: "Be ready for meetings", template: "maya" },
   { id: "habits", label: "Stick to my goals", template: "kemi" },
   { id: "family", label: "Check in on family", template: "ada" },
   { id: "language", label: "Practise a language", template: "mateo" },
   { id: "errands", label: "Get things done for me", template: "theo" },
-  { id: "evenings", label: "Wind down at night", template: "bea" },
-  { id: "inbox", label: "Stay on top of email", template: "noor" },
+  { id: "evenings", label: "Wind down at night", template: "zoe" },
+  { id: "inbox", label: "Stay on top of email", template: "grace" },
 ] as const;
 
 export const LANGUAGES = [

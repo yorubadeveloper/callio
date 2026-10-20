@@ -150,22 +150,22 @@ function CallButton({
 
 const IN_CALL_LINES = [
   { who: "You", text: "Move my 3pm to tomorrow, and let Dana know." },
-  { who: "Juno", text: "Done. It's Thursday at 3, and I've emailed Dana." },
+  { who: "Maya", text: "Done. It's Thursday at 3, and I've emailed Dana." },
   { who: "You", text: "Remind me to bring the contract." },
-  { who: "Juno", text: "I'll call you at 2:50 with it." },
+  { who: "Maya", text: "I'll call you at 2:50 with it." },
 ];
 
 export function InCallScreen({ active }: { active: boolean }) {
-  const juno = agent("Juno");
+  const maya = agent("Maya");
   const timer = useCallTimer(38);
   return (
     <div className="flex size-full flex-col bg-[#161616] text-white">
       <StatusBar dark />
       <div className="flex flex-col items-center pt-6">
         <span className="size-16 overflow-hidden rounded-full">
-          <AgentFace agent={juno} className="size-full" />
+          <AgentFace agent={maya} className="size-full" />
         </span>
-        <p className="mt-3 font-display text-[26px] leading-none font-medium tracking-[-0.03em]">Juno</p>
+        <p className="mt-3 font-display text-[26px] leading-none font-medium tracking-[-0.03em]">Maya</p>
         <p className="mt-1.5 font-mono text-[12px] text-white/60">{timer}</p>
       </div>
       <div className="mt-6 flex flex-1 flex-col gap-3 px-5">

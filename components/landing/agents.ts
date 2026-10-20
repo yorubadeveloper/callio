@@ -52,7 +52,7 @@ export const AGENTS: Agent[] = [
     face: { tile: CORAL_TINT, skin: TEAL, hair: "puffs", hairColor: INK, shirt: "#FFFFFF" },
   },
   {
-    name: "Juno",
+    name: "Maya",
     role: "Meeting prep",
     pitch: "Ten minutes before each meeting, I call with who's in it and what you promised them.",
     schedule: "Before meetings",
@@ -73,7 +73,7 @@ export const AGENTS: Agent[] = [
     face: { tile: TEAL_TINT, skin: PERI, hair: "none", hairColor: INK, shirt: AMBER, glasses: true },
   },
   {
-    name: "Noor",
+    name: "Grace",
     role: "Inbox reader",
     pitch: "I read you what landed overnight and draft the replies while you drive.",
     schedule: "Weekdays · 8:15",
@@ -87,14 +87,14 @@ export const AGENTS: Agent[] = [
     face: { tile: CORAL_TINT, skin: AMBER, hair: "flat", hairColor: PERI, shirt: INK },
   },
   {
-    name: "Bea",
+    name: "Zoe",
     role: "Wind-down",
     pitch: "A short evening call to close the day: what went well, and what's first tomorrow.",
     schedule: "Daily · 21:30",
     face: { tile: TEAL_TINT, skin: AMBER, hair: "curls", hairColor: CORAL, shirt: PERI },
   },
   {
-    name: "Sol",
+    name: "Leo",
     role: "Travel desk",
     pitch: "Gate changes, delays, and the taxi you forgot to book, sorted before you land.",
     schedule: "On trips",

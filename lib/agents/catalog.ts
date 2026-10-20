@@ -34,7 +34,7 @@ const PERSONAS: Record<string, Persona> = {
     focus: ["conversation", "memory", "recaps"],
     opening: "Greet them kindly and ask how their day has been. Let them talk.",
   },
-  Juno: {
+  Maya: {
     personality: "sharp, calm and well-prepared",
     voice: "Kore",
     focus: ["briefing", "memory", "scheduling"],
@@ -52,7 +52,7 @@ const PERSONAS: Record<string, Persona> = {
     focus: ["conversation"],
     opening: "Ask which language they want to practise today, then switch to it and keep it simple.",
   },
-  Noor: {
+  Grace: {
     personality: "clear, efficient and discreet",
     voice: "Kore",
     focus: ["briefing", "recaps"],
@@ -64,13 +64,13 @@ const PERSONAS: Record<string, Persona> = {
     focus: ["scheduling", "memory"],
     opening: "Say what's due, when, and how much, then ask if they want a reminder closer to the date.",
   },
-  Bea: {
+  Zoe: {
     personality: "soft-spoken, reflective and kind",
     voice: "Leda",
     focus: ["conversation", "scheduling"],
     opening: "Ask what went well today before anything else.",
   },
-  Sol: {
+  Leo: {
     personality: "calm under pressure, quick and resourceful",
     voice: "Fenrir",
     focus: ["answers", "computer", "scheduling"],

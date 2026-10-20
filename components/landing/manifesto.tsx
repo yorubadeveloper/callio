@@ -10,10 +10,10 @@ const TEXT =
 
 // Faces drifting around the paragraph, at different depths.
 const DRIFTERS = [
-  { name: "Noor", className: "left-[4%] top-[8%] size-14 sm:size-20", depth: 120 },
+  { name: "Grace", className: "left-[4%] top-[8%] size-14 sm:size-20", depth: 120 },
   { name: "Ravi", className: "right-[6%] top-[14%] size-10 sm:size-14", depth: 60 },
-  { name: "Bea", className: "left-[10%] bottom-[10%] size-10 sm:size-16", depth: 90 },
-  { name: "Sol", className: "right-[3%] bottom-[18%] size-14 sm:size-20", depth: 150 },
+  { name: "Zoe", className: "left-[10%] bottom-[10%] size-10 sm:size-16", depth: 90 },
+  { name: "Leo", className: "right-[3%] bottom-[18%] size-14 sm:size-20", depth: 150 },
 ];
 
 export function Manifesto() {

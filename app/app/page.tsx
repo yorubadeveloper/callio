@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Brain, CalendarBlank, Plus, Sparkle } from "@phosphor-icons/react/dist/ssr";
+import { ArrowRight, Brain, CalendarBlank, Phone, Plus, Sparkle } from "@phosphor-icons/react/dist/ssr";
 import { AgentCard } from "@/components/app/agent-card";
 import { AgentFace } from "@/components/landing/agent-face";
 import { personalize } from "@/lib/agents/personalize";
@@ -22,6 +22,7 @@ export default async function HomePage() {
   ]);
   const people = agents.map(personalize);
   const byId = new Map(people.map((a) => [a.id, a]));
+  const featured = (calls[0] && byId.get(calls[0].agent_id)) || people[0];
   const lastTalked = (id: string) => {
     const c = calls.find((x) => x.agent_id === id);
     return c ? when(c.started_at, user.timezone, user.locale).toLowerCase() : null;
@@ -35,7 +36,8 @@ export default async function HomePage() {
 
   return (
     <div className="space-y-10">
-      <header>
+      {/* phone: a quiet greeting */}
+      <header className="lg:hidden">
         <p className="text-[15px] text-ink-soft">{greeting(user.timezone)},</p>
         <h1 className="font-display text-[clamp(2.4rem,8vw,3.5rem)] leading-[1] font-medium tracking-[-0.045em]">
           {name}
@@ -48,6 +50,55 @@ export default async function HomePage() {
           {` · ${highlights.memories} things remembered`}
         </p>
       </header>
+
+      {/* desktop: greeting plus one tap to the agent you talk to most */}
+      {featured && (
+        <section className="relative hidden overflow-hidden rounded-[32px] bg-[#121212] p-10 text-[#F3F2EE] lg:block">
+          <div aria-hidden className="pointer-events-none absolute inset-0">
+            <div
+              className="aurora-a absolute -right-24 -top-32 size-[28rem] rounded-full opacity-40 blur-[90px]"
+              style={{ background: featured.face.skin }}
+            />
+            <div
+              className="aurora-b absolute -bottom-40 right-1/3 size-[22rem] rounded-full opacity-25 blur-[90px]"
+              style={{ background: featured.face.tile }}
+            />
+          </div>
+          <div className="relative flex items-center justify-between gap-10">
+            <div>
+              <p className="text-[16px] text-white/60">{greeting(user.timezone)},</p>
+              <h1 className="font-display text-[64px] leading-[1] font-medium tracking-[-0.045em]">{name}</h1>
+              <p className="mt-4 text-[15px] text-white/60">
+                {highlights.calls_this_week
+                  ? `${highlights.calls_this_week} ${highlights.calls_this_week === 1 ? "call" : "calls"} this week`
+                  : "No calls yet this week"}
+                {highlights.streak_days > 1 && ` · ${highlights.streak_days}-day streak`}
+                {` · ${highlights.memories} things remembered`}
+              </p>
+            </div>
+            <div className="flex shrink-0 items-center gap-5">
+              <span className="relative size-24">
+                <span
+                  className="ring-pulse absolute inset-0 rounded-full border-2"
+                  style={{ borderColor: featured.face.skin }}
+                />
+                <span className="relative block size-full overflow-hidden rounded-full ring-4 ring-white/10">
+                  <AgentFace agent={featured} className="size-full" />
+                </span>
+              </span>
+              <div>
+                <p className="text-[14px] text-white/60">{featured.role}</p>
+                <Link
+                  href={`/call/${featured.id}`}
+                  className="mt-2 inline-flex h-12 items-center gap-2 rounded-full bg-teal px-6 text-[16px] font-semibold text-[#0E0E10] shadow-[0_10px_30px_-10px_#64B2AF] transition-transform duration-200 hover:-translate-y-0.5"
+                >
+                  <Phone weight="fill" /> Call {featured.name}
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       <section>
         <div className="mb-3 flex items-end justify-between">
@@ -67,10 +118,22 @@ export default async function HomePage() {
               <AgentCard agent={a} lastTalked={lastTalked(a.id)} />
             </div>
           ))}
+          {canAdd && (
+            <Link
+              href="/app/agents/new"
+              className="hidden min-h-[248px] flex-col items-center justify-center gap-3 rounded-[28px] border-2 border-dashed border-line text-ink-soft transition-colors hover:border-ink/30 hover:text-ink sm:flex"
+            >
+              <span className="grid size-14 place-items-center rounded-full bg-ink/[0.05] text-[22px]">
+                <Plus weight="bold" />
+              </span>
+              <span className="text-[15px] font-semibold">New agent</span>
+              <span className="max-w-[14rem] text-center text-[13px]">Someone for meetings, errands, family or a language.</span>
+            </Link>
+          )}
         </div>
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
         <section className="rounded-[28px] bg-plate p-5 ring-1 ring-line sm:p-6">
           <h2 className="flex items-center gap-2 text-[13px] font-semibold uppercase tracking-wider text-ink-soft">
             <CalendarBlank weight="bold" /> Coming up

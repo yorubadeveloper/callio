@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SiteFooter } from "@/components/landing/site-footer";
 import { Wordmark } from "@/components/brand/logo";
 import { LEGAL } from "@/lib/legal";
 
@@ -73,25 +74,9 @@ export default function LegalLayout({ children }: { children: React.ReactNode })
         </div>
       </header>
 
-      <main className="mx-auto w-full min-w-0 max-w-[720px] flex-1 px-4 pb-24 pt-10 sm:px-6 sm:pt-16">
-        {children}
-      </main>
+      <main className="mx-auto w-full min-w-0 max-w-[720px] flex-1 px-4 pb-24 pt-10 sm:px-6 sm:pt-16">{children}</main>
 
-      <footer className="border-t border-line">
-        <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 text-sm text-ink-soft sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <Link href="/" aria-label="Callio home" className="w-fit">
-            <Wordmark className="text-lg text-ink" />
-          </Link>
-          <nav aria-label="Footer" className="flex flex-wrap gap-x-6 gap-y-2">
-            {LEGAL.pages.map((page) => (
-              <Link key={page.href} href={page.href} className="hover:text-ink">
-                {page.label}
-              </Link>
-            ))}
-          </nav>
-          <p>© 2026 Callio · {LEGAL.domain}</p>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

@@ -12,7 +12,7 @@ const TEMPLATES = [
   { name: "Laura", color: TEAL },
   { name: "Theo", color: AMBER },
   { name: "Ada", color: CORAL },
-  { name: "Juno", color: PERI },
+  { name: "Maya", color: PERI },
   { name: "Kemi", color: TEAL },
   { name: "Mateo", color: AMBER },
 ];

@@ -8,7 +8,7 @@ import { LevelBars } from "@/components/landing/level-bars";
 
 const LINES: Record<string, string> = {
   Laura: "Morning! Your 10 o'clock moved to 11, and it'll rain after four.",
-  Juno: "Your call with Dana is in ten. Last time you promised her the deck.",
+  Maya: "Your call with Dana is in ten. Last time you promised her the deck.",
   Kemi: "You said you'd run at six. Still on?",
   Ada: "Called your mum. She's in good spirits and asked about Sunday.",
   Theo: "Booked: table for four, Friday at eight, under your name.",
