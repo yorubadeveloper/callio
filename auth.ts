@@ -1,109 +1,68 @@
 import NextAuth from "next-auth";
+import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
+import { syncUser } from "@/lib/server/backend";
 
-const API_BASE_URL = process.env.API_URL || "http://localhost:8000/api/v1";
-const API_KEY = process.env.API_KEY || "";
+/**
+ * A one-tap test account for local development, so the app can be explored
+ * without Google credentials. Only exists when running `next dev` with
+ * DEV_LOGIN=1; production builds never register it.
+ */
+export const devLoginEnabled = process.env.NODE_ENV === "development" && process.env.DEV_LOGIN === "1";
 
+// Google is the only way in. We ask for the basic profile only: calendar access
+// is a separate, optional step inside the app, so sign-up stays one tap.
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Google({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      authorization: {
-        params: {
-          access_type: "offline",
-          prompt: "consent",
-          scope: [
-            "openid",
-            "https://www.googleapis.com/auth/userinfo.email",
-            "https://www.googleapis.com/auth/userinfo.profile",
-            "https://www.googleapis.com/auth/calendar.readonly",
-          ].join(" "),
-        },
-      },
+      clientId: process.env.GOOGLE_CLIENT_ID ?? process.env.AUTH_GOOGLE_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? process.env.AUTH_GOOGLE_SECRET,
     }),
+    ...(devLoginEnabled
+      ? [
+          Credentials({
+            id: "dev",
+            name: "Test user",
+            credentials: {},
+            authorize: async () => ({ id: "dev", email: "test@callio.local", name: "Test User" }),
+          }),
+        ]
+      : []),
   ],
+  pages: { signIn: "/signin", error: "/signin" },
+  session: { strategy: "jwt" },
   callbacks: {
-    async jwt({ token, account, profile }) {
-      // Persist the OAuth access_token and refresh_token to the token right after signin
-      if (account) {
-        token.accessToken = account.access_token;
-        token.refreshToken = account.refresh_token;
-        token.expiresAt = account.expires_at;
-        // Mark that we have fresh tokens to sync
-        token.needsTokenSync = true;
-      }
-      // Store email for later user creation
-      if (profile?.email) {
-        token.email = profile.email;
+    async signIn({ account, profile }) {
+      if (account?.provider === "dev") return devLoginEnabled;
+      // Only verified Google emails can create accounts.
+      return Boolean(profile?.email && profile.email_verified !== false);
+    },
+    async jwt({ token, account, profile, user }) {
+      // First sign-in on this device: create or fetch the Callio user and remember its id.
+      if (account?.provider === "dev" && user?.email) {
+        const synced = await syncUser({
+          email: user.email,
+          name: user.name ?? "Test User",
+          image: null,
+          google_sub: "dev",
+          locale: null,
+        });
+        token.userId = synced.id;
+      } else if (account && profile?.email) {
+        const synced = await syncUser({
+          email: profile.email,
+          name: profile.name ?? profile.email,
+          image: (profile.picture as string | undefined) ?? null,
+          google_sub: account.providerAccountId,
+          locale: (profile.locale as string | undefined) ?? null,
+        });
+        token.userId = synced.id;
       }
       return token;
     },
     async session({ session, token }) {
-      // Send properties to the client
-      session.accessToken = token.accessToken as string;
-      session.refreshToken = token.refreshToken as string;
-      session.expiresAt = token.expiresAt as number;
-      session.email = token.email as string;
-      session.needsTokenSync = token.needsTokenSync as boolean;
+      if (typeof token.userId === "string") session.userId = token.userId;
       return session;
     },
-    async signIn({ account, profile }) {
-      // Create or get user in backend on every sign-in
-      if (profile?.email && account) {
-        try {
-          // 1. Create user (idempotent — returns existing if already exists)
-          const createRes = await fetch(`${API_BASE_URL}/users`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-API-Key": API_KEY,
-            },
-            body: JSON.stringify({
-              email: profile.email,
-              name: profile.name || profile.email,
-            }),
-          });
-
-          if (!createRes.ok) {
-            console.error("Failed to create/get user in backend:", await createRes.text());
-            // Don't block sign-in
-            return true;
-          }
-
-          const user = await createRes.json();
-
-          // 2. Sync calendar tokens to backend
-          if (account.access_token && account.refresh_token) {
-            const tokenRes = await fetch(`${API_BASE_URL}/users/${user.id}/calendar`, {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-                "X-API-Key": API_KEY,
-              },
-              body: JSON.stringify({
-                access_token: account.access_token,
-                refresh_token: account.refresh_token,
-                expires_at: new Date((account.expires_at || 0) * 1000).toISOString(),
-              }),
-            });
-
-            if (!tokenRes.ok) {
-              console.error("Failed to sync calendar tokens:", await tokenRes.text());
-            }
-          }
-        } catch (error) {
-          console.error("Error syncing user to backend on sign-in:", error);
-          // Don't block sign-in
-        }
-      }
-      return true;
-    },
-  },
-  pages: {
-    signIn: "/signin",
-  },
-  session: {
-    strategy: "jwt",
   },
 });
