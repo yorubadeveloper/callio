@@ -5,7 +5,7 @@ import { currentUser, userBackend } from "@/lib/server/backend";
 import type { UserAgent } from "@/lib/types";
 import { CallRoom } from "./call-room";
 
-export const metadata: Metadata = { title: "Call" };
+export const metadata: Metadata = { title: "Call", robots: { index: false, follow: false } };
 
 export default async function CallPage({
   params,

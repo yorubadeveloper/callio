@@ -294,6 +294,7 @@ function sync(body: Body): User {
     detail: "normal",
     languages: ["en"],
     style: null,
+    integrations: { google_calendar: { connected: false, account_email: null, connected_at: null } },
     created_at: now(),
   };
   db.users.set(user.id, user);

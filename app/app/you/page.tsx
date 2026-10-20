@@ -4,6 +4,6 @@ import { currentUser } from "@/lib/server/backend";
 
 export const metadata: Metadata = { title: "You" };
 
-export default async function YouPage() {
-  return <YouView user={(await currentUser())!} />;
+export default async function YouPage({ searchParams }: { searchParams: Promise<{ calendar?: string }> }) {
+  return <YouView user={(await currentUser())!} calendarResult={(await searchParams).calendar} />;
 }

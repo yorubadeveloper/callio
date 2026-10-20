@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { OnboardingFlow } from "@/components/onboarding/onboarding-flow";
 import { currentUser } from "@/lib/server/backend";
 
-export const metadata: Metadata = { title: "Welcome" };
+export const metadata: Metadata = { title: "Welcome", robots: { index: false, follow: false } };
 
 export default async function WelcomePage() {
   const user = await currentUser();

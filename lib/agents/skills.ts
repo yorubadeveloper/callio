@@ -6,7 +6,15 @@ import type { PlanId } from "@/lib/pricing";
 //   - plan gating, so the agent can say "that's on Plus" instead of failing silently
 
 export type SkillId =
-  "briefing" | "memory" | "scheduling" | "answers" | "computer" | "phone_errands" | "recaps" | "conversation";
+  | "briefing"
+  | "calendar"
+  | "memory"
+  | "scheduling"
+  | "answers"
+  | "computer"
+  | "phone_errands"
+  | "recaps"
+  | "conversation";
 
 export interface Skill {
   id: SkillId;
@@ -32,6 +40,17 @@ export const SKILLS: Skill[] = [
     instructions:
       "When asked about the day, or on a scheduled briefing call, give the three things that matter most first, then offer detail. Read times in the person's timezone. Never read out more than three calendar items in a row without pausing for them.",
     tools: ["get_calendar_events", "get_weather", "google_search"],
+    minPlan: "free",
+    status: "live",
+  },
+  {
+    id: "calendar",
+    title: "Manage your calendar",
+    summary: "Add meetings and move them around, just by saying so. Needs your Google Calendar connected.",
+    examples: ["Push my 3pm to tomorrow", "Add lunch with Dana on Friday at 1", "What's my first meeting tomorrow?"],
+    instructions:
+      "Only when their Google Calendar is connected (see the About section). Before creating or moving an event, say the title and new time back and get a clear yes. Moving an event doesn't email the other guests; tell them so they can let people know. Never delete events.",
+    tools: ["get_calendar_events", "create_calendar_event", "move_calendar_event"],
     minPlan: "free",
     status: "live",
   },

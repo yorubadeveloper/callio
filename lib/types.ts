@@ -26,6 +26,9 @@ export interface User {
   languages: string[];
   /** How the person talks and writes, and how they like to be spoken to. */
   style: string | null;
+  integrations: {
+    google_calendar: { connected: boolean; account_email: string | null; connected_at: string | null };
+  };
   created_at: string;
 }
 

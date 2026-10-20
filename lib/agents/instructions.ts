@@ -19,6 +19,7 @@ export interface CallContext {
     | "detail"
     | "languages"
     | "style"
+    | "integrations"
   >;
   memory: {
     facts: string[];
@@ -109,6 +110,9 @@ export function buildInstructions(ctx: CallContext): string {
     user.style?.trim() && `How they talk and like to be spoken to: ${user.style.trim()} Match it.`,
     user.interests.length > 0 && `They're into: ${user.interests.join(", ")}.`,
     user.languages.length > 1 && `They speak ${user.languages.join(", ")}; follow their lead.`,
+    user.integrations?.google_calendar?.connected
+      ? "Their Google Calendar is connected: use the calendar tools for anything about their schedule."
+      : "Their calendar isn't connected. If they ask about their schedule, say you can't see it yet and that they can connect Google Calendar in the Callio app under You, then Connections.",
   ].filter(Boolean);
   sections.push(`## About ${callName}\n${about.join("\n")}`);
 

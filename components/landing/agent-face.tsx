@@ -49,13 +49,15 @@ function Hair({ style, color }: { style: HairStyle; color: string }) {
 interface AgentFaceProps {
   agent: Agent;
   className?: string;
+  /** Pixel size, for renderers that need explicit dimensions (e.g. OG images). */
+  size?: number;
 }
 
 /** A headset-wearing agent portrait. Square; round it with the container. */
-export function AgentFace({ agent, className }: AgentFaceProps) {
+export function AgentFace({ agent, className, size }: AgentFaceProps) {
   const { tile, skin, hair, hairColor, shirt, glasses } = agent.face;
   return (
-    <svg viewBox="0 0 100 100" className={cn("block", className)} role="img" aria-label={agent.name}>
+    <svg viewBox="0 0 100 100" width={size} height={size} className={cn("block", className)} role="img" aria-label={agent.name}>
       <rect width="100" height="100" fill={tile} />
       <path fill={shirt} d="M12 100C14 81 31 72 50 72S86 81 88 100Z" />
       <rect x="43" y="62" width="14" height="13" rx="4" fill={skin} />

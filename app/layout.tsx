@@ -30,7 +30,7 @@ const jetbrains = JetBrains_Mono({
 });
 
 const description =
-  "Callio agents call you with what matters, answer when you ring, and make the calls you keep putting off.";
+  "Personal AI voice agents with names, voices and memory. They call you with what matters, answer when you call, and get things done for you. Free to start.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://callio.site"),
@@ -40,18 +40,33 @@ export const metadata: Metadata = {
   },
   description,
   applicationName: "Callio",
+  keywords: [
+    "AI voice assistant",
+    "AI phone call assistant",
+    "personal AI agent",
+    "AI that calls you",
+    "daily briefing",
+    "AI reminders",
+    "voice AI",
+    "AI accountability partner",
+    "AI calls elderly parents",
+  ],
+  category: "productivity",
   openGraph: {
     type: "website",
     siteName: "Callio",
     title: "Callio · Agents that pick up the phone",
     description,
     url: "https://callio.site",
+    locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
     title: "Callio · Agents that pick up the phone",
     description,
   },
+  robots: { index: true, follow: true },
+  formatDetection: { telephone: false },
 };
 
 export const viewport: Viewport = {

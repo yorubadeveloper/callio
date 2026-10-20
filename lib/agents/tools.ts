@@ -136,6 +136,47 @@ export const TOOLS: Record<string, ToolMeta> = {
       },
     },
   },
+  create_calendar_event: {
+    kind: "calendar",
+    label: (a) => `Adding to your calendar: ${str(a.title)}`,
+    scheduling: FunctionResponseScheduling.WHEN_IDLE,
+    declaration: {
+      name: "create_calendar_event",
+      description: "Add an event to the person's Google Calendar. Confirm title and time out loud first.",
+      behavior: Behavior.BLOCKING,
+      parametersJsonSchema: {
+        type: "object",
+        properties: {
+          title: { type: "string" },
+          start: { type: "string", description: "Local ISO date-time in the person's timezone, e.g. 2026-10-23T13:00." },
+          end: { type: "string", description: "Local ISO date-time. Defaults to 30 minutes after start." },
+          description: { type: "string" },
+        },
+        required: ["title", "start"],
+      },
+    },
+  },
+  move_calendar_event: {
+    kind: "calendar",
+    label: (a) => `Moving ${str(a.query) || "your event"}`,
+    scheduling: FunctionResponseScheduling.WHEN_IDLE,
+    declaration: {
+      name: "move_calendar_event",
+      description:
+        "Move an existing event to a new time, keeping its length. Pass event_id from get_calendar_events, or a short query like 'call with Dana'. Confirm first.",
+      behavior: Behavior.BLOCKING,
+      parametersJsonSchema: {
+        type: "object",
+        properties: {
+          event_id: { type: "string" },
+          query: { type: "string", description: "Words from the event title, if you don't have the id." },
+          new_start: { type: "string", description: "Local ISO date-time in the person's timezone." },
+          new_end: { type: "string", description: "Local ISO date-time. Defaults to keeping the same length." },
+        },
+        required: ["new_start"],
+      },
+    },
+  },
   get_weather: {
     kind: "search",
     label: (a) => `Checking the weather${a.place ? ` in ${str(a.place)}` : ""}`,

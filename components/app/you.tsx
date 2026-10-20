@@ -11,9 +11,10 @@ import { LANGUAGES } from "@/components/onboarding/onboarding-flow";
 import { api, ApiError } from "@/lib/api";
 import { disablePush, enablePush, pushEnabled, pushSupported } from "@/lib/push";
 import type { Detail, Tone, User } from "@/lib/types";
+import { Connections } from "./connections";
 import { btn, Chip, Field, inputClass, PageTitle, Segmented, Sheet } from "./ui";
 
-export function YouView({ user: initial }: { user: User }) {
+export function YouView({ user: initial, calendarResult }: { user: User; calendarResult?: string }) {
   const router = useRouter();
   const [user, setUser] = useState(initial);
   const [form, setForm] = useState({
@@ -236,6 +237,7 @@ export function YouView({ user: initial }: { user: User }) {
         </section>
 
         <aside className="space-y-8">
+          <Connections user={user} result={calendarResult} />
           <Notifications />
           <section>
             <h2 className="text-[13px] font-semibold uppercase tracking-wider text-ink-soft">Appearance</h2>

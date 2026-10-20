@@ -127,7 +127,9 @@ export default async function HomePage() {
                 <Plus weight="bold" />
               </span>
               <span className="text-[15px] font-semibold">New agent</span>
-              <span className="max-w-[14rem] text-center text-[13px]">Someone for meetings, errands, family or a language.</span>
+              <span className="max-w-[14rem] text-center text-[13px]">
+                Someone for meetings, errands, family or a language.
+              </span>
             </Link>
           )}
         </div>
@@ -173,6 +175,24 @@ export default async function HomePage() {
           </ul>
         </section>
       </div>
+
+      {!user.integrations?.google_calendar?.connected && (
+        <Link
+          href="/app/you#connections"
+          className="group flex items-center gap-4 rounded-[28px] bg-teal/20 p-5 ring-1 ring-teal/40 transition-colors hover:bg-teal/30 sm:p-6"
+        >
+          <span className="grid size-12 shrink-0 place-items-center rounded-full bg-teal text-[22px] text-[#121212]">
+            <CalendarBlank weight="fill" />
+          </span>
+          <span className="flex-1">
+            <span className="block text-[16px] font-semibold">Connect your calendar</span>
+            <span className="block text-[14px] text-ink-soft">
+              So {featured?.name ?? "your agents"} can brief you on your day and move meetings when you ask.
+            </span>
+          </span>
+          <ArrowRight className="shrink-0 transition-transform group-hover:translate-x-1" />
+        </Link>
+      )}
 
       {highlights.memories < 5 && (
         <Link

@@ -14,6 +14,7 @@ const SECTIONS = [
   { id: "how-calls-work", title: "How calls and AI processing work" },
   { id: "what-we-collect", title: "What we collect" },
   { id: "purposes", title: "Why we use it and our legal bases" },
+  { id: "google-data", title: "Google user data" },
   { id: "cookies", title: "Cookies and local storage" },
   { id: "retention", title: "How long we keep data" },
   { id: "recipients", title: "Who receives your data" },
@@ -197,8 +198,9 @@ export default function PrivacyPage() {
             never see your card details.
           </li>
           <li>
-            <strong>Calendar (optional, later).</strong> If you connect Google Calendar, read-only access to your
-            events so your agent can mention them.
+            <strong>Google Calendar (optional).</strong> If you connect it, access to the events on your primary
+            calendar, so your agents can tell you what&apos;s on and, when you ask, add or move events. We store an
+            encrypted access token, not a copy of your calendar.
           </li>
           <li>
             <strong>Technical logs.</strong> IP address, browser type, timestamps and error logs, which our hosting
@@ -236,7 +238,7 @@ export default function PrivacyPage() {
                 <td>Your consent (Art. 6(1)(a)), given when you allow notifications</td>
               </tr>
               <tr>
-                <td>Read your Google Calendar (when available)</td>
+                <td>Read and, when you ask, update your Google Calendar</td>
                 <td>Your consent (Art. 6(1)(a)), given when you connect it</td>
               </tr>
               <tr>
@@ -262,6 +264,40 @@ export default function PrivacyPage() {
           You can withdraw consent at any time, for example by turning off notifications, disconnecting your
           calendar or deleting imported memory. This doesn’t affect processing that happened before.
         </p>
+      </section>
+
+      <section id="google-data">
+        <Heading id="google-data" />
+        <p>
+          Callio&apos;s use and transfer to any other app of information received from Google APIs will adhere to
+          the{" "}
+          <a href="https://developers.google.com/terms/api-services-user-data-policy">
+            Google API Services User Data Policy
+          </a>
+          , including the Limited Use requirements.
+        </p>
+        <ul>
+          <li>
+            <strong>What we access.</strong> With Google sign-in: your name, email address and profile picture. If you
+            connect Google Calendar: the events on your primary calendar (title, time, location, description, guests
+            and video link), and permission to create events and change their times.
+          </li>
+          <li>
+            <strong>How we use it.</strong> Only to provide features you use: signing you in, and letting your agents
+            tell you about your schedule, prepare briefings you&apos;ve set up, and add or move events when you ask.
+            Calendar details are passed to Google&apos;s Gemini API during your call so the agent can answer you.
+          </li>
+          <li>
+            <strong>What we never do.</strong> We don&apos;t sell Google user data, use it for advertising, or use it
+            to train or improve general AI or machine-learning models. People at Callio don&apos;t read it, unless you
+            ask us to for support, it&apos;s needed for security or to investigate abuse, or the law requires it.
+          </li>
+          <li>
+            <strong>Your control.</strong> Disconnect Google Calendar any time in the app under You, then
+            Connections, or from your Google Account&apos;s third-party access page. We delete our access token
+            straight away.
+          </li>
+        </ul>
       </section>
 
       <section id="cookies">
