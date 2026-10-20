@@ -7,31 +7,17 @@ Frontend dashboard for the Voice Assistant Bot. Users can manage their profile, 
 
 ## Design System
 
-### **Monochromatic Color Palette**
-This project uses a **strict monochromatic design** - Black, White, and Grays only.
+The site was revamped in Oct 2026 (branch `landing-revamp`) around the Callio logo. The old monochrome rules are retired.
 
-**Light Mode Colors:**
-- Background: White (`#FFFFFF`)
-- Text: Black (`#000000`)
-- Buttons: Black background, White text
-- Cards/Borders: Gray (`#E5E5E5`, `#D4D4D4`)
-- Muted text: Gray (`#737373`, `#525252`)
-- Hover states: Darker gray
+- **Logo:** four blobs forming a C. Source PNG and traced SVG are in `public/brand/`; the React version is `components/brand/logo.tsx` (`LogoMark`, `Wordmark`, `speaking` pulse).
+- **Brand colours** (the same in light and dark): coral `#F17660`, amber `#F4BA6A`, teal `#64B2AF`, periwinkle `#8896E3`. Tailwind: `bg-coral`, `bg-amber`, `bg-teal`, `bg-peri`.
+- **Surfaces** (swap in dark mode via CSS variables): `bg-page` (#F3F2EE / #111111), `text-ink`, `text-ink-soft`, `bg-plate`, `border-line`.
+- **Type:** `font-display` (Instrument Sans, weight 500, tight tracking) for headlines, `font-body` (Hanken Grotesk) for text, `font-mono` (JetBrains Mono) for timers and schedules.
+- **Buttons:** ink pills (`bg-ink text-page rounded-full`).
+- **Motion:** `motion/react` plus Lenis smooth scroll. Shared helpers live in `components/landing/motion.tsx` (intro, `SplitWords`, `AfterIntro`). Always respect `prefers-reduced-motion`.
+- **Agents:** the characters are drawn by `components/landing/agent-face.tsx` from data in `components/landing/agents.ts`.
 
-**Dark Mode Colors (Inverted):**
-- Background: Black (`#000000`)
-- Text: White (`#FFFFFF`)
-- Buttons: White background, Black text
-- Cards/Borders: Dark gray (`#262626`, `#404040`)
-- Muted text: Light gray (`#A3A3A3`, `#D4D4D4`)
-- Hover states: Lighter gray
-
-**Dark Mode Behavior:**
-- Dark mode **inverts** the color scheme
-- Black buttons → White buttons
-- White backgrounds → Black backgrounds
-- Gray shades adjust accordingly
-- NO colors - only black, white, and gray tones
+The dashboard still uses the shadcn tokens below and has not been restyled yet.
 
 ---
 

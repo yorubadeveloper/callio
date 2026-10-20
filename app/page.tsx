@@ -1,21 +1,29 @@
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { Hero } from "@/components/landing/hero";
-import { Features } from "@/components/landing/features";
-import { HowItWorks } from "@/components/landing/how-it-works";
-import { CTA } from "@/components/landing/cta";
+import { CallStage } from "@/components/landing/call-stage";
+import { Closing, SiteFooter } from "@/components/landing/closing";
+import { DialHero } from "@/components/landing/dial-hero";
+import { Manifesto } from "@/components/landing/manifesto";
+import { Memory } from "@/components/landing/memory";
+import { LandingShell } from "@/components/landing/motion";
+import { LandingNav } from "@/components/landing/nav";
+import { Pricing } from "@/components/landing/pricing";
+import { Templates } from "@/components/landing/templates";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col overflow-x-hidden">
-      <Header />
-      <main className="flex-1 w-full">
-        <Hero />
-        <Features />
-        <HowItWorks />
-        <CTA />
-      </main>
-      <Footer />
+    <div className="min-h-screen overflow-x-clip bg-page font-body text-ink">
+      <LandingShell>
+        <LandingNav />
+        <main>
+          <DialHero />
+          <Manifesto />
+          <CallStage />
+          <Memory />
+          <Templates />
+          <Pricing />
+          <Closing />
+        </main>
+        <SiteFooter />
+      </LandingShell>
     </div>
   );
 }
