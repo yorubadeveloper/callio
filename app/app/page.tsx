@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Brain, CalendarBlank, Phone, Plus, Sparkle } from "@phosphor-icons/react/dist/ssr";
 import { AgentCard } from "@/components/app/agent-card";
+import { InstallNudge } from "@/components/app/notification-setup";
 import { AgentFace } from "@/components/landing/agent-face";
 import { personalize } from "@/lib/agents/personalize";
 import { SKILLS, planAllows } from "@/lib/agents/skills";
@@ -36,6 +37,7 @@ export default async function HomePage() {
 
   return (
     <div className="space-y-10">
+      <InstallNudge />
       {/* phone: a quiet greeting */}
       <header className="lg:hidden">
         <p className="text-[15px] text-ink-soft">{greeting(user.timezone)},</p>

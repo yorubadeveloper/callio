@@ -1,15 +1,15 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { Bell, BellRinging, CalendarDots, CheckCircle, Monitor, Phone, Repeat, X } from "@phosphor-icons/react";
+import { Bell, CalendarDots, CheckCircle, Monitor, Phone, Repeat, X } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { AgentFace } from "@/components/landing/agent-face";
 import type { PersonalAgent } from "@/lib/agents/personalize";
 import { api } from "@/lib/api";
 import { clockTime, dayLabel, when } from "@/lib/format";
-import { enablePush, pushEnabled, pushSupported } from "@/lib/push";
 import type { AppNotification, Schedule } from "@/lib/types";
+import { NotificationSetup } from "./notification-setup";
 import { btn, PageTitle } from "./ui";
 import { Spinner } from "@/components/brand/logo-loader";
 
@@ -47,7 +47,6 @@ export function UpcomingView({
     map.set(label, [...(map.get(label) ?? []), s]);
     return map;
   }, new Map());
-  const hasCalls = schedules.some((s) => s.type === "call");
 
   return (
     <>
@@ -55,7 +54,7 @@ export function UpcomingView({
         title="Upcoming"
         subtitle="Calls and reminders your agents have lined up. Ask any agent to add, move or cancel one."
       />
-      <PushBanner hasCalls={hasCalls} />
+      <NotificationSetup compact />
 
       <section className="mt-6">
         <h2 className="text-[13px] font-semibold uppercase tracking-wider text-ink-soft">Coming up</h2>
@@ -227,78 +226,5 @@ function ScheduleRow({
         </button>
       )}
     </motion.li>
-  );
-}
-
-// ---------- notifications status ----------
-
-type PushState = "checking" | "on" | "off" | "denied" | "install" | "unsupported";
-
-const isIOS = () =>
-  /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-const standalone = () =>
-  window.matchMedia("(display-mode: standalone)").matches ||
-  (navigator as Navigator & { standalone?: boolean }).standalone === true;
-
-function usePushState(): [PushState, (s: PushState) => void] {
-  const mounted = useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false,
-  );
-  const [state, setState] = useState<PushState>("checking");
-  useEffect(() => {
-    if (!mounted) return;
-    let alive = true;
-    const check = async (): Promise<PushState> => {
-      // iPhone and iPad only allow web notifications for apps added to the Home Screen.
-      if (isIOS() && !standalone()) return "install";
-      if (!pushSupported()) return "unsupported";
-      if (Notification.permission === "denied") return "denied";
-      return (await pushEnabled()) ? "on" : "off";
-    };
-    void check().then((s) => alive && setState(s));
-    return () => {
-      alive = false;
-    };
-  }, [mounted]);
-  return [state, setState];
-}
-
-function PushBanner({ hasCalls }: { hasCalls: boolean }) {
-  const [state, setState] = usePushState();
-  const [busy, setBusy] = useState(false);
-  if (state === "checking" || state === "on" || state === "unsupported") return null;
-
-  const turnOn = async () => {
-    setBusy(true);
-    const result = await enablePush().catch(() => "unsupported" as const);
-    setState(result === "granted" ? "on" : result === "denied" ? "denied" : "unsupported");
-    setBusy(false);
-  };
-
-  return (
-    <div className="flex flex-col gap-4 rounded-[28px] bg-amber/25 p-5 sm:flex-row sm:items-center">
-      <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-amber text-[24px] text-[#0E0E10]">
-        <BellRinging weight="fill" />
-      </span>
-      <div className="min-w-0 flex-1">
-        <p className="text-[16px] font-semibold">
-          {hasCalls ? "Your agents can't ring you yet" : "Let your agents ring you"}
-        </p>
-        <p className="mt-0.5 text-[14px] text-ink-soft">
-          {state === "install"
-            ? "On iPhone, add Callio to your Home Screen first (Share, then Add to Home Screen), open it from there, and turn on notifications here."
-            : state === "denied"
-              ? "Notifications are blocked for Callio. Allow them in your browser or phone settings, then come back."
-              : "Turn on notifications so scheduled calls ring and reminders pop up, even when Callio is closed."}
-        </p>
-      </div>
-      {state === "off" && (
-        <button type="button" onClick={turnOn} disabled={busy} className={cn(btn.primary, "shrink-0")}>
-          {busy && <Spinner />} Turn on
-        </button>
-      )}
-    </div>
   );
 }
