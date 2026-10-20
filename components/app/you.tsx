@@ -7,7 +7,7 @@ import { signOut } from "next-auth/react";
 import { Bell, CaretRight, DownloadSimple, PlugsConnected, SignOut, Trash, X } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
-import { LANGUAGES } from "@/components/onboarding/onboarding-flow";
+import { LANGUAGES } from "@/lib/languages";
 import { api, ApiError } from "@/lib/api";
 import { disablePush, enablePush, pushEnabled, pushSupported } from "@/lib/push";
 import type { Detail, Tone, User } from "@/lib/types";

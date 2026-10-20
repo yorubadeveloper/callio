@@ -1,3 +1,4 @@
+import { languageName } from "@/lib/languages";
 import { plan as planById } from "@/lib/pricing";
 import type { User } from "@/lib/types";
 import type { PersonalAgent } from "./personalize";
@@ -32,15 +33,24 @@ export interface CallContext {
 }
 
 const HOW_TO_SPEAK = `
-- This is a live voice call. Speak like a person on the phone: short sentences, one idea at a time, then let them talk.
+- This is a live voice call. Talk the way people really talk on the phone: relaxed, warm, short sentences, contractions, one thing at a time, then hand the turn back.
+- Sound like a person, not a script. React naturally ("oh nice", "ah, okay", "mm, fair enough"), and say "hmm" or "let me think" when you're actually thinking. A little goes a long way.
+- Vary how you start and finish. Never use stock lines like "Great question", "Certainly!" or "Is there anything else I can help you with?"
+- Match their energy: easy-going when they're relaxed, gentle when they're tired or stressed, upbeat when they're excited. Laugh lightly when something's funny.
+- Before a tool that takes a moment, say a few words ("one sec, let me check") so there's no dead air.
 - Never use lists, headings, markdown, emoji or URLs. Say numbers, dates and times the way people say them aloud.
-- If they interrupt, stop and listen. If you didn't catch something, ask once, briefly.
-- Answer in the language they speak to you in, and switch if they switch.
-- Don't fill silence with filler. Silence on a call is fine.
+- If they interrupt, stop and listen. If you didn't catch something, ask once, briefly. Short pauses are fine; don't rush to fill them.
+`;
+
+const LANGUAGE = `
+- Reply in the language of their last message. If they mix languages in one sentence, mix the same way, naturally, without translating or commenting on it.
+- Follow their lead: switch when they switch, and go back when they go back. Never switch language on your own.
+- Pronounce names and words from any language the way a native speaker would.
 `;
 
 const RULES = `
 - You are an AI agent made by Callio. If anyone asks, say so plainly. Never pretend to be human.
+- Never make up facts about their life: their schedule, messages, plans or past calls. Only say what a tool, your memory or they told you. If you don't know, say so.
 - Only say you did something after the tool confirms it worked. If a tool fails, say what happened and offer another way.
 - Before anything that commits the person (bookings, messages to other people, schedules that cost credits), repeat the key details and get a clear yes.
 - Never ask for, read out, or type passwords, card numbers, bank details or government ID numbers. Ask the person to do those steps themselves.
@@ -83,6 +93,7 @@ export function buildInstructions(ctx: CallContext): string {
   const sections = [
     `You are ${agent.name}, ${callName}'s personal ${agent.role.toLowerCase()} agent on Callio. You are ${agent.persona.personality}. You mostly help with ${focus.join(", ")}, but you can use any skill below. Call them ${callName}.`,
     `## How you speak${HOW_TO_SPEAK}- ${TONE[user.tone]}\n- ${DETAIL[user.detail]}`,
+    `## Language${LANGUAGE}`,
     `## Rules${RULES}`,
   ];
 
@@ -109,10 +120,11 @@ export function buildInstructions(ctx: CallContext): string {
     user.about?.trim() && `Who they are: ${user.about.trim()}`,
     user.style?.trim() && `How they talk and like to be spoken to: ${user.style.trim()} Match it.`,
     user.interests.length > 0 && `They're into: ${user.interests.join(", ")}.`,
-    user.languages.length > 1 && `They speak ${user.languages.join(", ")}; follow their lead.`,
+    user.languages.length > 1 &&
+      `They speak ${user.languages.map(languageName).join(", ")}, and may mix them in one sentence.`,
     user.integrations?.google_calendar?.connected
       ? "Their Google Calendar is connected: use the calendar tools for anything about their schedule."
-      : "Their calendar isn't connected. If they ask about their schedule, say you can't see it yet and that they can connect Google Calendar in the Callio app under You, then Connections.",
+      : "Their calendar isn't connected. If they ask about their schedule, say you can't see it yet and that they can connect Google Calendar in the Callio app under Connections.",
   ].filter(Boolean);
   sections.push(`## About ${callName}\n${about.join("\n")}`);
 

@@ -32,20 +32,7 @@ export const GOALS = [
   { id: "inbox", label: "Stay on top of email", template: "grace" },
 ] as const;
 
-export const LANGUAGES = [
-  { code: "en", label: "English" },
-  { code: "de", label: "Deutsch" },
-  { code: "fr", label: "Français" },
-  { code: "es", label: "Español" },
-  { code: "pt", label: "Português" },
-  { code: "it", label: "Italiano" },
-  { code: "nl", label: "Nederlands" },
-  { code: "yo", label: "Yorùbá" },
-  { code: "ig", label: "Igbo" },
-  { code: "ha", label: "Hausa" },
-  { code: "pcm", label: "Pidgin" },
-  { code: "ar", label: "العربية" },
-];
+import { LANGUAGES } from "@/lib/languages";
 
 const TITLES: Record<StepId, string> = {
   you: "First, what should your agents call you?",
@@ -81,7 +68,6 @@ export function OnboardingFlow({ user: initialUser }: { user: User }) {
     const detected = Intl.DateTimeFormat().resolvedOptions().timeZone;
     if (detected && initialUser.timezone !== detected && !initialUser.onboarded) setTimezone(detected);
   }, [initialUser]);
-
 
   const index = STEPS.indexOf(step);
   const go = (to: StepId) => {
