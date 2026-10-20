@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useSyncExternalStore } from "react";
+import { useRef, useState } from "react";
 import {
   AnimatePresence,
   motion,
@@ -44,18 +44,9 @@ const screenVariants = {
   exit: (dir: number) => ({ y: dir > 0 ? "-5%" : "5%", scale: 1.04, opacity: 0, filter: "blur(6px)" }),
 };
 
-const WIDE = "(min-width: 768px)";
-const subscribeWide = (cb: () => void) => {
-  const mq = window.matchMedia(WIDE);
-  mq.addEventListener("change", cb);
-  return () => mq.removeEventListener("change", cb);
-};
-const isWide = () => window.matchMedia(WIDE).matches;
-
 export function CallStage() {
   const ref = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
-  const wide = useSyncExternalStore(subscribeWide, isWide, () => true);
   const [active, setActive] = useState(0);
   const [dir, setDir] = useState(1);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
@@ -70,17 +61,14 @@ export function CallStage() {
 
   // The phone turns slowly as you scroll past, so it reads as an object, not a screenshot.
   const smooth = useSpring(scrollYProgress, { stiffness: 80, damping: 20 });
-  // The tilt reads as depth on a big screen but as a skewed phone on a small one.
-  const flat = reduce || !wide;
-  const rotateY = useTransform(smooth, [0, 1], flat ? [0, 0] : [-14, 10]);
-  const rotateX = useTransform(smooth, [0, 0.5, 1], flat ? [0, 0, 0] : [6, 0, 4]);
+  const rotateY = useTransform(smooth, [0, 1], reduce ? [0, 0] : [-14, 10]);
+  const rotateX = useTransform(smooth, [0, 0.5, 1], reduce ? [0, 0, 0] : [6, 0, 4]);
 
   const beat = BEATS[active];
   const { Screen } = beat;
 
   return (
-    // Each beat gets a full screen of scroll on desktop and three quarters on phones, so thumbs don't tire.
-    <section ref={ref} id="how" className="relative h-[300svh] md:h-[400svh]">
+    <section ref={ref} id="how" className="relative h-[400svh]">
       <div className="sticky top-0 mx-auto grid h-svh max-w-6xl grid-rows-[auto_1fr] items-center gap-6 px-4 pb-6 pt-20 sm:px-6 md:grid-cols-[1fr_auto] md:grid-rows-1 md:gap-16 md:pb-0 md:pt-16">
         <div className="relative min-h-[178px] md:min-h-[300px]">
           <ol className="mb-6 flex gap-1.5" aria-label="Ways to use Callio">

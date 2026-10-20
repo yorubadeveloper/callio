@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import {
   CaretLeft,
@@ -17,7 +17,23 @@ import { AgentFace } from "./agent-face";
 import { agent, CORAL, TEAL } from "./agents";
 import { LevelBars } from "./level-bars";
 
+/** Width the phone screens are designed at. Smaller phones scale the whole screen down instead of reflowing it. */
+const SCREEN_WIDTH = 272;
+
 export function PhoneFrame({ children, className }: { children: React.ReactNode; className?: string }) {
+  const screen = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+
+  // Scale the screen content with the mockup so it looks identical on any viewport,
+  // e.g. on real phones where Safari's toolbars leave less room for the device.
+  useLayoutEffect(() => {
+    const el = screen.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([entry]) => setScale(entry.contentRect.width / SCREEN_WIDTH));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
   return (
     <div
       className={cn(
@@ -25,9 +41,14 @@ export function PhoneFrame({ children, className }: { children: React.ReactNode;
         className,
       )}
     >
-      <div className="relative size-full overflow-hidden rounded-[2.25rem] bg-white">
-        {children}
-        <div className="pointer-events-none absolute left-1/2 top-2.5 z-20 h-[26px] w-[34%] -translate-x-1/2 rounded-full bg-[#0B0B0B]" />
+      <div ref={screen} className="relative size-full overflow-hidden rounded-[2.25rem] bg-white">
+        <div
+          className="absolute left-0 top-0 origin-top-left"
+          style={{ width: SCREEN_WIDTH, height: `${100 / scale}%`, transform: `scale(${scale})` }}
+        >
+          {children}
+          <div className="pointer-events-none absolute left-1/2 top-2.5 z-20 h-[26px] w-[34%] -translate-x-1/2 rounded-full bg-[#0B0B0B]" />
+        </div>
       </div>
     </div>
   );
