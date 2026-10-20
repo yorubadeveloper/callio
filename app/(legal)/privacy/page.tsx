@@ -83,7 +83,7 @@ export default function PrivacyPage() {
             In-app call audio goes straight from your browser to Google’s Gemini AI. We don’t record audio. We keep
             a <strong>text transcript</strong> and a one-sentence summary so your agent can remember the call.
           </li>
-          <li>We don’t sell your data, we don’t show ads and we don’t use analytics or advertising trackers.</li>
+          <li>We don’t sell your data and we don’t show ads. We only use analytics (Google Analytics) if you allow it in the cookie banner.</li>
           <li>We don’t use your conversations to train AI models.</li>
           <li>
             You can export your data or delete your account at any time in the app. Deletion removes your memory,
@@ -234,6 +234,10 @@ export default function PrivacyPage() {
                 <td>Your consent (Art. 6(1)(a)), given when you paste and confirm the import</td>
               </tr>
               <tr>
+                <td>Measure how the website is used (Google Analytics)</td>
+                <td>Your consent (Art. 6(1)(a) GDPR and §25(1) TDDDG), given in the cookie banner. Withdraw it any time with “Cookie settings” at the bottom of every page</td>
+              </tr>
+              <tr>
                 <td>Send push notifications</td>
                 <td>Your consent (Art. 6(1)(a)), given when you allow notifications</td>
               </tr>
@@ -302,20 +306,21 @@ export default function PrivacyPage() {
 
       <section id="cookies">
         <Heading id="cookies" />
-        <p>We only use what is strictly necessary to run Callio:</p>
+        <p>These are strictly necessary to run Callio, so they don’t need consent under §25(2) TDDDG:</p>
         <ul>
-          <li>
-            <strong>A session cookie</strong> that keeps you signed in.
-          </li>
-          <li>
-            <strong>Your theme preference</strong> (light or dark), saved in your browser’s local storage.
-          </li>
+          <li><strong>A session cookie</strong> that keeps you signed in.</li>
+          <li><strong>Your theme and cookie choices</strong>, saved in your browser’s local storage.</li>
         </ul>
         <p>
-          We don’t use analytics, advertising or tracking cookies, and no third-party trackers run on our site.
-          Because these items are strictly necessary for a service you asked for, they don’t need consent under §25(2)
-          TDDDG, which is why you don’t see a cookie banner.
+          <strong>Analytics, only if you allow it.</strong> When you tap “Allow” in the cookie banner, we load Google
+          Analytics 4. It sets first-party cookies (<code>_ga</code> and <code>_ga_*</code>, which last up to two years)
+          and tells Google which pages you visit, your device and browser type and your approximate location. Google
+          Analytics 4 doesn’t log or store IP addresses. We use the reports only to improve the website: no ads, no
+          profiles, and it never sees your calls, memory or anything in your account. Google keeps the analytics data
+          for up to 14 months. If you tap “No thanks”, Google Analytics never loads. You can change your mind any time
+          with “Cookie settings” at the bottom of every page.
         </p>
+        <p>We don’t use advertising cookies or any other third-party trackers.</p>
       </section>
 
       <section id="retention">

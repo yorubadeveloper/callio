@@ -11,6 +11,7 @@ import { LANGUAGES } from "@/components/onboarding/onboarding-flow";
 import { api, ApiError } from "@/lib/api";
 import { disablePush, enablePush, pushEnabled, pushSupported } from "@/lib/push";
 import type { Detail, Tone, User } from "@/lib/types";
+import { CookieSettingsButton } from "@/components/analytics/analytics";
 import { Connections } from "./connections";
 import { btn, Chip, Field, inputClass, PageTitle, Segmented, Sheet } from "./ui";
 import { Spinner } from "@/components/brand/logo-loader";
@@ -264,6 +265,9 @@ export function YouView({ user: initial, calendarResult }: { user: User; calenda
                   </Link>
                 </li>
               ))}
+              <li>
+                <CookieSettingsButton className="text-ink-soft underline-offset-4 hover:text-ink hover:underline" />
+              </li>
             </ul>
           </section>
         </aside>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import { LogoMark, Wordmark } from "@/components/brand/logo";
+import { CookieSettingsButton } from "@/components/analytics/analytics";
 import { LEGAL } from "@/lib/legal";
 
 const COLUMNS = [
@@ -70,6 +71,7 @@ export function SiteFooter() {
 
       <div className="mx-auto flex max-w-6xl flex-col gap-3 border-t border-line px-5 py-6 text-[13px] text-ink-soft sm:flex-row sm:items-center sm:justify-between sm:px-8">
         <p>© {new Date().getFullYear()} Callio. All agents are AI, and they&apos;ll always tell you so.</p>
+        <CookieSettingsButton className="self-start text-left transition-colors hover:text-ink sm:self-auto" />
         <p className="flex items-center gap-1.5">
           <LogoMark className="size-3.5" /> callio.site
         </p>
