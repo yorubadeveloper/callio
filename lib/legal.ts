@@ -33,22 +33,24 @@ export const LEGAL = {
   url: "https://callio.site",
 
   operator: {
-    legalName: "[LEGAL NAME — your full name as sole trader, or the company name]",
-    legalForm: "[LEGAL FORM — e.g. sole proprietor (Einzelunternehmer) or UG (haftungsbeschränkt)]",
-    /** Only for a company. Delete the line on the imprint if you are a sole trader. */
-    representedBy: "[REPRESENTED BY — managing director's name, companies only]",
+    legalName: "[YOUR FULL NAME]",
+    legalForm: "Sole proprietor (Einzelunternehmer)",
+    /** Companies only (the managing director). Null hides the line on the imprint. */
+    representedBy: null as string | null,
     street: "[STREET AND NUMBER]",
     postcodeCity: "[POSTCODE CITY]",
     country: "Germany",
-    email: "[EMAIL — e.g. hello@callio.site]",
-    privacyEmail: "[PRIVACY EMAIL — e.g. privacy@callio.site]",
-    abuseEmail: "[ABUSE EMAIL — e.g. abuse@callio.site]",
+    email: "hello@callio.site",
+    privacyEmail: "privacy@callio.site",
+    abuseEmail: "abuse@callio.site",
     /** §5 DDG requires a fast, direct way to reach you besides email. */
     phone: "[PHONE NUMBER — or another fast, direct contact route]",
-    vatId: "[VAT ID (USt-IdNr.) or 'not applicable']",
-    register: "[COMMERCIAL REGISTER AND NUMBER — e.g. Amtsgericht Berlin, HRB 000000 — or 'not registered']",
+    /** USt-IdNr. once you have one. Null hides the section (small business without a VAT ID). */
+    vatId: null as string | null,
+    /** Commercial register entry once registered as a company. Null hides the section. */
+    register: null as string | null,
     /** Person responsible for editorial content under §18(2) MStV. */
-    contentResponsible: "[NAME AND ADDRESS of the person responsible for content — usually you]",
+    contentResponsible: "The operator named above, at the address above",
   },
 
   /** The data protection authority of the founder's German Land. */
@@ -77,7 +79,7 @@ export const LEGAL = {
     /** Deleted accounts: memory, transcripts and schedules are gone within this many days. */
     deletionDays: 30,
     /** Server and error logs. */
-    logDays: "[LOG RETENTION — e.g. 30] days",
+    logDays: "30 days",
   },
 
   age: {

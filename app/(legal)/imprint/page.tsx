@@ -36,7 +36,7 @@ export default function ImprintPage() {
             <br />
             {operator.country}
           </p>
-          <p>Represented by (Vertreten durch): {operator.representedBy}</p>
+          {operator.representedBy && <p>Represented by (Vertreten durch): {operator.representedBy}</p>}
         </section>
 
         <section id="contact">
@@ -50,19 +50,23 @@ export default function ImprintPage() {
           </p>
         </section>
 
-        <section id="register">
-          <h2>
-            <a href="#register">Register entry (Registereintrag)</a>
-          </h2>
-          <p>{operator.register}</p>
-        </section>
+        {operator.register && (
+          <section id="register">
+            <h2>
+              <a href="#register">Register entry (Registereintrag)</a>
+            </h2>
+            <p>{operator.register}</p>
+          </section>
+        )}
 
-        <section id="vat">
-          <h2>
-            <a href="#vat">VAT ID (Umsatzsteuer-Identifikationsnummer)</a>
-          </h2>
-          <p>VAT identification number under §27a of the German VAT Act (UStG): {operator.vatId}</p>
-        </section>
+        {operator.vatId && (
+          <section id="vat">
+            <h2>
+              <a href="#vat">VAT ID (Umsatzsteuer-Identifikationsnummer)</a>
+            </h2>
+            <p>VAT identification number under §27a of the German VAT Act (UStG): {operator.vatId}</p>
+          </section>
+        )}
 
         <section id="responsible">
           <h2>
@@ -97,9 +101,9 @@ export default function ImprintPage() {
             <a href="#links">Liability for links (Haftung für Links)</a>
           </h2>
           <p>
-            Our site contains links to external websites. We have no control over their content and are not
-            responsible for it. The provider or operator of a linked page is always responsible for its content. If
-            we become aware of a legal violation on a linked page, we will remove the link.
+            Our site contains links to external websites. We have no control over their content and are not responsible
+            for it. The provider or operator of a linked page is always responsible for its content. If we become aware
+            of a legal violation on a linked page, we will remove the link.
           </p>
         </section>
       </div>
