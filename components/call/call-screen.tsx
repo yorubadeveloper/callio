@@ -38,12 +38,15 @@ export function CallScreen({
   engine,
   credits,
   demo = false,
+  incoming = false,
 }: {
   agent: AgentProfile;
   engine: CallEngine;
   credits: number;
   /** A scripted call for visitors who haven't signed up. */
   demo?: boolean;
+  /** Opened from a scheduled call's notification: show it like a phone ringing, with Answer and Decline. */
+  incoming?: boolean;
 }) {
   const snap = useSyncExternalStore(engine.subscribe, engine.getSnapshot, engine.getSnapshot);
   const [captionsOn, setCaptionsOn] = useState(true);
@@ -107,7 +110,7 @@ export function CallScreen({
           <h1 className="mt-7 font-display text-[clamp(2.2rem,9vw,3rem)] leading-none font-medium tracking-[-0.04em]">
             {agent.name}
           </h1>
-          <StatusLine snap={snap} role={agent.role} />
+          <StatusLine snap={snap} role={incoming ? "Incoming call…" : agent.role} />
 
           <Actions snap={snap} />
         </div>
@@ -126,13 +129,17 @@ export function CallScreen({
       {/* controls */}
       <footer className="relative z-10 px-6 pb-[max(env(safe-area-inset-bottom),1.75rem)] pt-2">
         {status === "idle" || status === "error" ? (
-          <StartCall
-            agentName={agent.name}
-            credits={credits}
-            error={snap.error}
-            demo={demo}
-            onStart={() => engine.start()}
-          />
+          incoming && status === "idle" ? (
+            <IncomingCall agentName={agent.name} onAnswer={() => engine.start()} />
+          ) : (
+            <StartCall
+              agentName={agent.name}
+              credits={credits}
+              error={snap.error}
+              demo={demo}
+              onStart={() => engine.start()}
+            />
+          )
         ) : inCall ? (
           <div className="mx-auto flex max-w-sm items-end justify-between">
             <Control
@@ -363,6 +370,31 @@ function Control({
       </span>
       {label}
     </button>
+  );
+}
+
+function IncomingCall({ agentName, onAnswer }: { agentName: string; onAnswer: () => void }) {
+  return (
+    <div className="mx-auto flex max-w-sm items-start justify-between px-6">
+      <Link href="/app" className="flex flex-col items-center gap-2" aria-label="Decline">
+        <span className="grid size-[72px] place-items-center rounded-full bg-[#E5484D] text-[30px] text-white shadow-[0_12px_40px_-10px_#E5484D] transition-transform active:scale-95">
+          <PhoneDisconnect weight="fill" />
+        </span>
+        <span className="text-[13px] text-white/65">Decline</span>
+      </Link>
+      <button
+        type="button"
+        onClick={onAnswer}
+        className="flex flex-col items-center gap-2"
+        aria-label={`Answer ${agentName}`}
+      >
+        <span className="relative grid size-[72px] place-items-center rounded-full bg-teal text-[30px] text-[#0E0E10] shadow-[0_12px_40px_-10px_#64B2AF] transition-transform active:scale-95">
+          <span aria-hidden className="absolute inset-0 animate-ping rounded-full bg-teal/40 motion-reduce:hidden" />
+          <Phone weight="fill" className="relative" />
+        </span>
+        <span className="text-[13px] text-white/65">Answer</span>
+      </button>
+    </div>
   );
 }
 

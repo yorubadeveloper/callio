@@ -273,3 +273,25 @@
   0%, 100% { height: 4px; }
   50% { height: 14px; }
 }
+
+/* ---------- Installed as an app (home screen) ---------- */
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+@media (display-mode: standalone) {
+  html,
+  body {
+    overscroll-behavior-y: none;
+  }
+  /* Like a native app: no text-selection callouts on buttons and chrome, but content stays selectable. */
+  button,
+  a,
+  nav,
+  header,
+  img,
+  svg {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+}

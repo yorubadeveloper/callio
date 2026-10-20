@@ -31,3 +31,21 @@ export function when(iso: string, timezone: string, locale = "en-GB", now = new 
     ) + `, ${time}`
   );
 }
+
+/** "Today", "Tomorrow", "Thursday 23 October": headings for lists grouped by day. */
+export function dayLabel(iso: string, timezone: string, locale = "en-GB", now = new Date()) {
+  const day = (d: Date) => new Intl.DateTimeFormat("en-CA", { timeZone: timezone }).format(d);
+  const diffDays = Math.round((Date.parse(day(new Date(iso))) - Date.parse(day(now))) / 86_400_000);
+  if (diffDays === 0) return "Today";
+  if (diffDays === 1) return "Tomorrow";
+  if (diffDays === -1) return "Yesterday";
+  return new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long", timeZone: timezone }).format(
+    new Date(iso),
+  );
+}
+
+export function clockTime(iso: string, timezone: string, locale = "en-GB") {
+  return new Intl.DateTimeFormat(locale, { hour: "numeric", minute: "2-digit", timeZone: timezone }).format(
+    new Date(iso),
+  );
+}
