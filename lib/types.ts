@@ -112,6 +112,15 @@ export interface Schedule {
   status: "pending" | "done" | "cancelled";
 }
 
+export interface AppNotification {
+  id: string;
+  kind: "recap" | "reminder" | "task" | "call";
+  title: string;
+  body: string;
+  created_at: string;
+  read: boolean;
+}
+
 export interface TaskStep {
   n: number;
   action: string;

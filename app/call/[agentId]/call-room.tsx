@@ -21,5 +21,5 @@ export function CallRoom({
   const [engine] = useState(() =>
     demo ? createDemoEngine(agent.template) : createGeminiEngine({ agentId: agent.id, purpose }),
   );
-  return <CallScreen agent={agent} engine={engine} credits={credits} demo={demo} />;
+  return <CallScreen agent={agent} engine={engine} credits={credits} demo={demo} incoming={Boolean(purpose)} />;
 }

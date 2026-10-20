@@ -137,9 +137,14 @@ export default async function HomePage() {
 
       <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
         <section className="rounded-[28px] bg-plate p-5 ring-1 ring-line sm:p-6">
-          <h2 className="flex items-center gap-2 text-[13px] font-semibold uppercase tracking-wider text-ink-soft">
-            <CalendarBlank weight="bold" /> Coming up
-          </h2>
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="flex items-center gap-2 text-[13px] font-semibold uppercase tracking-wider text-ink-soft">
+              <CalendarBlank weight="bold" /> Coming up
+            </h2>
+            <Link href="/app/upcoming" className="text-[14px] font-semibold text-ink-soft hover:text-ink">
+              See all
+            </Link>
+          </div>
           {highlights.next_schedule ? (
             <div className="mt-4 flex items-center gap-3">
               {byId.get(highlights.next_schedule.agent_id) && (

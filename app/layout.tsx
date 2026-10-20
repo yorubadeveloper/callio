@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/providers/theme-provider";
 import { SessionProvider } from "@/components/providers/session-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { Analytics } from "@/components/analytics/analytics";
+import { RegisterServiceWorker } from "@/components/pwa/register-sw";
 
 const figtree = Figtree({
   subsets: ["latin"],
@@ -68,9 +69,13 @@ export const metadata: Metadata = {
   },
   robots: { index: true, follow: true },
   formatDetection: { telephone: false },
+  appleWebApp: { capable: true, title: "Callio", statusBarStyle: "default" },
+  icons: { apple: "/brand/apple-touch-icon.png" },
 };
 
 export const viewport: Viewport = {
+  // Edge to edge on notched phones; layouts pad with env(safe-area-inset-*).
+  viewportFit: "cover",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#F3F2EE" },
     { media: "(prefers-color-scheme: dark)", color: "#111111" },
@@ -94,6 +99,7 @@ export default function RootLayout({
             {children}
             <Toaster />
             <Analytics />
+            <RegisterServiceWorker />
           </ThemeProvider>
         </SessionProvider>
       </body>

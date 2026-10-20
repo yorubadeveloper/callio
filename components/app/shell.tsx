@@ -12,6 +12,7 @@ import {
   type Icon,
   Monitor,
   SidebarSimple,
+  CalendarDots,
   PlugsConnected,
   UserCircle,
   UsersThree,
@@ -36,6 +37,7 @@ const GROUPS: { label: string; items: NavItem[] }[] = [
       { href: "/app", label: "Home", icon: House, tab: true },
       { href: "/app/agents", label: "Agents", icon: UsersThree, tab: true },
       { href: "/app/calls", label: "Calls", icon: ChatsCircle, tab: true },
+      { href: "/app/upcoming", label: "Upcoming", icon: CalendarDots },
     ],
   },
   {
@@ -145,14 +147,26 @@ export function AppShell({ user, children }: { user: User; children: React.React
         <Link href="/app" className="text-lg" aria-label="Callio home">
           <Wordmark />
         </Link>
-        <Link
-          href="/app/billing"
-          className="flex h-9 items-center gap-1.5 rounded-full bg-plate px-3 text-[14px] font-semibold ring-1 ring-line"
-          aria-label={`${user.credits.total} credits left. Plan and credits`}
-        >
-          <Coins weight="fill" className="text-amber" />
-          {user.credits.total}
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/app/upcoming"
+            className={cn(
+              "grid size-9 place-items-center rounded-full ring-1 ring-line transition-colors",
+              pathname.startsWith("/app/upcoming") ? "bg-ink text-page" : "bg-plate",
+            )}
+            aria-label="Upcoming calls and reminders"
+          >
+            <CalendarDots weight={pathname.startsWith("/app/upcoming") ? "fill" : "regular"} className="text-[18px]" />
+          </Link>
+          <Link
+            href="/app/billing"
+            className="flex h-9 items-center gap-1.5 rounded-full bg-plate px-3 text-[14px] font-semibold ring-1 ring-line"
+            aria-label={`${user.credits.total} credits left. Plan and credits`}
+          >
+            <Coins weight="fill" className="text-amber" />
+            {user.credits.total}
+          </Link>
+        </div>
       </header>
 
       <div
