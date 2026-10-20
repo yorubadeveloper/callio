@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { Bell, CircleNotch, DownloadSimple, SignOut, Trash, X } from "@phosphor-icons/react";
+import { Bell, DownloadSimple, SignOut, Trash, X } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { LANGUAGES } from "@/components/onboarding/onboarding-flow";
@@ -13,6 +13,7 @@ import { disablePush, enablePush, pushEnabled, pushSupported } from "@/lib/push"
 import type { Detail, Tone, User } from "@/lib/types";
 import { Connections } from "./connections";
 import { btn, Chip, Field, inputClass, PageTitle, Segmented, Sheet } from "./ui";
+import { Spinner } from "@/components/brand/logo-loader";
 
 export function YouView({ user: initial, calendarResult }: { user: User; calendarResult?: string }) {
   const router = useRouter();
@@ -232,7 +233,7 @@ export function YouView({ user: initial, calendarResult }: { user: User; calenda
             </p>
           )}
           <button type="button" onClick={save} disabled={busy} className={cn(btn.primary, "w-full sm:w-auto")}>
-            {busy && <CircleNotch className="animate-spin" />} Save
+            {busy && <Spinner />} Save
           </button>
         </section>
 
@@ -309,7 +310,7 @@ function Notifications() {
             }}
             className={cn(on ? btn.soft : btn.primary, "mt-4 h-11")}
           >
-            {busy && <CircleNotch className="animate-spin" />} {on ? "Turn off" : "Turn on"}
+            {busy && <Spinner />} {on ? "Turn off" : "Turn on"}
           </button>
         )}
       </div>
@@ -369,7 +370,7 @@ function Account() {
             }}
             className={btn.danger}
           >
-            {busy && <CircleNotch className="animate-spin" />} Delete
+            {busy && <Spinner />} Delete
           </button>
         </div>
       </Sheet>

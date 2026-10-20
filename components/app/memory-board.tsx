@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { CircleNotch, DownloadSimple, Plus } from "@phosphor-icons/react";
+import { DownloadSimple, Plus } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import type { PersonalAgent } from "@/lib/agents/personalize";
 import { api, ApiError } from "@/lib/api";
@@ -10,6 +10,7 @@ import type { Memory } from "@/lib/types";
 import { MemoryList } from "./agent-profile";
 import { MemoryImport } from "./memory-import";
 import { btn, inputClass, PageTitle, Sheet } from "./ui";
+import { Spinner } from "@/components/brand/logo-loader";
 
 export function MemoryBoard({
   memories: initial,
@@ -90,7 +91,7 @@ export function MemoryBoard({
           aria-label="Add"
           className={cn(btn.primary, "w-12 shrink-0 px-0")}
         >
-          {busy ? <CircleNotch className="animate-spin" /> : <Plus weight="bold" />}
+          {busy ? <Spinner /> : <Plus weight="bold" />}
         </button>
       </form>
       {error && <p className="mt-2 text-[14px] text-[#B0412C] dark:text-coral">{error}</p>}

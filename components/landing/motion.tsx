@@ -9,8 +9,9 @@ import { LOGO_BLOBS } from "@/components/brand/logo-paths";
 export const EASE_OUT = [0.2, 0.8, 0.2, 1] as const;
 const EASE_IN = [0.7, 0, 0.84, 0] as const;
 
-// The intro plays once per browser session; later visits go straight to the page.
-const INTRO_KEY = "callio-intro-seen";
+// The intro plays on every fresh visit or refresh, but not when someone comes
+// back to the landing page from elsewhere in the site without reloading.
+let introPlayedThisLoad = false;
 const INTRO_MS = 1500;
 
 const IntroDone = createContext(true);
@@ -28,12 +29,8 @@ export function LandingShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (skip.current === null) {
-      try {
-        skip.current = sessionStorage.getItem(INTRO_KEY) === "1";
-        sessionStorage.setItem(INTRO_KEY, "1");
-      } catch {
-        skip.current = false;
-      }
+      skip.current = introPlayedThisLoad;
+      introPlayedThisLoad = true;
     }
     const instant = reduce || skip.current;
     const leave = setTimeout(() => setPhase(instant ? "gone" : "leaving"), instant ? 0 : INTRO_MS);

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Check, CircleNotch, Globe, LockSimple, Monitor, Prohibit, WarningCircle } from "@phosphor-icons/react";
+import { Check, Globe, LockSimple, Monitor, Prohibit, WarningCircle } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { AgentFace } from "@/components/landing/agent-face";
 import type { PersonalAgent } from "@/lib/agents/personalize";
@@ -13,6 +13,7 @@ import { CREDIT_COSTS, type PlanId } from "@/lib/pricing";
 import type { Task } from "@/lib/types";
 import { btn, Field, inputClass } from "./ui";
 import { UpgradeSheet } from "./upgrade";
+import { Spinner } from "@/components/brand/logo-loader";
 
 export const TASK_STATUS: Record<Task["status"], string> = {
   queued: "Waiting to start",
@@ -142,13 +143,7 @@ export function NewTask({ agents, plan, credits }: { agents: PersonalAgent[]; pl
         disabled={allowed && (busy || goal.trim().length < 8 || credits < CREDIT_COSTS.computerTaskFrom)}
         className={cn(btn.primary, "mt-6 w-full sm:w-auto")}
       >
-        {busy ? (
-          <CircleNotch className="animate-spin" />
-        ) : allowed ? (
-          <Monitor weight="fill" />
-        ) : (
-          <LockSimple weight="bold" />
-        )}
+        {busy ? <Spinner /> : allowed ? <Monitor weight="fill" /> : <LockSimple weight="bold" />}
         {allowed ? "Start task" : "Unlock computer tasks"}
       </button>
       <UpgradeSheet
@@ -195,7 +190,7 @@ export function TaskLive({ task: initial, agent }: { task: Task; agent: Personal
           <div className="flex items-center gap-2 border-b border-white/10 px-4 py-2.5 text-[13px] text-white/60">
             <Globe />
             <span className="truncate">{task.url ?? "about:blank"}</span>
-            {active && <CircleNotch className="ml-auto animate-spin text-amber" />}
+            {active && <Spinner className="ml-auto" />}
           </div>
           {/* eslint-disable-next-line @next/next/no-img-element -- live screenshots, not static assets */}
           <img

@@ -2,11 +2,12 @@
 
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowSquareOut, Check, CircleNotch, Copy } from "@phosphor-icons/react";
+import { ArrowSquareOut, Check, Copy } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { api, ApiError } from "@/lib/api";
 import type { ImportedFact, ProfileSuggestion, User } from "@/lib/types";
 import { btn, inputClass } from "./ui";
+import { Spinner } from "@/components/brand/logo-loader";
 
 export const IMPORT_PROMPT = `I'm setting up Callio, a personal AI assistant that talks to me by voice. Using everything you remember and know about me from our conversations, write a profile so it can get to know me. Include:
 
@@ -173,7 +174,7 @@ export function MemoryImport({ onDone, onSkip }: { onDone: (user: User, saved: n
               </button>
             )}
             <button type="button" onClick={read} disabled={text.trim().length < 20 || busy} className={btn.primary}>
-              {busy && <CircleNotch className="animate-spin" />} {busy ? "Reading…" : "Read it"}
+              {busy && <Spinner />} {busy ? "Reading…" : "Read it"}
             </button>
           </div>
         </motion.div>
@@ -227,7 +228,7 @@ export function MemoryImport({ onDone, onSkip }: { onDone: (user: User, saved: n
               Back
             </button>
             <button type="button" onClick={save} disabled={total === 0 || busy} className={btn.primary}>
-              {busy && <CircleNotch className="animate-spin" />} Save {total} {total === 1 ? "thing" : "things"}
+              {busy && <Spinner />} Save {total} {total === 1 ? "thing" : "things"}
             </button>
           </div>
         </motion.div>

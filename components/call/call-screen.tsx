@@ -7,7 +7,6 @@ import {
   CaretDown,
   ChatText,
   Check,
-  CircleNotch,
   Lightbulb,
   Microphone,
   MicrophoneSlash,
@@ -24,6 +23,7 @@ import type { CallEngine, CallSnapshot } from "@/lib/call/types";
 import { AgentOrb } from "./agent-orb";
 import { CallSummary } from "./call-summary";
 import { SkillsSheet } from "./skills-sheet";
+import { Spinner } from "@/components/brand/logo-loader";
 
 const STATUS_LINE: Record<CallSnapshot["activity"], string> = {
   listening: "Listening",
@@ -239,7 +239,7 @@ function Actions({ snap }: { snap: CallSnapshot }) {
             className="flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-2 text-[13px] backdrop-blur-md"
           >
             {a.state === "running" ? (
-              <CircleNotch className="animate-spin text-amber" />
+              <Spinner />
             ) : a.state === "done" ? (
               <Check weight="bold" className="text-teal" />
             ) : (

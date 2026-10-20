@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowLeft, Bell, Check, CircleNotch, Phone } from "@phosphor-icons/react";
+import { ArrowLeft, Bell, Check, Phone } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { Wordmark } from "@/components/brand/logo";
 import { AgentFace } from "@/components/landing/agent-face";
@@ -14,6 +14,7 @@ import type { User, UserAgent } from "@/lib/types";
 import { AgentEditor, AgentPreview, draftFromTemplate, type AgentDraft } from "@/components/app/agent-editor";
 import { MemoryImport } from "@/components/app/memory-import";
 import { btn, Chip, Field, inputClass } from "@/components/app/ui";
+import { Spinner } from "@/components/brand/logo-loader";
 
 const STEPS = ["you", "goals", "agent", "memory", "ready"] as const;
 type StepId = (typeof STEPS)[number];
@@ -376,7 +377,7 @@ export function OnboardingFlow({ user: initialUser }: { user: User }) {
                 disabled={busy || (step === "goals" && goals.length === 0)}
                 className={cn(step === "ready" ? btn.call : btn.primary, "w-full sm:w-auto sm:min-w-56")}
               >
-                {busy ? <CircleNotch className="animate-spin" /> : step === "ready" ? <Phone weight="fill" /> : null}
+                {busy ? <Spinner /> : step === "ready" ? <Phone weight="fill" /> : null}
                 {step === "ready" ? `Call ${agentName}` : step === "agent" ? `Keep ${agentName}` : "Continue"}
               </button>
             </div>

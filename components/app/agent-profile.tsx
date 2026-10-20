@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
-import { CircleNotch, LockSimple, Phone, Plus, Trash } from "@phosphor-icons/react";
+import { LockSimple, Phone, Plus, Trash } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { AgentFace } from "@/components/landing/agent-face";
 import { agentProfile } from "@/lib/agents/catalog";
@@ -17,6 +17,7 @@ import type { Memory, Schedule, UserAgent } from "@/lib/types";
 import { AgentEditor, type AgentDraft } from "./agent-editor";
 import { btn, inputClass, Segmented } from "./ui";
 import { UpgradeSheet } from "./upgrade";
+import { Spinner } from "@/components/brand/logo-loader";
 
 type Tab = "skills" | "memory" | "customize";
 
@@ -277,7 +278,7 @@ function AgentMemory({
             aria-label="Add"
             className={cn(btn.primary, "w-12 shrink-0 px-0")}
           >
-            {busy ? <CircleNotch className="animate-spin" /> : <Plus weight="bold" />}
+            {busy ? <Spinner /> : <Plus weight="bold" />}
           </button>
         </form>
         {error && <p className="mt-2 text-[14px] text-[#B0412C] dark:text-coral">{error}</p>}
@@ -406,7 +407,7 @@ function Customize({ agent, onSaved }: { agent: UserAgent; onSaved: (a: UserAgen
       )}
       <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-between">
         <button type="button" onClick={save} disabled={busy !== null} className={btn.primary}>
-          {busy === "save" && <CircleNotch className="animate-spin" />} Save changes
+          {busy === "save" && <Spinner />} Save changes
         </button>
         {confirmDelete ? (
           <div className="flex gap-2">
@@ -414,7 +415,7 @@ function Customize({ agent, onSaved }: { agent: UserAgent; onSaved: (a: UserAgen
               Keep {draft.name || base.name}
             </button>
             <button type="button" onClick={remove} disabled={busy !== null} className={btn.danger}>
-              {busy === "delete" && <CircleNotch className="animate-spin" />} Delete for good
+              {busy === "delete" && <Spinner />} Delete for good
             </button>
           </div>
         ) : (

@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { CalendarBlank, CheckCircle, CircleNotch } from "@phosphor-icons/react";
+import { CalendarBlank, CheckCircle } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { api, ApiError } from "@/lib/api";
 import type { User } from "@/lib/types";
 import { btn } from "./ui";
+import { Spinner } from "@/components/brand/logo-loader";
 
 const RESULT: Record<string, { tone: "good" | "bad"; text: string }> = {
   connected: { tone: "good", text: "Google Calendar connected. Your agents can see and update your schedule now." },
@@ -99,7 +100,7 @@ export function Connections({ user, result }: { user: User; result?: string }) {
           onClick={calendar?.connected ? disconnect : connect}
           className={cn(calendar?.connected ? btn.soft : btn.primary, "mt-4 h-11 w-full")}
         >
-          {busy && <CircleNotch className="animate-spin" />}
+          {busy && <Spinner />}
           {calendar?.connected
             ? "Disconnect"
             : calendar?.needs_reconnect

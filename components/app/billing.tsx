@@ -2,13 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, CircleNotch, Coins } from "@phosphor-icons/react";
+import { Check, Coins } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { api, ApiError } from "@/lib/api";
 import { plan as planById, PLANS, TOP_UPS, type PlanId } from "@/lib/pricing";
 import type { Billing } from "@/lib/types";
 import { btn, Field, inputClass, PageTitle, Segmented, Sheet } from "./ui";
 import { useCheckout } from "./upgrade";
+import { Spinner } from "@/components/brand/logo-loader";
 
 const REASONS: Record<string, string> = {
   signup: "Welcome credits",
@@ -142,7 +143,7 @@ export function BillingView({
                   }
                   className={cn(isCurrent ? btn.soft : btn.primary, "mt-5 h-11")}
                 >
-                  {busy === p.id && <CircleNotch className="animate-spin" />}
+                  {busy === p.id && <Spinner />}
                   {isCurrent ? "Current plan" : `Choose ${p.name}`}
                 </button>
               </li>
@@ -170,7 +171,7 @@ export function BillingView({
                 </span>
                 <span className="text-[13px] text-ink-soft">credits</span>
                 <span className="mt-3 inline-flex items-center gap-1.5 text-[15px] font-semibold">
-                  {busy === t.id && <CircleNotch className="animate-spin" />} ${t.price}
+                  {busy === t.id && <Spinner />} ${t.price}
                 </span>
               </button>
             </li>
@@ -234,7 +235,7 @@ function ManageButton() {
         }}
         className="mt-5 inline-flex h-11 items-center gap-2 rounded-full bg-white/12 px-5 text-[15px] font-semibold hover:bg-white/20"
       >
-        {busy && <CircleNotch className="animate-spin" />} Payment details & invoices
+        {busy && <Spinner />} Payment details & invoices
       </button>
       {error && <p className="mt-2 text-[13px] text-coral">{error}</p>}
     </>
@@ -301,7 +302,7 @@ function ContractActions({ billing, onChange }: { billing: Billing; onChange: (b
           }
           className={cn(btn.primary, "mt-6 w-full")}
         >
-          {busy && <CircleNotch className="animate-spin" />} Confirm cancellation
+          {busy && <Spinner />} Confirm cancellation
         </button>
       </Sheet>
 
@@ -339,7 +340,7 @@ function ContractActions({ billing, onChange }: { billing: Billing; onChange: (b
           }
           className={cn(btn.primary, "mt-6 w-full")}
         >
-          {busy && <CircleNotch className="animate-spin" />} Confirm withdrawal
+          {busy && <Spinner />} Confirm withdrawal
         </button>
       </Sheet>
     </section>

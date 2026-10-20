@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { CircleNotch } from "@phosphor-icons/react";
+import { Spinner } from "@/components/brand/logo-loader";
 
 /** Google's sign-in button, following their branding guidelines (white, full-colour G). */
 export function GoogleSignInButton({ next }: { next?: string }) {
@@ -18,7 +18,7 @@ export function GoogleSignInButton({ next }: { next?: string }) {
       disabled={loading}
       className="flex h-14 w-full items-center justify-center gap-3 rounded-full bg-white text-[16px] font-semibold text-[#1F1F1F] shadow-[0_1px_2px_rgb(0_0_0/0.08),0_8px_24px_-12px_rgb(0_0_0/0.25)] ring-1 ring-black/10 transition-transform duration-200 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-80"
     >
-      {loading ? <CircleNotch className="size-5 animate-spin text-[#1F1F1F]" /> : <GoogleG className="size-5" />}
+      {loading ? <Spinner className="size-5" /> : <GoogleG className="size-5" />}
       {loading ? "Opening Google…" : "Continue with Google"}
     </button>
   );
@@ -59,7 +59,7 @@ export function DevSignInButton({ next }: { next?: string }) {
       }}
       className="flex h-12 w-full items-center justify-center gap-2 rounded-full border-2 border-dashed border-amber text-[15px] font-semibold text-ink"
     >
-      {loading && <CircleNotch className="size-4 animate-spin" />} Continue as test user (dev only)
+      {loading && <Spinner className="size-4" />} Continue as test user (dev only)
     </button>
   );
 }

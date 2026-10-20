@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Check, CircleNotch } from "@phosphor-icons/react";
+import { Check } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { api, ApiError } from "@/lib/api";
 import { plan as planById, type PlanId } from "@/lib/pricing";
 import { btn, Sheet } from "./ui";
+import { Spinner } from "@/components/brand/logo-loader";
 
 /** Sends the person to Stripe Checkout. Credits are granted by the webhook, never on return. */
 export async function startCheckout(
@@ -79,7 +80,7 @@ export function UpgradeSheet({
         disabled={busy !== null}
         className={cn(btn.primary, "mt-5 w-full")}
       >
-        {busy && <CircleNotch className="animate-spin" />} Upgrade to {p.name}
+        {busy && <Spinner />} Upgrade to {p.name}
       </button>
       <p className="mt-3 text-center text-[13px] text-ink-soft">Cancel any time. Tax is added at checkout.</p>
     </Sheet>

@@ -172,6 +172,38 @@
   45% { transform: scale(1.06); }
 }
 
+/* Loading: the blobs breathe in turn while the C turns, like the dial spinning. */
+.logo-loading {
+  animation: logo-turn 2.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+.logo-loading path {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: blob-breathe 1.2s ease-in-out infinite;
+}
+.logo-loading path:nth-child(2) { animation-delay: 0.15s; }
+.logo-loading path:nth-child(3) { animation-delay: 0.45s; }
+.logo-loading path:nth-child(4) { animation-delay: 0.3s; }
+
+@keyframes logo-turn {
+  0% { transform: rotate(0deg); }
+  50% { transform: rotate(180deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes blob-breathe {
+  0%, 100% { transform: scale(0.72); opacity: 0.75; }
+  45% { transform: scale(1.04); opacity: 1; }
+}
+
+/* Loaders wait a beat before appearing, so quick loads don't flash. */
+.loader-fade-in {
+  animation: loader-in 0.4s ease-out 0.15s both;
+}
+@keyframes loader-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
 /* Agents blink every few seconds. */
 .agent-eyes {
   transform-box: fill-box;
@@ -221,6 +253,10 @@
 .aurora-b { animation: aurora-drift-b 18s ease-in-out infinite; }
 
 @media (prefers-reduced-motion: reduce) {
+  .logo-loading,
+  .logo-loading path {
+    animation: none;
+  }
   .aurora-a,
   .aurora-b,
   .logo-speaking path,

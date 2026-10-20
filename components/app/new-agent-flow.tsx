@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowLeft, CircleNotch } from "@phosphor-icons/react";
+import { ArrowLeft } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { AgentFace } from "@/components/landing/agent-face";
 import { AGENT_PROFILES, agentProfile } from "@/lib/agents/catalog";
@@ -11,6 +11,7 @@ import { api, ApiError } from "@/lib/api";
 import type { UserAgent } from "@/lib/types";
 import { AgentEditor, AgentPreview, draftFromTemplate, type AgentDraft } from "./agent-editor";
 import { btn } from "./ui";
+import { Spinner } from "@/components/brand/logo-loader";
 
 /** Pick who they start as, then make them yours. */
 export function NewAgentFlow({ initialTemplate }: { initialTemplate?: string }) {
@@ -114,8 +115,7 @@ export function NewAgentFlow({ initialTemplate }: { initialTemplate?: string }) 
                 disabled={busy}
                 className={cn(btn.primary, "w-full sm:w-auto sm:min-w-56")}
               >
-                {busy && <CircleNotch className="animate-spin" />} Create{" "}
-                {draft.name || agentProfile(draft.template)!.name}
+                {busy && <Spinner />} Create {draft.name || agentProfile(draft.template)!.name}
               </button>
             </div>
           </div>
