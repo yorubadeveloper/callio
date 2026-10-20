@@ -12,6 +12,8 @@ import {
   MicrophoneSlash,
   Phone,
   PhoneDisconnect,
+  SpeakerHigh,
+  SpeakerLow,
   WarningCircle,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
@@ -19,7 +21,7 @@ import { LogoMark } from "@/components/brand/logo";
 import { EASE_OUT } from "@/components/landing/motion";
 import type { AgentProfile } from "@/lib/agents/catalog";
 import { CREDIT_COSTS } from "@/lib/pricing";
-import type { CallEngine, CallSnapshot } from "@/lib/call/types";
+import type { AudioOutput, CallEngine, CallSnapshot } from "@/lib/call/types";
 import { AgentOrb } from "./agent-orb";
 import { CallSummary } from "./call-summary";
 import { SkillsSheet } from "./skills-sheet";
@@ -46,6 +48,17 @@ export function CallScreen({
   const snap = useSyncExternalStore(engine.subscribe, engine.getSnapshot, engine.getSnapshot);
   const [captionsOn, setCaptionsOn] = useState(true);
   const [skillsOpen, setSkillsOpen] = useState(false);
+  const [outputs, setOutputs] = useState<AudioOutput[] | null>(null);
+
+  // Like a phone: on desktop browsers that can route audio, pick the output;
+  // otherwise the button flips between speaker and quieter earpiece volume.
+  const onSpeaker = async () => {
+    const audio = engine.audio;
+    if (!audio) return;
+    const list = await audio.listOutputs().catch(() => []);
+    if (list.length > 1) setOutputs(list);
+    else audio.setSpeaker(!snap.speaker);
+  };
 
   // Hang up if the person leaves the page mid-call.
   useEffect(() => () => engine.end(), [engine]);
@@ -129,6 +142,14 @@ export function CallScreen({
               icon={snap.muted ? <MicrophoneSlash weight="fill" /> : <Microphone weight="fill" />}
               level={engine.levels}
             />
+            {engine.audio && (
+              <Control
+                label="Speaker"
+                active={snap.speaker}
+                onClick={onSpeaker}
+                icon={snap.speaker ? <SpeakerHigh weight="fill" /> : <SpeakerLow weight="fill" />}
+              />
+            )}
             <Control
               label="Captions"
               active={captionsOn}
@@ -155,6 +176,14 @@ export function CallScreen({
         )}
       </AnimatePresence>
       <SkillsSheet open={skillsOpen} onClose={() => setSkillsOpen(false)} agent={agent} />
+      <OutputSheet
+        outputs={outputs}
+        current={snap.outputId}
+        speaker={snap.speaker}
+        onPick={(id) => void engine.audio?.setOutput(id)}
+        onSpeaker={(on) => engine.audio?.setSpeaker(on)}
+        onClose={() => setOutputs(null)}
+      />
     </div>
   );
 }
@@ -364,7 +393,7 @@ function StartCall({
       </button>
       <p className="text-center text-[13px] text-white/50">
         {demo ? (
-          "A 20-second sample call. No microphone needed."
+          "Turn your sound on. A 30-second sample call, no microphone needed."
         ) : empty ? (
           <>
             You&apos;re out of credits.{" "}
@@ -377,5 +406,82 @@ function StartCall({
         )}
       </p>
     </div>
+  );
+}
+
+/** Audio output picker, shown where the browser can route sound to a chosen device. */
+function OutputSheet({
+  outputs,
+  current,
+  speaker,
+  onPick,
+  onSpeaker,
+  onClose,
+}: {
+  outputs: AudioOutput[] | null;
+  current: string | null;
+  speaker: boolean;
+  onPick: (id: string) => void;
+  onSpeaker: (on: boolean) => void;
+  onClose: () => void;
+}) {
+  return (
+    <AnimatePresence>
+      {outputs && (
+        <motion.div
+          className="absolute inset-0 z-40 flex items-end justify-center bg-black/50 backdrop-blur-sm lg:items-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+        >
+          <motion.section
+            role="dialog"
+            aria-label="Audio output"
+            onClick={(e) => e.stopPropagation()}
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ type: "spring", stiffness: 260, damping: 30 }}
+            className="w-full rounded-t-[32px] bg-[#1A1A1D] px-5 pb-[max(env(safe-area-inset-bottom),1.25rem)] pt-5 lg:max-w-sm lg:rounded-[32px] lg:pb-5"
+          >
+            <h2 className="px-1 font-display text-[22px] font-medium tracking-[-0.03em]">Audio output</h2>
+            <ul className="mt-4 space-y-1">
+              {outputs.map((o) => {
+                const selected = (current ?? "default") === o.id;
+                return (
+                  <li key={o.id}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onPick(o.id);
+                        onClose();
+                      }}
+                      className={cn(
+                        "flex w-full items-center justify-between rounded-2xl px-4 py-3.5 text-left text-[15px] transition-colors",
+                        selected ? "bg-white/12" : "hover:bg-white/6",
+                      )}
+                    >
+                      <span className="flex items-center gap-3">
+                        <SpeakerHigh weight="fill" className="text-white/60" /> {o.label}
+                      </span>
+                      {selected && <Check weight="bold" className="text-teal" />}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+            <button
+              type="button"
+              onClick={() => onSpeaker(!speaker)}
+              className="mt-3 flex w-full items-center justify-between rounded-2xl bg-white/6 px-4 py-3.5 text-[15px]"
+            >
+              <span>{speaker ? "Full volume" : "Quiet, like holding the phone"}</span>
+              <span className="text-[13px] text-white/50">Tap to switch</span>
+            </button>
+          </motion.section>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

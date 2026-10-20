@@ -18,6 +18,8 @@ export function CallRoom({
   demo?: boolean;
 }) {
   // One engine per visit. The demo plays a scripted call with no microphone or network.
-  const [engine] = useState(() => (demo ? createDemoEngine() : createGeminiEngine({ agentId: agent.id, purpose })));
+  const [engine] = useState(() =>
+    demo ? createDemoEngine(agent.template) : createGeminiEngine({ agentId: agent.id, purpose }),
+  );
   return <CallScreen agent={agent} engine={engine} credits={credits} demo={demo} />;
 }

@@ -25,6 +25,10 @@ export interface CallSnapshot {
   startedAt: number | null;
   endedAt: number | null;
   muted: boolean;
+  /** Loud speaker (true) or quieter earpiece-style volume (false). */
+  speaker: boolean;
+  /** The chosen audio output device, when the browser lets us pick one. */
+  outputId: string | null;
   captions: Caption[];
   actions: CallAction[];
   error?: string;
@@ -34,6 +38,18 @@ export interface CallSnapshot {
 export interface LevelSource {
   agent(): number;
   you(): number;
+}
+
+export interface AudioOutput {
+  id: string;
+  label: string;
+}
+
+/** Phone-style audio controls. Output picking works in Chrome/Edge on desktop; elsewhere the list is empty. */
+export interface AudioControls {
+  setSpeaker(on: boolean): void;
+  listOutputs(): Promise<AudioOutput[]>;
+  setOutput(id: string): Promise<void>;
 }
 
 /**
@@ -46,6 +62,7 @@ export interface CallEngine {
   end(): void;
   setMuted(muted: boolean): void;
   levels: LevelSource;
+  audio?: AudioControls;
   subscribe(listener: (snapshot: CallSnapshot) => void): () => void;
   getSnapshot(): CallSnapshot;
 }
@@ -56,6 +73,8 @@ export const initialSnapshot: CallSnapshot = {
   startedAt: null,
   endedAt: null,
   muted: false,
+  speaker: true,
+  outputId: null,
   captions: [],
   actions: [],
 };

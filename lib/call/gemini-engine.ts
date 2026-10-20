@@ -2,6 +2,7 @@
 
 import { GoogleGenAI, Modality, type FunctionCall, type LiveServerMessage, type Session } from "@google/genai";
 import { TOOLS } from "@/lib/agents/tools";
+import { EARPIECE_GAIN, listOutputs, routeTo } from "./audio-out";
 import { createSnapshotStore } from "./store";
 import type { CallEngine, Caption } from "./types";
 
@@ -30,6 +31,7 @@ export function createGeminiEngine({ agentId, purpose }: Options): CallEngine {
   let playCtx: AudioContext | null = null;
   let stream: MediaStream | null = null;
   let player: AudioWorkletNode | null = null;
+  let outGain: GainNode | null = null;
   let micAnalyser: AnalyserNode | null = null;
   let outAnalyser: AnalyserNode | null = null;
   let session: Session | null = null;
@@ -78,7 +80,7 @@ export function createGeminiEngine({ agentId, purpose }: Options): CallEngine {
     void captureCtx?.close();
     void playCtx?.close();
     captureCtx = playCtx = null;
-    player = micAnalyser = outAnalyser = null;
+    player = micAnalyser = outAnalyser = outGain = null;
     closeCaption("you");
     closeCaption("agent");
 
@@ -218,8 +220,11 @@ export function createGeminiEngine({ agentId, purpose }: Options): CallEngine {
         grant = granted;
 
         player = new AudioWorkletNode(playCtx, "playback-processor");
+        outGain = playCtx.createGain();
+        outGain.gain.value = store.get().speaker ? 1 : EARPIECE_GAIN;
         outAnalyser = playCtx.createAnalyser();
-        player.connect(outAnalyser).connect(playCtx.destination);
+        player.connect(outGain).connect(outAnalyser).connect(playCtx.destination);
+        void routeTo(playCtx, store.get().outputId).catch(() => undefined);
         player.port.onmessage = (e: MessageEvent<{ playing: boolean }>) => {
           clearTimeout(quietTimer);
           if (e.data.playing) {
@@ -271,6 +276,18 @@ export function createGeminiEngine({ agentId, purpose }: Options): CallEngine {
     },
 
     end: finish,
+
+    audio: {
+      setSpeaker(on) {
+        store.set({ speaker: on });
+        if (outGain && playCtx) outGain.gain.setTargetAtTime(on ? 1 : EARPIECE_GAIN, playCtx.currentTime, 0.05);
+      },
+      listOutputs,
+      async setOutput(id) {
+        store.set({ outputId: id });
+        await routeTo(playCtx, id);
+      },
+    },
 
     setMuted(muted) {
       store.set({ muted });

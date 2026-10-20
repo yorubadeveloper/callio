@@ -46,7 +46,7 @@ export function CallSummary({
             {Math.floor(seconds / 60)}:{String(seconds % 60).padStart(2, "0")}
           </p>
           <p className="text-sm text-white/50">
-            {credits} {credits === 1 ? "credit" : "credits"}
+            {demo ? "Sample call · free" : `${credits} ${credits === 1 ? "credit" : "credits"}`}
           </p>
         </div>
 
