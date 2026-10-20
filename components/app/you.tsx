@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { Bell, DownloadSimple, SignOut, Trash, X } from "@phosphor-icons/react";
+import { Bell, CaretRight, DownloadSimple, PlugsConnected, SignOut, Trash, X } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { LANGUAGES } from "@/components/onboarding/onboarding-flow";
@@ -13,12 +13,11 @@ import { disablePush, enablePush, pushEnabled, pushSupported } from "@/lib/push"
 import type { Detail, Tone, User } from "@/lib/types";
 import { CookieSettingsButton } from "@/components/analytics/analytics";
 import { CityInput } from "./city-input";
-import { Connections } from "./connections";
 import { TimezoneSelect } from "./select-menu";
 import { btn, Chip, Field, inputClass, PageTitle, Segmented, Sheet } from "./ui";
 import { Spinner } from "@/components/brand/logo-loader";
 
-export function YouView({ user: initial, calendarResult }: { user: User; calendarResult?: string }) {
+export function YouView({ user: initial }: { user: User }) {
   const router = useRouter();
   const [user, setUser] = useState(initial);
   const [form, setForm] = useState({
@@ -221,7 +220,26 @@ export function YouView({ user: initial, calendarResult }: { user: User; calenda
         </section>
 
         <aside className="space-y-8">
-          <Connections user={user} result={calendarResult} />
+          <section>
+            <h2 className="text-[13px] font-semibold uppercase tracking-wider text-ink-soft">Connections</h2>
+            <Link
+              href="/app/connections"
+              className="mt-3 flex items-center gap-3 rounded-[24px] bg-plate px-5 py-4 ring-1 ring-line transition-colors hover:bg-ink/[0.03]"
+            >
+              <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-peri/30 text-[20px]">
+                <PlugsConnected weight="fill" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[15px] font-semibold">Apps and calendar</span>
+                <span className="block truncate text-[13px] text-ink-soft">
+                  {user.integrations?.google_calendar?.connected
+                    ? "Google Calendar connected"
+                    : "Connect Google Calendar and more"}
+                </span>
+              </span>
+              <CaretRight className="text-ink-soft" />
+            </Link>
+          </section>
           <Notifications />
           <section>
             <h2 className="text-[13px] font-semibold uppercase tracking-wider text-ink-soft">Appearance</h2>

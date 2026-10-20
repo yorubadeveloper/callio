@@ -64,9 +64,10 @@ export async function POST(req: Request) {
             realtimeInputConfig: {
               automaticActivityDetection: {
                 startOfSpeechSensitivity: StartSensitivity.START_SENSITIVITY_HIGH,
-                endOfSpeechSensitivity: EndSensitivity.END_SENSITIVITY_LOW,
+                // Answer as soon as the caller stops: eager end-of-speech, half a second of silence.
+                endOfSpeechSensitivity: EndSensitivity.END_SENSITIVITY_HIGH,
                 prefixPaddingMs: 20,
-                silenceDurationMs: 600,
+                silenceDurationMs: 500,
               },
             },
             tools: toolsForPlan(user.plan),

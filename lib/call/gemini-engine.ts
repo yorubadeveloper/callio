@@ -40,6 +40,7 @@ export function createGeminiEngine({ agentId, purpose }: Options): CallEngine {
   let hangUpAfterSpeech = false;
   let quietTimer: ReturnType<typeof setTimeout> | undefined;
   let limitTimer: ReturnType<typeof setTimeout> | undefined;
+  let pingTimer: ReturnType<typeof setInterval> | undefined;
   let captionSeq = 0;
   const open: Partial<Record<Caption["who"], string>> = {};
 
@@ -73,6 +74,7 @@ export function createGeminiEngine({ agentId, purpose }: Options): CallEngine {
     if (store.get().status === "ended") return;
     clearTimeout(quietTimer);
     clearTimeout(limitTimer);
+    clearInterval(pingTimer);
     ready = false;
     session?.close();
     session = null;
@@ -87,7 +89,7 @@ export function createGeminiEngine({ agentId, purpose }: Options): CallEngine {
     const snap = store.get();
     store.set({ status: snap.status === "error" ? "error" : "ended", endedAt: Date.now(), activity: "listening" });
     if (grant) {
-      void endOnServer(grant.callId, snap.captions);
+      void endOnServer(grant.callId, snap.captions, usage);
       grant = null;
     }
   };
@@ -138,11 +140,39 @@ export function createGeminiEngine({ agentId, purpose }: Options): CallEngine {
       turnComplete: true,
     });
 
+  // Real token usage, sent with /end so the backend (and the admin page) see what each call actually cost.
+  const usage: CallUsage = { prompt: {}, response: {}, cached: 0, thoughts: 0, reports: 0 };
+  const addUsage = (u: LiveServerMessage["usageMetadata"]) => {
+    if (!u) return;
+    usage.reports++;
+    const add = (
+      into: Record<string, number>,
+      details: { modality?: string; tokenCount?: number }[] | undefined,
+      total?: number,
+    ) => {
+      if (details?.length)
+        for (const d of details) into[d.modality ?? "OTHER"] = (into[d.modality ?? "OTHER"] ?? 0) + (d.tokenCount ?? 0);
+      else if (total) into.UNSPECIFIED = (into.UNSPECIFIED ?? 0) + total;
+    };
+    add(usage.prompt, u.promptTokensDetails, u.promptTokenCount);
+    add(usage.prompt, u.toolUsePromptTokensDetails, u.toolUsePromptTokenCount);
+    add(usage.response, u.responseTokensDetails, u.responseTokenCount);
+    usage.cached += u.cachedContentTokenCount ?? 0;
+    usage.thoughts += u.thoughtsTokenCount ?? 0;
+  };
+
   const onMessage = (m: LiveServerMessage) => {
+    addUsage(m.usageMetadata);
     if (m.setupComplete) {
       ready = true;
       store.set({ status: "live", startedAt: Date.now() });
       limitTimer = setTimeout(finish, (grant?.maxSeconds ?? 60) * 1000);
+      // Heartbeat: the server bills an abandoned call only up to the last ping.
+      if (grant) {
+        const callId = grant.callId;
+        void pingServer(callId);
+        pingTimer = setInterval(() => void pingServer(callId), 20_000);
+      }
       // setupComplete can arrive before live.connect() resolves; start() greets once it has the session.
       if (session) greet();
     }
@@ -297,13 +327,28 @@ export function createGeminiEngine({ agentId, purpose }: Options): CallEngine {
   };
 }
 
+function pingServer(callId: string) {
+  return fetch(`/api/v1/calls/${callId}/ping`, { method: "POST" }).catch(() => undefined);
+}
+
 /** The backend bills from its own clock; keepalive lets this survive the person navigating away. */
-function endOnServer(callId: string, captions: Caption[]) {
+interface CallUsage {
+  prompt: Record<string, number>;
+  response: Record<string, number>;
+  cached: number;
+  thoughts: number;
+  reports: number;
+}
+
+function endOnServer(callId: string, captions: Caption[], usage?: CallUsage) {
   return fetch(`/api/v1/calls/${callId}/end`, {
     method: "POST",
     keepalive: true,
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ transcript: captions.map((c) => ({ who: c.who, text: c.text })) }),
+    body: JSON.stringify({
+      transcript: captions.map((c) => ({ who: c.who, text: c.text })),
+      ...(usage?.reports ? { usage } : {}),
+    }),
   }).catch(() => undefined);
 }
 

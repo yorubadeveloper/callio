@@ -16,6 +16,7 @@ import { plan as planById, type PlanId } from "@/lib/pricing";
 import type { Memory, Schedule, UserAgent } from "@/lib/types";
 import { AgentEditor, type AgentDraft } from "./agent-editor";
 import { btn, inputClass, Segmented } from "./ui";
+import { HearVoice } from "./voice-preview";
 import { UpgradeSheet } from "./upgrade";
 import { Spinner } from "@/components/brand/logo-loader";
 
@@ -75,9 +76,12 @@ export function AgentProfileView({
             </p>
             {agent.name !== base.name && <p className="mt-1 text-[13px] text-ink-soft/80">Started as {base.name}</p>}
           </div>
-          <Link href={`/call/${agent.id}`} className={cn(btn.call, "mt-6 w-full sm:mt-0 sm:w-auto sm:px-8")}>
-            <Phone weight="fill" /> Call {a.name}
-          </Link>
+          <div className="mt-6 flex w-full gap-2 sm:mt-0 sm:w-auto">
+            <HearVoice voice={a.persona.voice} name={a.name} className="h-12 px-5" />
+            <Link href={`/call/${agent.id}`} className={cn(btn.call, "flex-1 sm:flex-none sm:px-8")}>
+              <Phone weight="fill" /> Call {a.name}
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -256,20 +260,25 @@ function AgentMemory({
   };
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      <section>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (text.trim()) void add();
-          }}
-          className="flex gap-2"
-        >
+    <div className="space-y-6">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (text.trim()) void add();
+        }}
+        className="rounded-[24px] bg-plate p-4 ring-1 ring-line sm:p-5"
+      >
+        <label htmlFor="teach" className="text-[15px] font-semibold">
+          Teach {agentName} something
+        </label>
+        <p className="mt-0.5 text-[13px] text-ink-soft">Only {agentName} will know it. They also save things as you talk.</p>
+        <div className="mt-3 flex gap-2">
           <input
+            id="teach"
             value={text}
             onChange={(e) => setText(e.target.value)}
             maxLength={300}
-            placeholder={`Tell ${agentName} something to remember`}
+            placeholder="I take my coffee black"
             className={inputClass}
           />
           <button
@@ -280,29 +289,31 @@ function AgentMemory({
           >
             {busy ? <Spinner /> : <Plus weight="bold" />}
           </button>
-        </form>
+        </div>
         {error && <p className="mt-2 text-[14px] text-[#B0412C] dark:text-coral">{error}</p>}
+      </form>
+      <div className="grid gap-6 lg:grid-cols-2">
         <MemoryList
           title={`Only ${agentName} knows`}
           items={own}
           onRemove={remove}
           empty={`${agentName} hasn't noted anything yet. It saves things as you talk.`}
         />
-      </section>
-      <MemoryList
-        title="Every agent knows"
-        items={shared}
-        onRemove={remove}
-        empty="Things you share with all your agents show up here."
-        footer={
-          <Link
-            href="/app/memory?import=1"
-            className="mt-3 inline-block text-[14px] font-semibold underline-offset-4 hover:underline"
-          >
-            Import from ChatGPT, Claude or Gemini
-          </Link>
-        }
-      />
+        <MemoryList
+          title="Every agent knows"
+          items={shared}
+          onRemove={remove}
+          empty="Things you share with all your agents show up here."
+          footer={
+            <Link
+              href="/app/memory?import=1"
+              className="mt-3 inline-block text-[14px] font-semibold underline-offset-4 hover:underline"
+            >
+              Import from ChatGPT, Claude or Gemini
+            </Link>
+          }
+        />
+      </div>
     </div>
   );
 }
@@ -321,8 +332,15 @@ export function MemoryList({
   footer?: React.ReactNode;
 }) {
   return (
-    <section className="mt-4 lg:mt-0">
-      <p className="text-[13px] font-semibold uppercase tracking-wider text-ink-soft">{title}</p>
+    <section>
+      <p className="flex items-center gap-2 text-[13px] font-semibold uppercase tracking-wider text-ink-soft">
+        {title}
+        {items.length > 0 && (
+          <span className="rounded-full bg-ink/[0.06] px-2 py-0.5 text-[11px] tracking-normal tabular-nums">
+            {items.length}
+          </span>
+        )}
+      </p>
       {items.length ? (
         <ul className="mt-3 divide-y divide-line overflow-hidden rounded-[24px] bg-plate ring-1 ring-line">
           {items.map((m) => (

@@ -19,24 +19,7 @@ export const PERSONALITIES: Record<PersonalityId, { label: string; hint: string;
 };
 
 /** Gemini Live voices worth offering, with how they sound. */
-export const VOICES = [
-  { id: "Aoede", hint: "Breezy" },
-  { id: "Kore", hint: "Firm" },
-  { id: "Leda", hint: "Youthful" },
-  { id: "Zephyr", hint: "Bright" },
-  { id: "Sulafat", hint: "Warm" },
-  { id: "Achernar", hint: "Soft" },
-  { id: "Vindemiatrix", hint: "Gentle" },
-  { id: "Despina", hint: "Smooth" },
-  { id: "Puck", hint: "Upbeat" },
-  { id: "Orus", hint: "Firm" },
-  { id: "Charon", hint: "Informative" },
-  { id: "Fenrir", hint: "Excitable" },
-  { id: "Achird", hint: "Friendly" },
-  { id: "Algieba", hint: "Smooth" },
-  { id: "Gacrux", hint: "Mature" },
-  { id: "Sadachbia", hint: "Lively" },
-] as const;
+export { VOICES } from "./voices";
 
 export function personalize(agent: UserAgent): PersonalAgent {
   const base = agentProfile(agent.template) ?? AGENT_PROFILES[0];

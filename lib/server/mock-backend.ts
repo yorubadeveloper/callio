@@ -198,6 +198,11 @@ export async function mockBackend(
         String(body!.name),
         (body!.args as Body) ?? {},
       );
+    case "POST calls/:id/ping": {
+      const call = db.calls.find((c) => c.id === rid && c.user_id === user.id);
+      if (!call) throw new MockError(404, "Call not found.");
+      return call;
+    }
     case "POST calls/:id/end": {
       const call = db.calls.find((c) => c.id === rid && c.user_id === user.id);
       if (!call) throw new MockError(404, "Call not found.");
