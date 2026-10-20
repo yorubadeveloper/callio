@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { SessionProvider } from "@/components/providers/session-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { Analytics } from "@/components/analytics/analytics";
 
 const figtree = Figtree({
   subsets: ["latin"],
@@ -89,14 +90,10 @@ export default function RootLayout({
     >
       <body className={`${figtree.className} antialiased`}>
         <SessionProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
             {children}
             <Toaster />
+            <Analytics />
           </ThemeProvider>
         </SessionProvider>
       </body>

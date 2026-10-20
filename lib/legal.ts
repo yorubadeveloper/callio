@@ -24,9 +24,9 @@ const US_SAFEGUARD =
 
 export const LEGAL = {
   /** ISO date of the last change to any legal page. */
-  lastUpdated: "2026-10-20",
+  lastUpdated: "2026-10-21",
   /** Human-readable version of lastUpdated. */
-  lastUpdatedLabel: "20 October 2026",
+  lastUpdatedLabel: "21 October 2026",
 
   product: "Callio",
   domain: "callio.site",
@@ -145,6 +145,15 @@ export const LEGAL = {
       location: "Depends on your browser",
       role: "Independent controller",
       safeguard: "Chosen by your browser vendor",
+      status: "active",
+    },
+    {
+      name: "Google Ireland Limited (Google Analytics 4)",
+      purpose: "Counting visits and seeing how people use the website, only if you allow it",
+      data: "Pages viewed, device and browser type, approximate location, and a random ID stored in a cookie",
+      location: "EU and USA",
+      role: "Processor",
+      safeguard: US_SAFEGUARD,
       status: "active",
     },
     {
