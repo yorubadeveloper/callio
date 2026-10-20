@@ -15,6 +15,7 @@ const RESULT: Record<string, { tone: "good" | "bad"; text: string }> = {
     text: "Calendar access wasn't granted. Try again and leave the calendar box ticked on Google's screen.",
   },
   error: { tone: "bad", text: "Couldn't connect Google Calendar. Try again in a moment." },
+  cancelled: { tone: "bad", text: "No problem. You can connect your calendar whenever you like." },
 };
 
 /** Optional data sources, connected separately from sign-in and removable any time. */
@@ -79,6 +80,11 @@ export function Connections({ user, result }: { user: User; result?: string }) {
               <p className="mt-0.5 flex items-center gap-1.5 truncate text-[14px] text-ink-soft">
                 <CheckCircle weight="fill" className="shrink-0 text-teal" /> {calendar.account_email ?? "Connected"}
               </p>
+            ) : calendar?.needs_reconnect ? (
+              <p className="mt-0.5 text-[14px] text-ink-soft">
+                Google stopped our access to {calendar.account_email ?? "your calendar"}. Connect again to keep your
+                briefings going.
+              </p>
             ) : (
               <p className="mt-0.5 text-[14px] text-ink-soft">
                 So agents can brief you on your day and add or move meetings when you ask.
@@ -94,7 +100,11 @@ export function Connections({ user, result }: { user: User; result?: string }) {
           className={cn(calendar?.connected ? btn.soft : btn.primary, "mt-4 h-11 w-full")}
         >
           {busy && <CircleNotch className="animate-spin" />}
-          {calendar?.connected ? "Disconnect" : "Connect Google Calendar"}
+          {calendar?.connected
+            ? "Disconnect"
+            : calendar?.needs_reconnect
+              ? "Reconnect Google Calendar"
+              : "Connect Google Calendar"}
         </button>
         <p className="mt-3 text-[12px] leading-relaxed text-ink-soft">
           Agents only look at your calendar when you ask about your schedule or before a briefing you&apos;ve set up.
