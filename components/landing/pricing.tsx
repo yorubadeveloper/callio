@@ -33,9 +33,7 @@ export function Pricing() {
         <BillingToggle value={billing} onChange={setBilling} />
       </div>
 
-      <p className="mt-10 text-[13px] text-ink-soft sm:hidden">Swipe to compare plans →</p>
-      {/* Phones: a swipeable row, one plan at a time. Larger screens: a grid. */}
-      <ul className="-mx-5 mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-4 [scrollbar-width:none] sm:mx-0 sm:mt-12 sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-4 [&::-webkit-scrollbar]:hidden">
+      <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {PLANS.map((p, i) => (
           <PlanCard key={p.id} plan={p} billing={billing} index={i} />
         ))}
@@ -91,7 +89,7 @@ function PlanCard({ plan: p, billing, index }: { plan: Plan; billing: Billing; i
       viewport={{ once: true, amount: 0.3 }}
       transition={{ duration: 0.7, delay: index * 0.07, ease: EASE_OUT }}
       className={cn(
-        "relative flex w-[80%] shrink-0 snap-center flex-col rounded-[28px] p-6 sm:w-auto",
+        "relative flex flex-col rounded-[28px] p-6",
         dark ? "bg-[#121212] text-[#F3F2EE]" : "bg-plate text-ink ring-1 ring-line",
       )}
     >
