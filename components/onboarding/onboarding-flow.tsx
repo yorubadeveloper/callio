@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { ArrowLeft, Bell, Check, Phone } from "@phosphor-icons/react";
@@ -12,7 +12,9 @@ import { api, ApiError } from "@/lib/api";
 import { enablePush, pushSupported } from "@/lib/push";
 import type { User, UserAgent } from "@/lib/types";
 import { AgentEditor, AgentPreview, draftFromTemplate, type AgentDraft } from "@/components/app/agent-editor";
+import { CityInput } from "@/components/app/city-input";
 import { MemoryImport } from "@/components/app/memory-import";
+import { TimezoneSelect } from "@/components/app/select-menu";
 import { btn, Chip, Field, inputClass } from "@/components/app/ui";
 import { Spinner } from "@/components/brand/logo-loader";
 
@@ -80,13 +82,6 @@ export function OnboardingFlow({ user: initialUser }: { user: User }) {
     if (detected && initialUser.timezone !== detected && !initialUser.onboarded) setTimezone(detected);
   }, [initialUser]);
 
-  const timezones = useMemo(() => {
-    try {
-      return Intl.supportedValuesOf("timeZone");
-    } catch {
-      return [timezone];
-    }
-  }, [timezone]);
 
   const index = STEPS.indexOf(step);
   const go = (to: StepId) => {
@@ -203,27 +198,16 @@ export function OnboardingFlow({ user: initialUser }: { user: User }) {
                   <Field label="Where are you?" hint="For the weather and the right time of day.">
                     {(id) => (
                       <div className="grid gap-2 sm:grid-cols-2">
-                        <input
+                        <CityInput
                           id={id}
                           value={city}
-                          maxLength={80}
-                          onChange={(e) => setCity(e.target.value)}
-                          placeholder="City"
-                          className={inputClass}
-                          autoComplete="address-level2"
+                          onChange={setCity}
+                          onPick={(place) => {
+                            setCity(place.name);
+                            setTimezone(place.timezone);
+                          }}
                         />
-                        <select
-                          value={timezone}
-                          onChange={(e) => setTimezone(e.target.value)}
-                          aria-label="Timezone"
-                          className={inputClass}
-                        >
-                          {timezones.map((tz) => (
-                            <option key={tz} value={tz}>
-                              {tz.replaceAll("_", " ")}
-                            </option>
-                          ))}
-                        </select>
+                        <TimezoneSelect value={timezone} onChange={setTimezone} />
                       </div>
                     )}
                   </Field>

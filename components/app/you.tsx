@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
@@ -12,7 +12,9 @@ import { api, ApiError } from "@/lib/api";
 import { disablePush, enablePush, pushEnabled, pushSupported } from "@/lib/push";
 import type { Detail, Tone, User } from "@/lib/types";
 import { CookieSettingsButton } from "@/components/analytics/analytics";
+import { CityInput } from "./city-input";
 import { Connections } from "./connections";
+import { TimezoneSelect } from "./select-menu";
 import { btn, Chip, Field, inputClass, PageTitle, Segmented, Sheet } from "./ui";
 import { Spinner } from "@/components/brand/logo-loader";
 
@@ -34,13 +36,6 @@ export function YouView({ user: initial, calendarResult }: { user: User; calenda
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const set = (patch: Partial<typeof form>) => setForm((f) => ({ ...f, ...patch }));
-  const timezones = useMemo(() => {
-    try {
-      return Intl.supportedValuesOf("timeZone");
-    } catch {
-      return [form.timezone];
-    }
-  }, [form.timezone]);
 
   const save = async () => {
     setBusy(true);
@@ -205,26 +200,13 @@ export function YouView({ user: initial, calendarResult }: { user: User; calenda
           <Field label="Where you are">
             {(id) => (
               <div className="grid gap-2 sm:grid-cols-2">
-                <input
+                <CityInput
                   id={id}
                   value={form.city}
-                  maxLength={80}
-                  onChange={(e) => set({ city: e.target.value })}
-                  placeholder="City"
-                  className={inputClass}
+                  onChange={(city) => set({ city })}
+                  onPick={(place) => set({ city: place.name, timezone: place.timezone })}
                 />
-                <select
-                  value={form.timezone}
-                  onChange={(e) => set({ timezone: e.target.value })}
-                  aria-label="Timezone"
-                  className={inputClass}
-                >
-                  {timezones.map((tz) => (
-                    <option key={tz} value={tz}>
-                      {tz.replaceAll("_", " ")}
-                    </option>
-                  ))}
-                </select>
+                <TimezoneSelect value={form.timezone} onChange={(timezone) => set({ timezone })} />
               </div>
             )}
           </Field>
