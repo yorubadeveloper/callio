@@ -60,7 +60,7 @@ export const LEGAL = {
   },
 
   backendHosting: {
-    provider: "[HOSTING PROVIDER of the Dokploy server, e.g. Hetzner Online GmbH, Germany]",
+    provider: "[HOSTING PROVIDER of the API server, e.g. Hetzner Online GmbH, Germany]",
     location: "[SERVER LOCATION — e.g. Germany (EU)]",
   },
 
@@ -121,7 +121,7 @@ export const LEGAL = {
       status: "active",
     },
     {
-      name: "[HOSTING PROVIDER of the Dokploy server, e.g. Hetzner Online GmbH, Germany]",
+      name: "[HOSTING PROVIDER of the API server, e.g. Hetzner Online GmbH, Germany]",
       purpose: "Runs our backend and PostgreSQL database",
       data: "Everything stored in your account",
       location: "[SERVER LOCATION — e.g. Germany (EU)]",

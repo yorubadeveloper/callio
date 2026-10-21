@@ -22,7 +22,9 @@ const tintFor = (name: string) => TINTS[[...name].reduce((n, ch) => n + ch.charC
 
 // Two-digit country codes; 1 (North America) and 7 are one digit, everything else is three (ITU E.164 zones).
 const TWO_DIGIT = new Set(
-  "20 27 30 31 32 33 34 36 39 40 41 43 44 45 46 47 48 49 51 52 53 54 55 56 57 58 60 61 62 63 64 65 66 81 82 84 86 90 91 92 93 94 95 98".split(" "),
+  "20 27 30 31 32 33 34 36 39 40 41 43 44 45 46 47 48 49 51 52 53 54 55 56 57 58 60 61 62 63 64 65 66 81 82 84 86 90 91 92 93 94 95 98".split(
+    " ",
+  ),
 );
 
 /** "+2348031234567" → "+234 803 123 4567": easier to check at a glance. */
@@ -179,10 +181,14 @@ function YourPhone({ phone }: { phone: PhoneSettings }) {
   };
   const sendCode = (e?: React.FormEvent) => {
     e?.preventDefault();
-    void run("verify", () => api("/phone/verify", { method: "POST", body: { number } }), () => {
-      setChanging(false);
-      setCode("");
-    });
+    void run(
+      "verify",
+      () => api("/phone/verify", { method: "POST", body: { number } }),
+      () => {
+        setChanging(false);
+        setCode("");
+      },
+    );
   };
 
   return (
@@ -212,7 +218,11 @@ function YourPhone({ phone }: { phone: PhoneSettings }) {
               <span className="font-mono text-[16px]">{spaced(phone.number)}</span>
               <span className="rounded-full bg-teal/25 px-2 py-0.5 text-[12px] font-semibold">Confirmed</span>
               <span className="ml-auto flex gap-1">
-                <button type="button" onClick={() => setChanging(true)} className={cn(btn.soft, "h-9 px-3.5 text-[13px]")}>
+                <button
+                  type="button"
+                  onClick={() => setChanging(true)}
+                  className={cn(btn.soft, "h-9 px-3.5 text-[13px]")}
+                >
                   Change
                 </button>
                 <button
@@ -255,15 +265,28 @@ function YourPhone({ phone }: { phone: PhoneSettings }) {
                 placeholder="6-digit code"
                 className={cn(inputClass, "font-mono tracking-[0.3em]")}
               />
-              <button type="submit" disabled={code.length !== 6 || busy !== null} className={cn(btn.primary, "shrink-0")}>
+              <button
+                type="submit"
+                disabled={code.length !== 6 || busy !== null}
+                className={cn(btn.primary, "shrink-0")}
+              >
                 {busy === "confirm" && <Spinner />} Confirm
               </button>
             </div>
             <p className="flex flex-wrap gap-x-4 gap-y-1 text-[13px] text-ink-soft">
-              <button type="button" onClick={() => sendCode()} disabled={busy !== null} className="font-semibold underline-offset-4 hover:underline">
+              <button
+                type="button"
+                onClick={() => sendCode()}
+                disabled={busy !== null}
+                className="font-semibold underline-offset-4 hover:underline"
+              >
                 {busy === "verify" ? "Calling…" : "Call me again"}
               </button>
-              <button type="button" onClick={() => setChanging(true)} className="font-semibold underline-offset-4 hover:underline">
+              <button
+                type="button"
+                onClick={() => setChanging(true)}
+                className="font-semibold underline-offset-4 hover:underline"
+              >
                 Use a different number
               </button>
             </p>
@@ -281,7 +304,11 @@ function YourPhone({ phone }: { phone: PhoneSettings }) {
               disabled={!usable}
               className={cn(inputClass, "font-mono")}
             />
-            <button type="submit" disabled={!usable || number.trim().length < 8 || busy !== null} className={cn(btn.primary, "shrink-0")}>
+            <button
+              type="submit"
+              disabled={!usable || number.trim().length < 8 || busy !== null}
+              className={cn(btn.primary, "shrink-0")}
+            >
               {busy === "verify" ? <Spinner /> : <PhoneCall weight="fill" />} Call me with a code
             </button>
             {changing && (
@@ -325,7 +352,10 @@ function ContactCard({
       <div className="flex items-start gap-3">
         <span
           aria-hidden
-          className={cn("grid size-12 shrink-0 place-items-center rounded-full font-display text-[20px] font-medium", tintFor(c.name))}
+          className={cn(
+            "grid size-12 shrink-0 place-items-center rounded-full font-display text-[20px] font-medium",
+            tintFor(c.name),
+          )}
         >
           {c.name.trim().charAt(0).toUpperCase()}
         </span>
@@ -344,12 +374,12 @@ function ContactCard({
           Asked not to be called by Callio. Edit to turn calls back on if they&apos;ve told you it&apos;s okay.
         </p>
       )}
-      <div className="mt-4 flex items-center gap-2">
+      <div className="mt-auto flex items-center gap-2 pt-4">
         <button
           type="button"
           onClick={onCall}
           disabled={!canCall || c.opted_out}
-          className={cn(btn.call, "h-10 flex-1 px-4 text-[14px]")}
+          className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-full bg-teal px-4 text-[14px] font-semibold text-[#0E0E10] transition-[background-color,transform] duration-200 hover:bg-[#58A7A4] active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40"
         >
           <ChatCircleText weight="fill" /> Send a message
         </button>
@@ -363,7 +393,11 @@ function ContactCard({
 
 const LANGUAGE_OPTIONS = [
   { value: "", label: "Whatever they answer in" },
-  ...LANGUAGES.map((l) => ({ value: l.code, label: l.label, keywords: l.name })),
+  ...LANGUAGES.map((l) => ({
+    value: l.code,
+    label: l.label,
+    keywords: l.name,
+  })),
 ];
 
 function ContactForm({ existing, onDone }: { existing: Contact | null; onDone: () => void }) {
@@ -381,7 +415,12 @@ function ContactForm({ existing, onDone }: { existing: Contact | null; onDone: (
     e.preventDefault();
     setBusy("save");
     setError(null);
-    const body: Record<string, unknown> = { name: name.trim(), phone: number, language: language || null, notes };
+    const body: Record<string, unknown> = {
+      name: name.trim(),
+      phone: number,
+      language: language || null,
+      notes,
+    };
     if (allowAgain) body.opted_out = false;
     try {
       if (existing) await api(`/contacts/${existing.id}`, { method: "PATCH", body });
@@ -411,7 +450,14 @@ function ContactForm({ existing, onDone }: { existing: Contact | null; onDone: (
     <form onSubmit={submit} className="space-y-5">
       <Field label="Name" hint="What you call them. Your agent uses it to know who you mean.">
         {(id) => (
-          <input id={id} value={name} onChange={(e) => setName(e.target.value)} maxLength={80} placeholder="Mum" className={inputClass} />
+          <input
+            id={id}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            maxLength={80}
+            placeholder="Mum"
+            className={inputClass}
+          />
         )}
       </Field>
       <Field label="Phone number" hint="With the country code.">
@@ -541,7 +587,12 @@ function MessageForm({
     try {
       await api(`/contacts/${contact.id}/call`, {
         method: "POST",
-        body: { agent_id: agentId, message, when: timing === "later" ? at : null, repeat: timing === "later" ? repeat : "none" },
+        body: {
+          agent_id: agentId,
+          message,
+          when: timing === "later" ? at : null,
+          repeat: timing === "later" ? repeat : "none",
+        },
       });
       setDone(true);
       router.refresh();
@@ -594,7 +645,11 @@ function MessageForm({
               label="Who calls"
               value={agentId}
               onChange={setAgentId}
-              options={agents.map((a) => ({ value: a.id, label: a.name, description: a.role }))}
+              options={agents.map((a) => ({
+                value: a.id,
+                label: a.name,
+                description: a.role,
+              }))}
             />
           )}
         </Field>
@@ -626,7 +681,8 @@ function MessageForm({
         </p>
       )}
       <button type="submit" disabled={busy || !message.trim() || !agentId} className={cn(btn.call, "w-full")}>
-        {busy ? <Spinner /> : <PhoneCall weight="fill" />} {timing === "now" ? `Call ${contact.name} now` : "Book the call"}
+        {busy ? <Spinner /> : <PhoneCall weight="fill" />}{" "}
+        {timing === "now" ? `Call ${contact.name} now` : "Book the call"}
       </button>
     </form>
   );

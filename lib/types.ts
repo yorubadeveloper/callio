@@ -18,6 +18,8 @@ export interface User {
   plan_status: "active" | "past_due" | "cancelled" | "none";
   credits: { plan: number; topup: number; total: number };
   onboarded: boolean;
+  /** One-time guides finished or dismissed: "tour", "guide". */
+  seen?: string[];
   nickname: string | null;
   about: string | null;
   interests: string[];

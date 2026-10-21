@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils";
 import { LogoMark, Wordmark } from "@/components/brand/logo";
 import { plan } from "@/lib/pricing";
 import type { User } from "@/lib/types";
+import { Tour } from "./tour";
 
 interface NavItem {
   href: string;
@@ -59,6 +60,9 @@ const GROUPS: { label: string; items: NavItem[] }[] = [
   },
 ];
 const NAV = GROUPS.flatMap((g) => g.items);
+
+/** What the new-user tour points at: "home", "agents", "contacts", … */
+const tourKey = (href: string) => (href === "/app" ? "home" : href.split("/").pop()!);
 
 const isActive = (pathname: string, href: string) =>
   href === "/app" ? pathname === "/app" : pathname.startsWith(href);
@@ -152,6 +156,7 @@ export function AppShell({ user, children }: { user: User; children: React.React
         <div className="flex items-center gap-2">
           <Link
             href="/app/upcoming"
+            data-tour="upcoming"
             className={cn(
               "grid size-9 place-items-center rounded-full ring-1 ring-line transition-colors",
               pathname.startsWith("/app/upcoming") ? "bg-ink text-page" : "bg-plate",
@@ -182,6 +187,8 @@ export function AppShell({ user, children }: { user: User; children: React.React
         </main>
       </div>
 
+      <Tour user={user} />
+
       {/* phone tab bar */}
       <nav
         aria-label="Main"
@@ -194,6 +201,7 @@ export function AppShell({ user, children }: { user: User; children: React.React
               <li key={item.href} className="flex-1">
                 <Link
                   href={item.href}
+                  data-tour={tourKey(item.href)}
                   aria-current={active ? "page" : undefined}
                   className={cn(
                     "flex h-16 flex-col items-center justify-center gap-1 text-[11px] font-medium transition-colors",
@@ -221,6 +229,7 @@ function SideLink({ item, active, collapsed }: { item: NavItem; active: boolean;
   return (
     <Link
       href={item.href}
+      data-tour={tourKey(item.href)}
       aria-current={active ? "page" : undefined}
       aria-label={collapsed ? item.label : undefined}
       className={cn(

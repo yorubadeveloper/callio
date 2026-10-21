@@ -4,7 +4,17 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { CaretRight, DownloadSimple, PlugsConnected, SignOut, Trash, X } from "@phosphor-icons/react";
+import {
+  AddressBook,
+  CaretRight,
+  Compass,
+  DownloadSimple,
+  Monitor,
+  PlugsConnected,
+  SignOut,
+  Trash,
+  X,
+} from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { LANGUAGES } from "@/lib/languages";
@@ -221,24 +231,44 @@ export function YouView({ user: initial }: { user: User }) {
 
         <aside className="space-y-8">
           <section>
-            <h2 className="text-[13px] font-semibold uppercase tracking-wider text-ink-soft">Connections</h2>
-            <Link
-              href="/app/connections"
-              className="mt-3 flex items-center gap-3 rounded-[24px] bg-plate px-5 py-4 ring-1 ring-line transition-colors hover:bg-ink/[0.03]"
-            >
-              <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-peri/30 text-[20px]">
-                <PlugsConnected weight="fill" />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block text-[15px] font-semibold">Apps and calendar</span>
-                <span className="block truncate text-[13px] text-ink-soft">
-                  {user.integrations?.google_calendar?.connected
-                    ? "Google Calendar connected"
-                    : "Connect Google Calendar and more"}
-                </span>
-              </span>
-              <CaretRight className="text-ink-soft" />
-            </Link>
+            <h2 className="text-[13px] font-semibold uppercase tracking-wider text-ink-soft">More</h2>
+            <div className="mt-3 divide-y divide-line overflow-hidden rounded-[24px] bg-plate ring-1 ring-line">
+              {[
+                {
+                  href: "/app/contacts",
+                  icon: AddressBook,
+                  tint: "bg-coral/30",
+                  title: "Contacts and your phone",
+                  sub: "People your agent can call, and missed-call backup",
+                },
+                {
+                  href: "/app/connections",
+                  icon: PlugsConnected,
+                  tint: "bg-peri/30",
+                  title: "Connections",
+                  sub: user.integrations?.google_calendar?.connected
+                    ? "Morning call, calendar, sites"
+                    : "Morning call, Google Calendar, sites",
+                },
+                { href: "/app/tasks", icon: Monitor, tint: "bg-teal/30", title: "Tasks", sub: "Things your agents did on the web" },
+                { href: "/app?tour=1", icon: Compass, tint: "bg-amber/40", title: "Take the tour again", sub: "A 30-second look around" },
+              ].map((l) => (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  className="flex items-center gap-3 px-5 py-4 transition-colors hover:bg-ink/[0.03]"
+                >
+                  <span className={cn("grid size-10 shrink-0 place-items-center rounded-2xl text-[20px]", l.tint)}>
+                    <l.icon weight="fill" />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-[15px] font-semibold">{l.title}</span>
+                    <span className="block truncate text-[13px] text-ink-soft">{l.sub}</span>
+                  </span>
+                  <CaretRight className="text-ink-soft" />
+                </Link>
+              ))}
+            </div>
           </section>
           <Notifications />
           <section>

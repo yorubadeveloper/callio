@@ -247,14 +247,14 @@ export const TOOLS: Record<string, ToolMeta> = {
     declaration: {
       name: "check_sources",
       description:
-        "A fresh look at their connected sources right now: whether sites are up, which apps or deploys failed on Dokploy, and recent traffic from Analytix. Always use this instead of memory for anything about how these are doing.",
+        "A fresh look at their connected sources right now: whether sites are up, which apps or deploys failed on their servers, and recent traffic from Analytix. Always use this instead of memory for anything about how these are doing.",
       behavior: Behavior.BLOCKING,
       parametersJsonSchema: {
         type: "object",
         properties: {
           source: {
             type: "string",
-            description: "A connection's name or what it covers (\"my sites\", \"Dokploy\", \"analytics\"). Empty for all.",
+            description: "A connection's name or what it covers (\"my sites\", \"servers\", \"analytics\"). Empty for all.",
           },
         },
       },

@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import type { User } from "@/lib/types";
 import { mockBackend, mockEnabled, MockError } from "./mock-backend";
 
-// The FastAPI backend (voice-bot repo, on Dokploy) is only reachable from this
+// The FastAPI backend (voice-bot repo, on our own server) is only reachable from this
 // server: every request carries the shared API key and, for user data, the
 // signed-in user's backend id. Browsers never see either.
 

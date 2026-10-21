@@ -8,7 +8,6 @@ import {
   MicrophoneSlash,
   Phone,
   PhoneDisconnect,
-  Play,
   SpeakerHigh,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
@@ -132,7 +131,7 @@ export function IncomingCallScreen() {
         <p className="mt-5 font-display text-[34px] leading-none font-medium tracking-[-0.03em]">Laura</p>
         <p className="mt-2 text-[13px] text-[#5E5C57]">Morning brief · calling…</p>
         <div className="mx-6 mt-6 rounded-2xl bg-white/70 px-4 py-3 text-[13px] leading-snug shadow-sm">
-          &ldquo;Three meetings today, the 10:00 moved to 11:00. Rain after four.&rdquo;
+          &ldquo;Morning! Traffic&apos;s up 18% this week, one deploy failed overnight, and it rains after four.&rdquo;
         </div>
       </div>
       <div className="flex justify-between px-10 pb-[12%]">
@@ -218,8 +217,8 @@ export function InCallScreen({ active }: { active: boolean }) {
 
 /* ---------- They call for you ---------- */
 
-export function TextThreadScreen({ active }: { active: boolean }) {
-  const theo = agent("Theo");
+export function MessageCallScreen({ active }: { active: boolean }) {
+  const ada = agent("Ada");
   return (
     <div className="flex size-full flex-col bg-white text-[#121212]">
       <StatusBar />
@@ -228,43 +227,43 @@ export function TextThreadScreen({ active }: { active: boolean }) {
           <CaretLeft className="text-[20px] text-[#8896E3]" />
         </div>
         <span className="-mt-3 size-11 overflow-hidden rounded-full">
-          <AgentFace agent={theo} className="size-full" />
+          <AgentFace agent={ada} className="size-full" />
         </span>
-        <p className="mt-1 text-[12px] font-semibold">Theo</p>
+        <p className="mt-1 text-[12px] font-semibold">Ada</p>
       </div>
       <div className="flex flex-1 flex-col gap-2 px-3 pt-4 text-[14px] leading-snug">
         <Reveal active={active} delay={0.3} className="ml-auto max-w-[78%]">
           <p className="rounded-[18px] rounded-br-md bg-[#121212] px-3.5 py-2 text-white">
-            Can you book Bella Napoli for 4, Friday at 8?
+            Call Mum at 7 and tell her I&apos;m doing well. I&apos;ll visit in December.
           </p>
         </Reveal>
         <Reveal active={active} delay={1.0} className="max-w-[78%]">
-          <p className="rounded-[18px] rounded-bl-md bg-[#EFEEEA] px-3.5 py-2">Calling them now.</p>
+          <p className="rounded-[18px] rounded-bl-md bg-[#EFEEEA] px-3.5 py-2">Got it. I&apos;ll ring her at 7.</p>
         </Reveal>
         <Reveal active={active} delay={1.8} className="max-w-[82%]">
           <div className="rounded-[18px] rounded-bl-md bg-[#EFEEEA] p-2.5">
             <div className="flex items-center gap-2.5">
               <span className="grid size-8 place-items-center rounded-full text-white" style={{ background: TEAL }}>
-                <Play weight="fill" className="text-[14px]" />
+                <Phone weight="fill" className="text-[14px]" />
               </span>
               <div className="min-w-0 flex-1">
-                <p className="text-[12px] font-semibold">Call with Bella Napoli</p>
+                <p className="text-[12px] font-semibold">Called Mum</p>
                 <div className="mt-1 flex items-center gap-2">
                   <LevelBars color={TEAL} className="h-3" />
-                  <span className="font-mono text-[11px] text-[#5E5C57]">2:14</span>
+                  <span className="font-mono text-[11px] text-[#5E5C57]">1:48</span>
                 </div>
               </div>
             </div>
-            <p className="mt-2 text-[11px] text-[#5E5C57]">Transcript saved to your notes</p>
+            <p className="mt-2 text-[11px] text-[#5E5C57]">Message delivered</p>
           </div>
         </Reveal>
         <Reveal active={active} delay={2.6} className="max-w-[80%]">
           <p className="rounded-[18px] rounded-bl-md bg-[#EFEEEA] px-3.5 py-2">
-            Booked: table for 4, Friday at 8pm, under Alex. They&apos;ll hold it for 15 minutes.
+            She says well done, and to call her on Sunday. She sounded happy.
           </p>
         </Reveal>
       </div>
-      <div className="mx-3 mb-9 rounded-full border border-black/10 px-4 py-2 text-[13px] text-[#9A9893]">Text Theo</div>
+      <div className="mx-3 mb-9 rounded-full border border-black/10 px-4 py-2 text-[13px] text-[#9A9893]">Message Ada</div>
     </div>
   );
 }
@@ -273,8 +272,8 @@ export function TextThreadScreen({ active }: { active: boolean }) {
 
 const NOTIFICATIONS = [
   { name: "Kemi", title: "Gym check-in", body: "You said 6pm. Are you on your way?", when: "now" },
-  { name: "Ada", title: "Called Mum", body: "She's in good spirits and took her meds.", when: "40m ago" },
-  { name: "Theo", title: "Dentist moved", body: "Thursday at 2pm, confirmed by phone.", when: "3h ago" },
+  { name: "Ada", title: "Called Mum", body: "She says well done, and to call her on Sunday.", when: "40m ago" },
+  { name: "Theo", title: "Your site is back", body: "It was down for 6 minutes. All good now.", when: "3h ago" },
   { name: "Laura", title: "Morning brief", body: "3 meetings, rain after four. Call lasted 1:52.", when: "7:30" },
 ];
 

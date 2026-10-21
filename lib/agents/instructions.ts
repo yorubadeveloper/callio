@@ -94,7 +94,7 @@ function localTime(now: Date, timezone: string, locale: string) {
 /** Builds the system instruction for one call. Keep it compact: Live re-bills context every turn. */
 const SOURCE_KIND: Record<NonNullable<CallStart["sources"]>[number]["kind"], string> = {
   analytix: "website analytics via Analytix",
-  dokploy: "their servers and deploys on Dokploy",
+  dokploy: "their servers and deploys",
   website: "uptime checks for their sites",
   mcp: "a custom connector",
 };

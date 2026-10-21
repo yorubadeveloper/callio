@@ -65,7 +65,7 @@ export const PLANS: Plan[] = [
       "300 credits a month",
       "5 agents",
       "Computer tasks: booking, forms, research",
-      "Real phone calls, in and out (coming soon)",
+      "Real phone calls: missed-call backup, and calls to your people",
     ],
     highlight: true,
   },

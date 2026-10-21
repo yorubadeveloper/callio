@@ -11,24 +11,24 @@ import {
   useTransform,
   type MotionValue,
 } from "motion/react";
-import { IncomingCallScreen, InCallScreen, LockScreen, PhoneFrame, TextThreadScreen } from "./phone";
+import { IncomingCallScreen, InCallScreen, LockScreen, MessageCallScreen, PhoneFrame } from "./phone";
 import { EASE_OUT, SplitWords } from "./motion";
 
 const BEATS: { title: string; body: string; Screen: React.ComponentType<{ active: boolean }> }[] = [
   {
     title: "They call you",
-    body: "A briefing before your first coffee. A heads-up before the meeting you forgot. Answer, ask questions, and change plans, all out loud.",
+    body: "A morning call with your day, the news and how your sites are doing. A heads-up the moment one goes down. Miss it in the app, and it rings your real phone.",
     Screen: IncomingCallScreen,
   },
   {
     title: "You call them",
-    body: "Tap call in the app, or ring your agent's number from any phone. It picks up straight away and already knows what you're working on.",
+    body: "Tap call in the app, or ring the Callio number from your own phone. It picks up straight away and already knows what you're working on.",
     Screen: InCallScreen,
   },
   {
-    title: "They call for you",
-    body: "Restaurants, dentists, landlords. Your agent makes the call, says up front that it's an AI, and texts you what happened.",
-    Screen: TextThreadScreen,
+    title: "They call your people",
+    body: "Tell Mum you're doing fine, or pass a message on. Your agent rings them, says it's an AI calling for you, and tells you what they said.",
+    Screen: MessageCallScreen,
   },
   {
     title: "Routines that run without you",

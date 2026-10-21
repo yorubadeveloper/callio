@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform } from "motion/react";
-import { DeviceMobileSpeaker, Phone, WhatsappLogo } from "@phosphor-icons/react";
+import { DeviceMobileSpeaker, Phone } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { AgentFace } from "./agent-face";
 import { AGENTS } from "./agents";
@@ -175,7 +175,6 @@ export function DialHero() {
         <span>Talk in</span>
         <Channel icon={<DeviceMobileSpeaker weight="fill" />} label="The app" />
         <Channel icon={<Phone weight="fill" />} label="Phone" />
-        <Channel icon={<WhatsappLogo weight="fill" />} label="WhatsApp" />
       </AfterIntro>
     </section>
   );

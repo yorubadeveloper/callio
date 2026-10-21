@@ -33,7 +33,7 @@ export const KIND: Record<ConnectorKind, { name: string; what: string; icon: Ico
     tint: "bg-coral/25",
   },
   dokploy: {
-    name: "Dokploy",
+    name: "Servers",
     what: "Your apps and deploys: what's running, what failed.",
     icon: HardDrives,
     tint: "bg-peri/30",
@@ -71,7 +71,7 @@ export function Sources({
 }) {
   const [adding, setAdding] = useState<ConnectorKind | null>(null);
   const [editing, setEditing] = useState<Connector | null>(null);
-  // Analytix and Dokploy are one per account in practice; sites and custom connectors can repeat.
+  // Analytix and Servers are one per account in practice; sites and custom connectors can repeat.
   const addable = ORDER.filter((k) => k === "website" || k === "mcp" || !connectors.some((c) => c.kind === k));
 
   return (
@@ -352,7 +352,7 @@ const HELP: Record<ConnectorKind, React.ReactNode> = {
   ),
   dokploy: (
     <>
-      In Dokploy, go to Settings → Profile → API/CLI and generate a key. Callio only reads your projects, apps and
+      In your server panel, go to Settings → Profile → API/CLI and generate a key. Callio only reads your projects, apps and
       deploys.
     </>
   ),
@@ -434,7 +434,7 @@ function ConnectorForm({
         </Field>
       )}
       {(kind === "dokploy" || kind === "mcp") && (
-        <Field label={kind === "dokploy" ? "Dokploy address" : "Server address"}>
+        <Field label={kind === "dokploy" ? "Panel address" : "Server address"}>
           {(id) => (
             <input
               id={id}
@@ -443,7 +443,7 @@ function ConnectorForm({
               inputMode="url"
               autoComplete="off"
               spellCheck={false}
-              placeholder={kind === "dokploy" ? "https://dokploy.yourdomain.com" : "https://mcp.example.com/mcp"}
+              placeholder={kind === "dokploy" ? "https://panel.yourdomain.com" : "https://mcp.example.com/mcp"}
               required
               className={inputClass}
             />

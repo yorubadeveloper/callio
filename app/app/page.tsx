@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Brain, CalendarBlank, Phone, Plus, Sparkle } from "@phosphor-icons/react/dist/ssr";
 import { AgentCard } from "@/components/app/agent-card";
+import { GetSetUp, type GuideStep } from "@/components/app/guide";
 import { InstallNudge } from "@/components/app/notification-setup";
 import { AgentFace } from "@/components/landing/agent-face";
 import { personalize } from "@/lib/agents/personalize";
@@ -9,17 +10,20 @@ import { SKILLS, planAllows } from "@/lib/agents/skills";
 import { duration, greeting, when } from "@/lib/format";
 import { plan } from "@/lib/pricing";
 import { currentUser, userBackend } from "@/lib/server/backend";
-import type { Call, Highlights, UserAgent } from "@/lib/types";
+import type { Call, Contact, Highlights, MorningCall, PhoneSettings, UserAgent } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Home" };
 
 export default async function HomePage() {
   const user = (await currentUser())!;
   const call = await userBackend();
-  const [agents, highlights, calls] = await Promise.all([
+  const [agents, highlights, calls, morning, phone, contacts] = await Promise.all([
     call<UserAgent[]>("/v1/agents"),
     call<Highlights>("/v1/me/highlights"),
     call<Call[]>("/v1/calls?limit=5"),
+    call<MorningCall>("/v1/briefing"),
+    call<PhoneSettings>("/v1/phone"),
+    call<Contact[]>("/v1/contacts"),
   ]);
   const people = agents.map(personalize);
   const byId = new Map(people.map((a) => [a.id, a]));
@@ -31,6 +35,48 @@ export default async function HomePage() {
   const name = user.nickname || user.name.split(" ")[0];
   const limit = plan(user.plan).agents;
   const canAdd = limit === "unlimited" || agents.length < limit;
+  const phoneReady = phone.available && phone.plan_allows;
+  const steps: GuideStep[] = [
+    {
+      id: "call",
+      label: "Have your first call",
+      hint: `Say hi to ${people[0]?.name ?? "your agent"}. It takes a minute.`,
+      href: people[0] ? `/call/${people[0].id}` : "/app/agents/new",
+      done: calls.length > 0,
+    },
+    {
+      id: "morning",
+      label: "Set up your morning call",
+      hint: "Your day, the news and the weather, every morning.",
+      href: "/app/connections",
+      done: morning.enabled,
+    },
+    {
+      id: "calendar",
+      label: "Connect your calendar",
+      hint: "So your agents know your day and can move things.",
+      href: "/app/connections",
+      done: Boolean(user.integrations?.google_calendar?.connected),
+    },
+    ...(phoneReady
+      ? [
+          {
+            id: "phone",
+            label: "Add your phone",
+            hint: "A missed app call rings your real phone.",
+            href: "/app/contacts",
+            done: Boolean(phone.number),
+          },
+          {
+            id: "contacts",
+            label: "Add someone to call",
+            hint: "Your agent can call them with a message from you.",
+            href: "/app/contacts",
+            done: contacts.length > 0,
+          },
+        ]
+      : []),
+  ];
   const suggestions = SKILLS.filter((s) => s.status === "live" && planAllows(user.plan, s.minPlan)).flatMap(
     (s) => s.examples[0],
   );
@@ -38,6 +84,7 @@ export default async function HomePage() {
   return (
     <div className="space-y-10">
       <InstallNudge />
+      {!(user.seen ?? []).includes("guide") && <GetSetUp steps={steps} seen={user.seen ?? []} />}
       {/* phone: a quiet greeting */}
       <header className="lg:hidden">
         <p className="text-[15px] text-ink-soft">{greeting(user.timezone)},</p>
@@ -157,7 +204,12 @@ export default async function HomePage() {
               <div>
                 <p className="text-[16px] font-semibold">{highlights.next_schedule.text}</p>
                 <p className="text-[14px] text-ink-soft">
-                  {highlights.next_schedule.type === "call" ? "Call" : "Reminder"} ·{" "}
+                  {highlights.next_schedule.contact_name
+                    ? `${byId.get(highlights.next_schedule.agent_id)?.name ?? "Your agent"} calls ${highlights.next_schedule.contact_name}`
+                    : highlights.next_schedule.type === "call"
+                      ? "Call"
+                      : "Reminder"}{" "}
+                  ·{" "}
                   {when(highlights.next_schedule.when, user.timezone, user.locale)}
                 </p>
               </div>
@@ -183,7 +235,8 @@ export default async function HomePage() {
         </section>
       </div>
 
-      {!user.integrations?.google_calendar?.connected && (
+      {/* While the setup list is showing, it already asks for the calendar. */}
+      {!user.integrations?.google_calendar?.connected && (user.seen ?? []).includes("guide") && (
         <Link
           href="/app/you#connections"
           className="group flex items-center gap-4 rounded-[28px] bg-teal/20 p-5 ring-1 ring-teal/40 transition-colors hover:bg-teal/30 sm:p-6"
