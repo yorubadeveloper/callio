@@ -6,16 +6,20 @@ export function liveConfig({
   systemInstruction,
   voice,
   tools,
+  languages = [],
 }: {
   systemInstruction: string;
   voice: string;
   tools: Tool[];
+  /** Languages the call is likely in. Without them, speech-to-text guesses per phrase and phone audio often
+   * comes out as Spanish or Korean. */
+  languages?: string[];
 }): LiveConnectConfig {
   return {
     responseModalities: [Modality.AUDIO],
     systemInstruction,
     speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voice } } },
-    inputAudioTranscription: {},
+    inputAudioTranscription: languages.length ? { languageCodes: languages } : {},
     outputAudioTranscription: {},
     // Live re-bills the whole context every turn; compress early to keep long calls affordable.
     contextWindowCompression: { triggerTokens: "16000", slidingWindow: { targetTokens: "8000" } },

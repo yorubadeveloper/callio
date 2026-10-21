@@ -19,7 +19,8 @@ import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { LANGUAGES } from "@/lib/languages";
 import { api, ApiError } from "@/lib/api";
-import type { Detail, Tone, User } from "@/lib/types";
+import { pronounsOf } from "@/lib/pronouns";
+import type { Detail, Pronouns, Tone, User } from "@/lib/types";
 import { CookieSettingsButton } from "@/components/analytics/analytics";
 import { CityInput } from "./city-input";
 import { NotificationSetup } from "./notification-setup";
@@ -32,6 +33,7 @@ export function YouView({ user: initial }: { user: User }) {
   const [user, setUser] = useState(initial);
   const [form, setForm] = useState({
     nickname: initial.nickname ?? "",
+    pronouns: pronounsOf(initial),
     about: initial.about ?? "",
     style: initial.style ?? "",
     city: initial.city ?? "",
@@ -95,6 +97,22 @@ export function YouView({ user: initial }: { user: User }) {
               />
             )}
           </Field>
+          <div>
+            <p className="text-[14px] font-semibold">How they refer to you</p>
+            <p className="mb-2 mt-0.5 text-[13px] text-ink-soft">
+              When your agent talks about you, like on a call to your mum.
+            </p>
+            <Segmented<Pronouns>
+              label="How they refer to you"
+              value={form.pronouns}
+              onChange={(pronouns) => set({ pronouns })}
+              options={[
+                { value: "he", label: "He" },
+                { value: "she", label: "She" },
+                { value: "they", label: "They" },
+              ]}
+            />
+          </div>
           <Field
             label="About you"
             hint="A few lines in your own words: what you do, who matters, what you're working on."
@@ -250,8 +268,20 @@ export function YouView({ user: initial }: { user: User }) {
                     ? "Morning call, calendar, sites"
                     : "Morning call, Google Calendar, sites",
                 },
-                { href: "/app/tasks", icon: Monitor, tint: "bg-teal/30", title: "Tasks", sub: "Things your agents did on the web" },
-                { href: "/app?tour=1", icon: Compass, tint: "bg-amber/40", title: "Take the tour again", sub: "A 30-second look around" },
+                {
+                  href: "/app/tasks",
+                  icon: Monitor,
+                  tint: "bg-teal/30",
+                  title: "Tasks",
+                  sub: "Things your agents did on the web",
+                },
+                {
+                  href: "/app?tour=1",
+                  icon: Compass,
+                  tint: "bg-amber/40",
+                  title: "Take the tour again",
+                  sub: "A 30-second look around",
+                },
               ].map((l) => (
                 <Link
                   key={l.href}

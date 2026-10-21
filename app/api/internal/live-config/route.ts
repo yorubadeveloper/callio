@@ -1,6 +1,6 @@
 import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
-import { buildContactInstructions, buildInstructions } from "@/lib/agents/instructions";
+import { buildContactInstructions, buildInstructions, contactLanguage } from "@/lib/agents/instructions";
 import { personalize } from "@/lib/agents/personalize";
 import { CONTACT_CALL_TOOLS, TOOL_SCHEDULING, toolsForPlan } from "@/lib/agents/tools";
 import { liveConfig } from "@/lib/server/live";
@@ -34,7 +34,12 @@ export async function POST(req: Request) {
     });
     return NextResponse.json({
       model: LIVE_MODEL,
-      config: liveConfig({ systemInstruction, voice: agent.persona.voice, tools: CONTACT_CALL_TOOLS }),
+      config: liveConfig({
+        systemInstruction,
+        voice: agent.persona.voice,
+        tools: CONTACT_CALL_TOOLS,
+        languages: [contactLanguage(setup.contact, setup.user)],
+      }),
       scheduling: TOOL_SCHEDULING,
     });
   }
@@ -56,7 +61,12 @@ export async function POST(req: Request) {
   });
   return NextResponse.json({
     model: LIVE_MODEL,
-    config: liveConfig({ systemInstruction, voice: agent.persona.voice, tools: toolsForPlan(start.user.plan) }),
+    config: liveConfig({
+      systemInstruction,
+      voice: agent.persona.voice,
+      tools: toolsForPlan(start.user.plan),
+      languages: start.user.languages,
+    }),
     scheduling: TOOL_SCHEDULING,
   });
 }

@@ -5,6 +5,7 @@ import type { PlanId } from "@/lib/pricing";
 export type Tone = "casual" | "balanced" | "formal";
 export type Detail = "brief" | "normal" | "detailed";
 export type PersonalityId = "warm" | "direct" | "playful" | "calm";
+export type Pronouns = "he" | "she" | "they";
 
 export interface User {
   id: string;
@@ -21,6 +22,8 @@ export interface User {
   /** One-time guides finished or dismissed: "tour", "guide". */
   seen?: string[];
   nickname: string | null;
+  /** How agents refer to them when talking about them. Unset: worked out from `about`, else "they". */
+  pronouns?: Pronouns | null;
   about: string | null;
   interests: string[];
   tone: Tone;
@@ -214,7 +217,7 @@ export type PhoneCallSetup =
   | { kind: "user"; channel: "phone"; inbound: boolean; purpose: string | null; start: CallStart }
   | {
       kind: "contact";
-      user: Pick<User, "name" | "nickname" | "timezone" | "locale">;
+      user: Pick<User, "name" | "nickname" | "pronouns" | "about" | "languages" | "timezone" | "locale">;
       agent: UserAgent;
       contact: Pick<Contact, "name" | "language" | "notes">;
       message: string;

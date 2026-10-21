@@ -1,6 +1,7 @@
 import { languageName } from "@/lib/languages";
 import { plan as planById } from "@/lib/pricing";
-import type { Briefing, CallStart, User } from "@/lib/types";
+import { PRONOUN_FORMS, pronounsOf } from "@/lib/pronouns";
+import type { Briefing, CallStart, Pronouns, User } from "@/lib/types";
 import type { PersonalAgent } from "./personalize";
 import { planAllows, SKILLS } from "./skills";
 
@@ -10,6 +11,7 @@ export interface CallContext {
     User,
     | "name"
     | "nickname"
+    | "pronouns"
     | "timezone"
     | "locale"
     | "city"
@@ -57,6 +59,31 @@ const LANGUAGE = `
 - Follow their lead: switch when they switch, and go back when they go back. Never switch language on your own.
 - Pronounce names and words from any language the way a native speaker would.
 `;
+
+// Phone audio is narrowband and noisy: a mumbled "hello" can come through as Spanish or Korean. On the phone
+// the agent holds one language instead of following whatever it thinks it heard.
+const phoneLanguage = (language: string, also: string[] = []) => `
+- Speak ${language} and stay in it. Phone lines are rough and you'll sometimes hear a word or two as another language; that's the line, not them. Only switch if they clearly speak another language${also.length ? ` (they also speak ${also.join(" and ")})` : ""} for a whole sentence, or ask you to.
+- If you didn't understand what they said, don't guess and don't answer something they didn't say. Ask them to say it again.
+- Pronounce names and words from any language the way a native speaker would.
+`;
+
+/** The language a phone call starts in: English if they speak it, else their first language. */
+function mainLanguage(codes: readonly string[]) {
+  return codes.includes("en") ? "en" : (codes[0] ?? "en");
+}
+
+/** The one language a message call expects: the contact's, else the person's main one. */
+export function contactLanguage(contact: { language: string | null }, user: { languages?: string[] }) {
+  return contact.language || mainLanguage(user.languages ?? []);
+}
+
+function pronounLine(name: string, pronouns: Pronouns) {
+  const p = PRONOUN_FORMS[pronouns];
+  return pronouns === "they"
+    ? `When you talk about ${name}, say "they" and "them", or just ${name}. Never assume a gender from the name.`
+    : `${name} is ${pronouns === "he" ? "a man" : "a woman"}: say "${p.they}", "${p.them}" and "${p.their}" when you talk about ${name}. Never guess otherwise from the name.`;
+}
 
 const RULES = `
 - You are an AI agent made by Callio. If anyone asks, say so plainly. Never pretend to be human.
@@ -123,7 +150,12 @@ export function buildInstructions(ctx: CallContext): string {
   const sections = [
     `You are ${agent.name}, ${callName}'s personal ${agent.role.toLowerCase()} agent on Callio. You are ${agent.persona.personality}. You mostly help with ${focus.join(", ")}, but you can use any skill below. Call them ${callName}.`,
     `## How you speak${HOW_TO_SPEAK}- ${TONE[user.tone]}\n- ${DETAIL[user.detail]}`,
-    `## Language${LANGUAGE}`,
+    ctx.channel === "phone"
+      ? `## Language${phoneLanguage(
+          languageName(mainLanguage(user.languages)),
+          user.languages.filter((c) => c !== mainLanguage(user.languages)).map(languageName),
+        )}`
+      : `## Language${LANGUAGE}`,
     `## Rules${RULES}`,
   ];
 
@@ -148,9 +180,11 @@ export function buildInstructions(ctx: CallContext): string {
     `It's ${localTime(ctx.now, user.timezone, user.locale)} for ${callName} (${user.timezone}${user.city ? `, ${user.city}` : ""}).`,
     `They're talking to you ${ctx.channel === "app" ? "in the Callio app" : "on the phone"}.`,
     user.about?.trim() && `Who they are: ${user.about.trim()}`,
+    pronounLine(callName, pronounsOf(user)),
     user.style?.trim() && `How they talk and like to be spoken to: ${user.style.trim()} Match it.`,
     user.interests.length > 0 && `They're into: ${user.interests.join(", ")}.`,
-    user.languages.length > 1 &&
+    ctx.channel === "app" &&
+      user.languages.length > 1 &&
       `They speak ${user.languages.map(languageName).join(", ")}, and may mix them in one sentence.`,
     user.integrations?.google_calendar?.connected
       ? "Their Google Calendar is connected: use the calendar tools for anything about their schedule."
@@ -159,7 +193,9 @@ export function buildInstructions(ctx: CallContext): string {
   sections.push(`## About ${callName}\n${about.join("\n")}`);
 
   if (ctx.sources?.length) {
-    const list = ctx.sources.map((s) => `${s.name} (${SOURCE_KIND[s.kind]}${s.status === "error" ? ", not answering" : ""})`);
+    const list = ctx.sources.map(
+      (s) => `${s.name} (${SOURCE_KIND[s.kind]}${s.status === "error" ? ", not answering" : ""})`,
+    );
     sections.push(
       `## Their connected sources
 ${list.join(", ")}.
@@ -206,7 +242,7 @@ function spokenLength(seconds: number) {
 
 export interface ContactCallContext {
   agent: PersonalAgent;
-  user: Pick<User, "name" | "nickname" | "timezone" | "locale">;
+  user: Pick<User, "name" | "nickname" | "pronouns" | "about" | "languages" | "timezone" | "locale">;
   contact: { name: string; language: string | null; notes: string | null };
   message: string;
   maxSeconds: number;
@@ -221,18 +257,20 @@ export function buildContactInstructions(ctx: ContactCallContext): string {
   const { agent, user, contact } = ctx;
   const fullName = user.name.trim() || user.nickname || "the person you work for";
   const first = user.nickname || fullName.split(" ")[0];
-  const language = contact.language ? languageName(contact.language) : null;
+  const p = PRONOUN_FORMS[pronounsOf(user)];
   return [
     `You are ${agent.name}, an AI assistant from Callio. You're phoning ${contact.name} on behalf of ${fullName} (${first}) to pass on a message. You are ${agent.persona.personality}.`,
     `## How you speak${HOW_TO_SPEAK}`,
-    `## Language\n${language ? `Speak ${language}, unless they answer in another language; then follow them.` : "Speak the language they answer in."}${LANGUAGE}`,
+    `## Language${phoneLanguage(languageName(contactLanguage(contact, user)))}`,
+    `## ${first}\n${pronounLine(first, pronounsOf(user))} That's all you know about ${p.them} besides the message.`,
     `## The message from ${first}\n"${ctx.message.trim()}"`,
     contact.notes?.trim() ? `## About ${contact.name}, from ${first}\n${contact.notes.trim()}` : "",
     `## How the call goes
-- Wait for them to answer and say hello. Then say who you are in one breath: you're ${first}'s AI assistant from Callio, calling with a message from ${first}. Never pretend to be ${first} or a human; if asked, say plainly you're an AI.
-- Before the message, make sure you're speaking to ${contact.name}. If it's someone else, ask for ${contact.name}; if they're not there or it's the wrong number, apologise, don't share the message, and end the call.
-- Give the message warmly in your own words, as ${first}'s ("${first} asked me to tell you…"). Stay faithful to it: don't add news, promises or details ${first} didn't give.
-- If they reply or want something passed back, listen, then say back the gist so they know you've got it. Tell them ${first} will get it in writing straight after the call.
+- Wait for them to say hello. Then, in one or two short sentences: check you've got ${contact.name}, and say you're ${agent.name}, ${first}'s AI assistant from Callio, with a message from ${p.them}. Never pretend to be ${first} or a human; if asked, say plainly you're an AI.
+- Introduce yourself once. If they just say hello again or sound unsure, say briefly who you are and carry on. Don't repeat the whole introduction.
+- If it's someone else, ask for ${contact.name}. If ${contact.name} isn't there or it's the wrong number, apologise, don't share the message, and end the call.
+- Give the message warmly in your own words, as ${first}'s: "${first} asked me to tell you…". Turn ${p.their} "I" and "me" into ${first}, "${p.they}" and "${p.them}". Stay faithful to it: don't add news, promises or details ${first} didn't give.
+- If they reply or want something passed back, listen, then say back the gist in a sentence so they know you've got it, and that you'll pass it on to ${first}.
 - You only know the message. If they ask about anything else (where ${first} is, plans, money, anything private), say you don't know and that they can ask ${first} directly. Never ask for or accept bank details, codes or passwords.
 - If you reach voicemail or a recorded greeting, wait for it to finish, then leave the message in two or three sentences, say ${first} will call back, and end the call.
 - If they ask not to be called by Callio again, call stop_calls, apologise for the bother, say goodbye and end the call.

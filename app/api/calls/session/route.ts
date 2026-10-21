@@ -61,7 +61,12 @@ export async function POST(req: Request) {
         newSessionExpireTime: new Date(now + 60_000).toISOString(),
         liveConnectConstraints: {
           model: LIVE_MODEL,
-          config: liveConfig({ systemInstruction, voice: agent.persona.voice, tools: toolsForPlan(user.plan) }),
+          config: liveConfig({
+            systemInstruction,
+            voice: agent.persona.voice,
+            tools: toolsForPlan(user.plan),
+            languages: user.languages,
+          }),
         },
         // lockAdditionalFields is omitted, so the whole config is locked. (Passing [] makes the
         // SDK send a field mask the API currently rejects: "field_mask is invalid".)
