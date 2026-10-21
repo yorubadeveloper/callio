@@ -17,7 +17,7 @@ export function Faq() {
   return (
     <section
       id="faq"
-      className="mx-auto grid max-w-6xl gap-10 px-5 py-24 sm:px-8 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] md:gap-16 md:py-32"
+      className="mx-auto grid grid-cols-1 max-w-6xl gap-10 px-5 py-24 sm:px-8 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] md:gap-16 md:py-32"
     >
       <div className="md:sticky md:top-28 md:self-start">
         <h2

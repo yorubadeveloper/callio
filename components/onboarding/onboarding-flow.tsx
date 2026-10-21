@@ -183,7 +183,7 @@ export function OnboardingFlow({ user: initialUser }: { user: User }) {
                   </Field>
                   <Field label="Where are you?" hint="For the weather and the right time of day.">
                     {(id) => (
-                      <div className="grid gap-2 sm:grid-cols-2">
+                      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                         <CityInput
                           id={id}
                           value={city}

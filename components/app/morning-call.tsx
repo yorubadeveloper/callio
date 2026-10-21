@@ -176,7 +176,7 @@ function MorningForm({
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-5 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <Field label="Who calls">
           {(id) => (
             <SelectMenu
@@ -195,7 +195,8 @@ function MorningForm({
               type="time"
               value={time}
               onChange={(e) => setTime(e.target.value)}
-              className={cn(inputClass, "font-mono")}
+              // iOS sizes date/time inputs to their own content unless told otherwise.
+              className={cn(inputClass, "min-w-0 appearance-none font-mono")}
             />
           )}
         </Field>

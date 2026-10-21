@@ -69,7 +69,7 @@ export function BillingView({
         </p>
       )}
 
-      <section className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+      <section className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
         <div className="rounded-[28px] bg-[#121212] p-6 text-[#F3F2EE]">
           <p className="text-[13px] text-white/60">Your plan</p>
           <p className="mt-1 font-display text-[36px] leading-none font-medium tracking-[-0.04em]">{current.name}</p>
@@ -110,7 +110,7 @@ export function BillingView({
             />
           </div>
         </div>
-        <ul className="grid gap-3 sm:grid-cols-3">
+        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           {PLANS.filter((p) => p.id !== "free").map((p) => {
             const isCurrent = p.id === billing.plan;
             const price = interval === "year" ? p.yearlyPerMonth : p.monthly;

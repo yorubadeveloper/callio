@@ -30,7 +30,7 @@ export function Templates() {
         Pick one, change its name and voice if you like, and choose when it calls.
       </p>
 
-      <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {TEMPLATES.map(({ name, color }, i) => {
           const a = agent(name);
           return (

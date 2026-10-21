@@ -78,7 +78,7 @@ export function Sources({
     <section>
       <h2 className="text-[13px] font-semibold uppercase tracking-wider text-ink-soft">Sites and servers</h2>
       {connectors.length > 0 && (
-        <ul className="mt-3 grid gap-3">
+        <ul className="mt-3 grid grid-cols-1 gap-3">
           <AnimatePresence initial={false}>
             {connectors.map((c) => (
               <ConnectorCard
@@ -92,7 +92,7 @@ export function Sources({
           </AnimatePresence>
         </ul>
       )}
-      <div className={cn("grid gap-2 sm:grid-cols-2", connectors.length > 0 && "mt-4")}>
+      <div className={cn("grid grid-cols-1 gap-2 sm:grid-cols-2", connectors.length > 0 && "mt-4")}>
         {addable.map((kind) => {
           const k = KIND[kind];
           return (

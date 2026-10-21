@@ -107,7 +107,7 @@ export function ContactsView({
             </button>
           </div>
         ) : (
-          <ul className="mt-3 grid gap-3 sm:grid-cols-2">
+          <ul className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
             <AnimatePresence initial={false}>
               {contacts.map((c) => (
                 <ContactCard
@@ -535,8 +535,8 @@ const WHEN = [
 ];
 const REPEAT = [
   { value: "none" as const, label: "Once" },
-  { value: "weekly" as const, label: "Every week" },
-  { value: "daily" as const, label: "Every day" },
+  { value: "weekly" as const, label: "Weekly" },
+  { value: "daily" as const, label: "Daily" },
 ];
 
 /** "YYYY-MM-DDTHH:MM" in the person's timezone, for a datetime-local input. */
@@ -661,7 +661,7 @@ function MessageForm({
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="space-y-4 overflow-hidden"
+            className="-mx-1 space-y-4 overflow-hidden px-1 py-1"
           >
             <input
               aria-label="Date and time"
@@ -669,7 +669,7 @@ function MessageForm({
               value={at}
               min={localNow(timezone)}
               onChange={(e) => setAt(e.target.value)}
-              className={cn(inputClass, "font-mono")}
+              className={cn(inputClass, "min-w-0 appearance-none font-mono")}
             />
             <Segmented label="How often" value={repeat} options={REPEAT} onChange={setRepeat} />
           </motion.div>

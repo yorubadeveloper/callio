@@ -145,8 +145,8 @@ function Skills({
   const ordered = [...SKILLS].sort((x, y) => Number(focus.includes(y.id)) - Number(focus.includes(x.id)));
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-      <ul className="grid gap-3 sm:grid-cols-2">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {ordered.map((s) => {
           const allowed = planAllows(plan, s.minPlan);
           const soon = s.status === "soon";
@@ -292,7 +292,7 @@ function AgentMemory({
         </div>
         {error && <p className="mt-2 text-[14px] text-[#B0412C] dark:text-coral">{error}</p>}
       </form>
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <MemoryList
           title={`Only ${agentName} knows`}
           items={own}

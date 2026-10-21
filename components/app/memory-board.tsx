@@ -96,7 +96,7 @@ export function MemoryBoard({
       </form>
       {error && <p className="mt-2 text-[14px] text-[#B0412C] dark:text-coral">{error}</p>}
 
-      <div className="mt-6 grid gap-8 lg:grid-cols-2">
+      <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-2">
         <MemoryList
           title="Every agent knows"
           items={memories.filter((m) => m.agent_id === null)}

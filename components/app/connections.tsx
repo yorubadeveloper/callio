@@ -77,7 +77,7 @@ export function ConnectionsView({
         subtitle="What your agents can see and use. Everything is read-only unless you switch it on, and you can remove it any time."
       />
       <MorningCallCard morning={morning} agents={agents} connectors={connectors} user={user} />
-      <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+      <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <Sources connectors={connectors} timezone={user.timezone} locale={user.locale} />
         <section>
           <h2 className="text-[13px] font-semibold uppercase tracking-wider text-ink-soft">Apps</h2>
@@ -89,7 +89,7 @@ export function ConnectionsView({
       <div className="mt-10">
         <section>
           <h2 className="text-[13px] font-semibold uppercase tracking-wider text-ink-soft">Coming soon</h2>
-          <ul className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+          <ul className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
             {SOON.map((app) => (
               <li key={app.name} className="flex items-start gap-3 rounded-[22px] bg-plate p-4 ring-1 ring-line">
                 <span className={cn("grid size-10 shrink-0 place-items-center rounded-2xl text-[20px]", app.tint)}>

@@ -1,6 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Brain, CalendarBlank, Phone, Plus, Sparkle } from "@phosphor-icons/react/dist/ssr";
+import {
+  AddressBook,
+  ArrowRight,
+  Brain,
+  CalendarBlank,
+  CalendarDots,
+  Monitor,
+  Phone,
+  PlugsConnected,
+  Plus,
+  Sparkle,
+} from "@phosphor-icons/react/dist/ssr";
 import { AgentCard } from "@/components/app/agent-card";
 import { GetSetUp, type GuideStep } from "@/components/app/guide";
 import { InstallNudge } from "@/components/app/notification-setup";
@@ -184,7 +195,57 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
+      {/* Phones: the tab bar only fits five places, so the rest are one tap away here. */}
+      <nav aria-label="More in Callio" className="lg:hidden">
+        <h2 className="mb-3 font-display text-[22px] font-medium tracking-[-0.03em]">Everything else</h2>
+        <ul className="grid grid-cols-2 gap-2.5">
+          {[
+            {
+              href: "/app/upcoming",
+              tour: "upcoming-tile",
+              icon: CalendarDots,
+              tint: "bg-amber/40",
+              title: "Upcoming",
+              sub: highlights.next_schedule ? when(highlights.next_schedule.when, user.timezone, user.locale) : "Nothing booked",
+            },
+            {
+              href: "/app/contacts",
+              tour: "contacts",
+              icon: AddressBook,
+              tint: "bg-coral/30",
+              title: "Contacts",
+              sub: contacts.length ? `${contacts.length} ${contacts.length === 1 ? "person" : "people"}` : "Your phone and people",
+            },
+            {
+              href: "/app/connections",
+              tour: "connections",
+              icon: PlugsConnected,
+              tint: "bg-peri/35",
+              title: "Connections",
+              sub: morning.enabled ? `Mornings at ${morning.time}` : "Morning call, calendar",
+            },
+            { href: "/app/tasks", tour: "tasks", icon: Monitor, tint: "bg-teal/30", title: "Tasks", sub: "Done on the web" },
+          ].map((l) => (
+            <li key={l.href} className="min-w-0">
+              <Link
+                href={l.href}
+                data-tour={l.tour}
+                className="flex h-full min-w-0 flex-col gap-3 rounded-[22px] bg-plate p-4 ring-1 ring-line transition-transform active:scale-[0.98]"
+              >
+                <span className={`grid size-10 place-items-center rounded-2xl text-[20px] ${l.tint}`}>
+                  <l.icon weight="fill" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-[15px] font-semibold">{l.title}</span>
+                  <span className="block truncate text-[13px] text-ink-soft">{l.sub}</span>
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
         <section className="rounded-[28px] bg-plate p-5 ring-1 ring-line sm:p-6">
           <div className="flex items-center justify-between gap-4">
             <h2 className="flex items-center gap-2 text-[13px] font-semibold uppercase tracking-wider text-ink-soft">

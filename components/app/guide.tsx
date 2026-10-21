@@ -65,7 +65,7 @@ export function GetSetUp({ steps, seen }: { steps: GuideStep[]; seen: string[] }
           transition={{ type: "spring", stiffness: 200, damping: 30 }}
         />
       </div>
-      <ul className="relative mt-3 grid gap-2 sm:mt-4 sm:grid-cols-2">
+      <ul className="relative mt-3 grid grid-cols-1 gap-2 sm:mt-4 sm:grid-cols-2">
         {steps.map((s) => (
           // On phones only what's left is listed; the bar and the count show the rest.
           <li key={s.id} className={cn(s.done && "hidden sm:block")}>

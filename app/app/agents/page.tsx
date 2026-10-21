@@ -31,7 +31,7 @@ export default async function AgentsPage() {
         }
         action={<NewAgentButton count={agents.length} plan={user.plan} />}
       />
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {agents.map((a) => (
           <AgentCard key={a.id} agent={personalize(a)} lastTalked={lastTalked(a.id)} />
         ))}

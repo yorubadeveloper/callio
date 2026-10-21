@@ -35,7 +35,7 @@ export default async function SignInPage({
   if (await currentUser().catch(() => null)) redirect(destination?.startsWith("/") ? destination : "/app");
 
   return (
-    <div className="grid min-h-dvh bg-page font-body text-ink lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
+    <div className="grid grid-cols-1 min-h-dvh bg-page font-body text-ink lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
       <section className="flex flex-col px-5 pb-[max(env(safe-area-inset-bottom),1.5rem)] pt-[max(env(safe-area-inset-top),1.25rem)] sm:px-10">
         <Link href="/" className="self-start text-xl" aria-label="Callio home">
           <Wordmark />

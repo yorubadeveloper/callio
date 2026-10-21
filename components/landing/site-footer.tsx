@@ -35,7 +35,7 @@ const COLUMNS = [
 export function SiteFooter() {
   return (
     <footer className="relative overflow-hidden border-t border-line">
-      <div className="mx-auto grid max-w-6xl gap-12 px-5 pb-10 pt-16 sm:px-8 md:grid-cols-[1.5fr_1fr_1fr_1fr] md:pt-20">
+      <div className="mx-auto grid grid-cols-1 max-w-6xl gap-12 px-5 pb-10 pt-16 sm:px-8 md:grid-cols-[1.5fr_1fr_1fr_1fr] md:pt-20">
         <div className="max-w-xs">
           <Link href="/" aria-label="Callio home" className="text-[22px] text-ink">
             <Wordmark />

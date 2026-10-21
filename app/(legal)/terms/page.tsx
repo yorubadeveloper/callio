@@ -43,7 +43,7 @@ function Contents() {
   return (
     <nav aria-label="On this page" className="mt-10 rounded-[28px] bg-plate p-6 ring-1 ring-line sm:p-7">
       <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-ink-soft">On this page</p>
-      <ol className="mt-3 grid gap-x-6 gap-y-1.5 text-[15px] sm:grid-cols-2">
+      <ol className="mt-3 grid grid-cols-1 gap-x-6 gap-y-1.5 text-[15px] sm:grid-cols-2">
         {SECTIONS.map((s) => (
           <li key={s.id}>
             <a href={`#${s.id}`} className="text-ink-soft hover:text-ink">

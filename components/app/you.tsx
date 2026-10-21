@@ -81,7 +81,7 @@ export function YouView({ user: initial }: { user: User }) {
     <>
       <PageTitle title="You" subtitle={`Signed in as ${user.email}`} />
 
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
+      <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
         <section className="space-y-6">
           <h2 className="font-display text-[22px] font-medium tracking-[-0.03em]">How your agents know you</h2>
           <Field label="What they call you">
@@ -125,7 +125,7 @@ export function YouView({ user: initial }: { user: User }) {
               />
             )}
           </Field>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <p className="mb-2 text-[14px] font-semibold">Tone</p>
               <Segmented<Tone>
@@ -208,7 +208,7 @@ export function YouView({ user: initial }: { user: User }) {
           </div>
           <Field label="Where you are">
             {(id) => (
-              <div className="grid gap-2 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <CityInput
                   id={id}
                   value={form.city}

@@ -51,7 +51,7 @@ const STEPS: Step[] = [
     title: "Your phone and your people",
     body: "Add your number so a missed call reaches your real phone, and the people your agent can call with a message.",
     fallbackBody:
-      "Under You: add your number so a missed call reaches your real phone, and the people your agent can call with a message.",
+      "Under You, or Contacts on Home: add your number so a missed call reaches your real phone, and the people your agent can call with a message.",
   },
   {
     targets: ["connections", "you"],
@@ -76,7 +76,11 @@ function visible(el: Element) {
 function findTarget(step: Step): { rect: DOMRect; fallback: boolean } | null {
   for (const [i, key] of (step.targets ?? []).entries()) {
     const el = [...document.querySelectorAll(`[data-tour="${key}"]`)].find(visible);
-    if (el) return { rect: el.getBoundingClientRect(), fallback: i > 0 };
+    if (!el) continue;
+    const rect = el.getBoundingClientRect();
+    // Below the fold (the Home shortcuts on phones): bring it into view; the scroll listener measures again.
+    if (rect.top < 0 || rect.bottom > window.innerHeight) el.scrollIntoView({ block: "center" });
+    return { rect: el.getBoundingClientRect(), fallback: i > 0 };
   }
   return null;
 }

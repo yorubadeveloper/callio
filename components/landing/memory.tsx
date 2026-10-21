@@ -34,7 +34,7 @@ export function Memory() {
   };
 
   return (
-    <section className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-24 sm:px-6 md:grid-cols-2 md:py-36">
+    <section className="mx-auto grid grid-cols-1 max-w-6xl items-center gap-12 px-4 py-24 sm:px-6 md:grid-cols-2 md:py-36">
       <div>
         <h2 className="font-display text-[clamp(2rem,5vw,4rem)] leading-[1.04] font-medium tracking-[-0.035em] text-ink">
           <SplitWords show={inView} parts={[{ text: "They remember how you like it" }]} />

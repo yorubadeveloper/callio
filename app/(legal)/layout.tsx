@@ -9,7 +9,7 @@ import { LEGAL } from "@/lib/legal";
 // keep Tailwind-styled UI (title, table of contents) outside that wrapper and
 // use the .callout class for boxed paragraphs.
 const PROSE_CSS = `
-.legal-prose { font-size: 16.5px; line-height: 1.7; }
+.legal-prose { font-size: 16.5px; line-height: 1.7; overflow-wrap: anywhere; }
 .legal-prose > section { scroll-margin-top: 6rem; }
 .legal-prose h2 {
   margin-top: 3.5rem; font-family: var(--font-instrument), ui-sans-serif, system-ui, sans-serif; font-weight: 500;

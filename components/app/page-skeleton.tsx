@@ -25,7 +25,7 @@ export function PageSkeleton({ variant }: { variant: "agents" | "agent" | "list"
       {variant === "agents" && (
         <>
           <Title action />
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {[0, 1, 2].map((i) => (
               <div key={i} className="overflow-hidden rounded-[30px] bg-plate ring-1 ring-line">
                 <Block className="h-24 rounded-none" />
@@ -54,7 +54,7 @@ export function PageSkeleton({ variant }: { variant: "agents" | "agent" | "list"
             <Block className="h-12 w-full rounded-full sm:w-48" />
           </div>
           <Block className="mt-8 h-12 w-full rounded-full sm:max-w-md" />
-          <div className="mt-6 grid gap-3 sm:grid-cols-2">
+          <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
             {[0, 1, 2, 3].map((i) => (
               <Block key={i} className="h-32" />
             ))}
@@ -81,7 +81,7 @@ export function PageSkeleton({ variant }: { variant: "agents" | "agent" | "list"
       {variant === "detail" && (
         <>
           <Title />
-          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
             <Block className="h-96" />
             <Block className="h-56" />
           </div>
@@ -90,7 +90,7 @@ export function PageSkeleton({ variant }: { variant: "agents" | "agent" | "list"
       {variant === "form" && (
         <>
           <Title />
-          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
             <div className="space-y-4 rounded-[28px] bg-plate p-5 ring-1 ring-line sm:p-6">
               {[0, 1, 2, 3].map((i) => (
                 <div key={i} className="space-y-2">

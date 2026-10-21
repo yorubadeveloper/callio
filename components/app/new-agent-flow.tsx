@@ -60,7 +60,7 @@ export function NewAgentFlow({ initialTemplate }: { initialTemplate?: string }) 
           <p className="mt-2 text-[15px] text-ink-soft">
             Each one is good at something. You can change everything next.
           </p>
-          <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {AGENT_PROFILES.map((a) => (
               <li key={a.name}>
                 <button

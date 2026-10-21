@@ -184,7 +184,7 @@ export function TaskLive({ task: initial, agent }: { task: Task; agent: Personal
   };
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
       <section>
         <div className="overflow-hidden rounded-[24px] bg-[#0E0E10] ring-1 ring-line">
           <div className="flex items-center gap-2 border-b border-white/10 px-4 py-2.5 text-[13px] text-white/60">
