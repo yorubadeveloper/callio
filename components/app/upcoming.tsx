@@ -2,7 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { Bell, CalendarDots, CheckCircle, Monitor, Phone, Repeat, SunHorizon, Warning, X } from "@phosphor-icons/react";
+import {
+  Bell,
+  CalendarDots,
+  ChatCircleText,
+  CheckCircle,
+  Monitor,
+  Phone,
+  Repeat,
+  SunHorizon,
+  Warning,
+  X,
+} from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { AgentFace } from "@/components/landing/agent-face";
 import type { PersonalAgent } from "@/lib/agents/personalize";
@@ -192,7 +203,15 @@ function ScheduleRow({
             s.type === "call" ? "bg-teal text-[#0E0E10]" : "bg-amber text-[#0E0E10]",
           )}
         >
-          {s.briefing ? <SunHorizon weight="fill" /> : s.type === "call" ? <Phone weight="fill" /> : <Bell weight="fill" />}
+          {s.briefing ? (
+            <SunHorizon weight="fill" />
+          ) : s.contact_name ? (
+            <ChatCircleText weight="fill" />
+          ) : s.type === "call" ? (
+            <Phone weight="fill" />
+          ) : (
+            <Bell weight="fill" />
+          )}
         </span>
       </span>
       <div className="min-w-0 flex-1">
@@ -200,8 +219,9 @@ function ScheduleRow({
         <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-[14px] text-ink-soft">
           <span className="font-mono text-[13px] text-ink">{clockTime(s.when, timezone, locale)}</span>
           <span>
-            {s.briefing ? "Morning call" : s.type === "call" ? "Call" : "Reminder"}
-            {agent ? ` from ${agent.name}` : ""}
+            {s.contact_name
+              ? `${agent?.name ?? "Your agent"} calls ${s.contact_name}`
+              : `${s.briefing ? "Morning call" : s.type === "call" ? "Call" : "Reminder"}${agent ? ` from ${agent.name}` : ""}`}
           </span>
           {repeat && (
             <span className="inline-flex items-center gap-1 rounded-full bg-ink/[0.06] px-2 py-0.5 text-[12px] font-medium text-ink">

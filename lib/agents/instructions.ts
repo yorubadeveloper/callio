@@ -32,7 +32,13 @@ export interface CallContext {
   briefing?: Briefing | null;
   /** Sources they connected on the Connections page (sites, servers, analytics, MCP servers). */
   sources?: CallStart["sources"];
+  /** People the agent can phone with a message (Contacts page). */
+  contacts?: CallStart["contacts"];
   channel: "app" | "phone";
+  /** Phone calls: they rang the Callio number, rather than us ringing them. */
+  inbound?: boolean;
+  /** Phone calls are capped (2.5 minutes). */
+  maxSeconds?: number;
   now: Date;
 }
 
@@ -161,6 +167,14 @@ For anything about how these are doing right now, call check_sources; never answ
     );
   }
 
+  const callable = ctx.contacts?.filter((c) => !c.opted_out) ?? [];
+  if (callable.length && available.some((s) => s.id === "messages")) {
+    const off = ctx.contacts!.filter((c) => c.opted_out).map((c) => c.name);
+    sections.push(
+      `## People you can call for them\n${callable.map((c) => c.name).join(", ")}.${off.length ? ` ${off.join(", ")} asked not to be called by Callio.` : ""} Map what they say ("my mum", "my parents") to these names; if it's ambiguous, ask.`,
+    );
+  }
+
   if (memory.facts.length) {
     sections.push(`## What you remember\n${memory.facts.map((f) => `- ${f}`).join("\n")}`);
   }
@@ -170,13 +184,60 @@ For anything about how these are doing right now, call check_sources; never answ
 
   if (ctx.briefing) sections.push(briefingSection(ctx.briefing, callName));
 
-  sections.push(
-    ctx.briefing
-      ? `## This call\nThis is ${callName}'s morning call. Say the opening in your own words, then go through the briefing.`
-      : ctx.purpose
-      ? `## This call\nYou called them: ${ctx.purpose}. ${agent.persona.opening}`
-      : `## This call\nThey called you. Greet ${callName} warmly in a few words, the way you'd answer a friend's call, and let them lead.`,
-  );
+  const thisCall = ctx.briefing
+    ? `This is ${callName}'s morning call. Say the opening in your own words, then go through the briefing.`
+    : ctx.purpose
+      ? `You called them: ${ctx.purpose}. ${agent.persona.opening}`
+      : `They called you. Greet ${callName} warmly in a few words, the way you'd answer a friend's call, and let them lead.`;
+  const onPhone =
+    ctx.channel === "phone"
+      ? `\nThis is a real phone call${ctx.inbound ? " to the Callio number" : ", because they didn't pick up in the app"}. It lasts at most ${spokenLength(ctx.maxSeconds ?? 150)}, so keep it tight: the most important thing first, short turns, and offer to continue in the app if there's more. You'll get a note when time's nearly up; then say goodbye and call end_call.`
+      : "";
+  sections.push(`## This call\n${thisCall}${onPhone}`);
 
   return sections.join("\n\n");
+}
+
+function spokenLength(seconds: number) {
+  const m = Math.floor(seconds / 60);
+  const half = seconds % 60 >= 30;
+  return `${m}${half ? " and a half" : ""} minute${m === 1 && !half ? "" : "s"}`;
+}
+
+export interface ContactCallContext {
+  agent: PersonalAgent;
+  user: Pick<User, "name" | "nickname" | "timezone" | "locale">;
+  contact: { name: string; language: string | null; notes: string | null };
+  message: string;
+  maxSeconds: number;
+  now: Date;
+}
+
+/**
+ * A message call: the agent rings one of the person's contacts and speaks for them. It only knows the message,
+ * nothing else about the person, and has no tools beyond ending the call and recording an opt-out.
+ */
+export function buildContactInstructions(ctx: ContactCallContext): string {
+  const { agent, user, contact } = ctx;
+  const fullName = user.name.trim() || user.nickname || "the person you work for";
+  const first = user.nickname || fullName.split(" ")[0];
+  const language = contact.language ? languageName(contact.language) : null;
+  return [
+    `You are ${agent.name}, an AI assistant from Callio. You're phoning ${contact.name} on behalf of ${fullName} (${first}) to pass on a message. You are ${agent.persona.personality}.`,
+    `## How you speak${HOW_TO_SPEAK}`,
+    `## Language\n${language ? `Speak ${language}, unless they answer in another language; then follow them.` : "Speak the language they answer in."}${LANGUAGE}`,
+    `## The message from ${first}\n"${ctx.message.trim()}"`,
+    contact.notes?.trim() ? `## About ${contact.name}, from ${first}\n${contact.notes.trim()}` : "",
+    `## How the call goes
+- Wait for them to answer and say hello. Then say who you are in one breath: you're ${first}'s AI assistant from Callio, calling with a message from ${first}. Never pretend to be ${first} or a human; if asked, say plainly you're an AI.
+- Before the message, make sure you're speaking to ${contact.name}. If it's someone else, ask for ${contact.name}; if they're not there or it's the wrong number, apologise, don't share the message, and end the call.
+- Give the message warmly in your own words, as ${first}'s ("${first} asked me to tell you…"). Stay faithful to it: don't add news, promises or details ${first} didn't give.
+- If they reply or want something passed back, listen, then say back the gist so they know you've got it. Tell them ${first} will get it in writing straight after the call.
+- You only know the message. If they ask about anything else (where ${first} is, plans, money, anything private), say you don't know and that they can ask ${first} directly. Never ask for or accept bank details, codes or passwords.
+- If you reach voicemail or a recorded greeting, wait for it to finish, then leave the message in two or three sentences, say ${first} will call back, and end the call.
+- If they ask not to be called by Callio again, call stop_calls, apologise for the bother, say goodbye and end the call.
+- The call lasts at most ${spokenLength(ctx.maxSeconds)}. When you've delivered the message and heard any reply, say a warm goodbye and call end_call. Don't keep them talking.`,
+  ]
+    .filter(Boolean)
+    .join("\n\n");
 }

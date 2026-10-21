@@ -54,10 +54,12 @@ export default async function CallsPage() {
                       )}
                       <span className="min-w-0 flex-1">
                         <span className="block text-[15px] font-semibold leading-snug">
-                          {c.summary ?? `Call with ${a?.name ?? "your agent"}`}
+                          {c.summary ?? (c.contact_name ? `Called ${c.contact_name}` : `Call with ${a?.name ?? "your agent"}`)}
                         </span>
                         <span className="block text-[13px] text-ink-soft">
-                          {a?.name ?? "Deleted agent"} · {when(c.started_at, user.timezone, user.locale)} ·{" "}
+                          {a?.name ?? "Deleted agent"}
+                          {c.contact_name ? ` → ${c.contact_name}` : ""}
+                          {c.channel === "phone" ? " · phone" : ""} · {when(c.started_at, user.timezone, user.locale)} ·{" "}
                           {duration(c.seconds)} · {c.credits} {c.credits === 1 ? "credit" : "credits"}
                         </span>
                       </span>

@@ -37,9 +37,10 @@ export default async function CallDetailPage({ params }: { params: Promise<{ id:
         )}
         <div>
           <h1 className="font-display text-[30px] leading-tight font-medium tracking-[-0.035em]">
-            Call with {a?.name ?? "your agent"}
+            {c.contact_name ? `${a?.name ?? "Your agent"} called ${c.contact_name}` : `Call with ${a?.name ?? "your agent"}`}
           </h1>
           <p className="text-[14px] text-ink-soft">
+            {c.channel === "phone" && "Phone · "}
             {when(c.started_at, user.timezone, user.locale)} · {duration(c.seconds)} · {c.credits}{" "}
             {c.credits === 1 ? "credit" : "credits"}
           </p>
@@ -52,7 +53,10 @@ export default async function CallDetailPage({ params }: { params: Promise<{ id:
       {c.transcript?.length ? (
         <ol className="mt-3 space-y-3">
           {c.transcript.map((l, i) => (
-            <li key={i} className={cn("flex", l.who === "you" ? "justify-end" : "justify-start")}>
+            <li key={i} className={cn("flex flex-col", l.who === "you" ? "items-end" : "items-start")}>
+              {c.contact_name && l.who === "you" && (i === 0 || c.transcript![i - 1].who !== "you") && (
+                <span className="mb-1 px-1 text-[12px] font-semibold text-ink-soft">{c.contact_name}</span>
+              )}
               <p
                 className={cn(
                   "max-w-[85%] rounded-[20px] px-4 py-2.5 text-[15px] leading-snug",

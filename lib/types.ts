@@ -98,6 +98,10 @@ export interface Call {
   seconds: number;
   credits: number;
   summary: string | null;
+  /** Phone calls to one of their contacts: who was called and how it went. */
+  contact_id?: string | null;
+  contact_name?: string | null;
+  outcome?: string | null;
   transcript?: TranscriptLine[];
 }
 
@@ -112,6 +116,9 @@ export interface Schedule {
   status: "pending" | "done" | "cancelled";
   /** The morning call: a briefing is written just before it rings. */
   briefing?: boolean;
+  /** A message call: the agent phones this contact and passes `text` on. */
+  contact_id?: string | null;
+  contact_name?: string | null;
 }
 
 export interface AppNotification {
@@ -172,7 +179,46 @@ export interface CallStart {
   memory: { facts: string[]; recent_calls: { when: string; summary: string }[] };
   briefing?: Briefing | null;
   sources?: { name: string; kind: ConnectorKind; status: Connector["status"] }[];
+  /** People the agent can phone with a message. */
+  contacts?: { name: string; opted_out: boolean }[];
 }
+
+export interface Contact {
+  id: string;
+  name: string;
+  phone: string;
+  language: string | null;
+  notes: string | null;
+  opted_out: boolean;
+  opted_out_at: string | null;
+  created_at: string;
+}
+
+/** Their own phone: verified number, missed-call fallback, and whether phone calls are available at all. */
+export interface PhoneSettings {
+  number: string | null;
+  verified_at: string | null;
+  fallback: boolean;
+  /** A number waiting for its code. */
+  pending: string | null;
+  available: boolean;
+  plan_allows: boolean;
+  /** The number Callio calls from. */
+  caller_id: string | null;
+}
+
+/** What the backend sends /api/internal/live-config to set up a phone call. */
+export type PhoneCallSetup =
+  | { kind: "user"; channel: "phone"; inbound: boolean; purpose: string | null; start: CallStart }
+  | {
+      kind: "contact";
+      user: Pick<User, "name" | "nickname" | "timezone" | "locale">;
+      agent: UserAgent;
+      contact: Pick<Contact, "name" | "language" | "notes">;
+      message: string;
+      max_seconds: number;
+      attempt: number;
+    };
 
 export type ConnectorKind = "analytix" | "dokploy" | "website" | "mcp";
 

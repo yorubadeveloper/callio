@@ -280,6 +280,44 @@ export const TOOLS: Record<string, ToolMeta> = {
       },
     },
   },
+  call_contact: {
+    kind: "schedule",
+    label: (a) => `Booking a call to ${str(a.contact)}`,
+    scheduling: FunctionResponseScheduling.WHEN_IDLE,
+    declaration: {
+      name: "call_contact",
+      description:
+        "Book a real phone call to one of their contacts that passes a message on, now or at a time. Say back who, what and when, and get a yes first.",
+      behavior: Behavior.BLOCKING,
+      parametersJsonSchema: {
+        type: "object",
+        properties: {
+          contact: { type: "string", description: "A name from 'People you can call', e.g. Mum." },
+          message: {
+            type: "string",
+            description: "What to tell them, in the person's words, e.g. \"I'm doing well and I'll visit in December\".",
+          },
+          when: {
+            type: "string",
+            description: "Local ISO date-time in the person's timezone, e.g. 2026-10-21T19:00. Leave out to call now.",
+          },
+          repeat: { type: "string", enum: ["none", "daily", "weekdays", "weekly"] },
+        },
+        required: ["contact", "message"],
+      },
+    },
+  },
+  stop_calls: {
+    kind: "other",
+    label: () => "They asked not to be called again",
+    scheduling: FunctionResponseScheduling.WHEN_IDLE,
+    declaration: {
+      name: "stop_calls",
+      description: "The person you called asked not to be called by Callio again. Confirm, then say goodbye.",
+      behavior: Behavior.BLOCKING,
+      parametersJsonSchema: { type: "object", properties: {} },
+    },
+  },
   end_call: {
     kind: "other",
     label: () => "Wrapping up",
@@ -292,6 +330,16 @@ export const TOOLS: Record<string, ToolMeta> = {
     },
   },
 };
+
+/** On a call to one of their contacts the agent can only end the call or record an opt-out. */
+export const CONTACT_CALL_TOOLS: Tool[] = [
+  { functionDeclarations: [TOOLS.stop_calls.declaration, TOOLS.end_call.declaration] },
+];
+
+/** When each tool's result goes back to the model, for the phone bridge (it runs tools server-side). */
+export const TOOL_SCHEDULING: Record<string, FunctionResponseScheduling> = Object.fromEntries(
+  Object.entries(TOOLS).map(([name, t]) => [name, t.scheduling]),
+);
 
 /** The Live API tools for a call, limited to what the person's plan includes. */
 export function toolsForPlan(plan: PlanId): Tool[] {

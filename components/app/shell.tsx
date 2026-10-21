@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
 import {
+  AddressBook,
   Brain,
   ChatsCircle,
   Coins,
@@ -45,6 +46,7 @@ const GROUPS: { label: string; items: NavItem[] }[] = [
     items: [
       { href: "/app/memory", label: "Memory", icon: Brain, tab: true },
       { href: "/app/tasks", label: "Tasks", icon: Monitor },
+      { href: "/app/contacts", label: "Contacts", icon: AddressBook },
       { href: "/app/connections", label: "Connections", icon: PlugsConnected },
     ],
   },

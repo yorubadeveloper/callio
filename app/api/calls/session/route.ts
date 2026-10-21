@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
-import { EndSensitivity, GoogleGenAI, Modality, StartSensitivity } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 import { buildInstructions } from "@/lib/agents/instructions";
 import { personalize } from "@/lib/agents/personalize";
 import { toolsForPlan } from "@/lib/agents/tools";
 import { BackendError, userBackend } from "@/lib/server/backend";
+import { liveConfig } from "@/lib/server/live";
 import { geminiKey, LIVE_MODEL } from "@/lib/server/models";
 import type { CallStart } from "@/lib/types";
 
@@ -43,6 +44,7 @@ export async function POST(req: Request) {
     purpose: body.purpose?.slice(0, 200),
     briefing: start.briefing,
     sources: start.sources,
+    contacts: start.contacts,
     channel: "app",
     now: new Date(),
   });
@@ -59,25 +61,7 @@ export async function POST(req: Request) {
         newSessionExpireTime: new Date(now + 60_000).toISOString(),
         liveConnectConstraints: {
           model: LIVE_MODEL,
-          config: {
-            responseModalities: [Modality.AUDIO],
-            systemInstruction,
-            speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: agent.persona.voice } } },
-            inputAudioTranscription: {},
-            outputAudioTranscription: {},
-            // Live re-bills the whole context every turn; compress early to keep long calls affordable.
-            contextWindowCompression: { triggerTokens: "16000", slidingWindow: { targetTokens: "8000" } },
-            realtimeInputConfig: {
-              automaticActivityDetection: {
-                startOfSpeechSensitivity: StartSensitivity.START_SENSITIVITY_HIGH,
-                // Answer as soon as the caller stops: eager end-of-speech, half a second of silence.
-                endOfSpeechSensitivity: EndSensitivity.END_SENSITIVITY_HIGH,
-                prefixPaddingMs: 20,
-                silenceDurationMs: 500,
-              },
-            },
-            tools: toolsForPlan(user.plan),
-          },
+          config: liveConfig({ systemInstruction, voice: agent.persona.voice, tools: toolsForPlan(user.plan) }),
         },
         // lockAdditionalFields is omitted, so the whole config is locked. (Passing [] makes the
         // SDK send a field mask the API currently rejects: "field_mask is invalid".)

@@ -248,6 +248,22 @@ export async function mockBackend(
     case "PUT briefing":
     case "POST briefing/preview":
       throw new MockError(503, "Connections need the real backend. Set MOCK_BACKEND=0.");
+    // Phone calls go through Twilio, so the mock only shows the empty states.
+    case "GET phone":
+      return {
+        number: null,
+        verified_at: null,
+        fallback: true,
+        pending: null,
+        available: false,
+        plan_allows: planById(user.plan).id === "plus" || user.plan === "pro",
+        caller_id: null,
+      };
+    case "GET contacts":
+      return [];
+    case "POST contacts":
+    case "POST phone/verify":
+      throw new MockError(503, "Phone calls need the real backend. Set MOCK_BACKEND=0.");
     case "POST push/subscribe":
     case "DELETE push/subscribe":
       return undefined;

@@ -12,6 +12,7 @@ export type SkillId =
   | "scheduling"
   | "answers"
   | "computer"
+  | "messages"
   | "phone_errands"
   | "recaps"
   | "conversation";
@@ -114,6 +115,17 @@ export const SKILLS: Skill[] = [
     instructions:
       "For multi-step web work, call start_computer_task with a clear goal and constraints, tell the person you've started and roughly how long it takes, and carry on the conversation. Never enter payment details or passwords; stop and ask the person to finish those steps. Confirm before submitting anything that commits them.",
     tools: ["start_computer_task", "get_task_status"],
+    minPlan: "plus",
+    status: "live",
+  },
+  {
+    id: "messages",
+    title: "Call people for you",
+    summary: "Tell your parents you're fine, or pass a message on. I ring them, say I'm an AI calling for you, and tell you what they said.",
+    examples: ["Call my mum tonight at 7 and tell her I'm doing well", "Tell Dad I'll visit in December", "Every Sunday, call my parents to say hi"],
+    instructions:
+      "When they want someone told something, use call_contact with a name from 'People you can call'. Before booking, say back who you'll call, what you'll tell them and when, and get a clear yes. Pass the message on faithfully; don't add to it. Numbers can only be added on the Contacts page in the app, never on a call; if the person isn't listed, say so. The call rings from the Callio number, says it's an AI calling for them, lasts at most two and a half minutes, and they get a note with the reply afterwards.",
+    tools: ["call_contact"],
     minPlan: "plus",
     status: "live",
   },
