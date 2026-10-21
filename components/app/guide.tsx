@@ -36,14 +36,14 @@ export function GetSetUp({ steps, seen }: { steps: GuideStep[]; seen: string[] }
   };
 
   return (
-    <section className="relative overflow-hidden rounded-[28px] bg-plate p-5 ring-1 ring-line sm:p-6">
+    <section className="relative overflow-hidden rounded-[24px] bg-plate p-4 ring-1 ring-line sm:rounded-[28px] sm:p-6">
       <div
         aria-hidden
         className="pointer-events-none absolute -right-16 -top-20 size-56 rounded-full bg-coral/30 blur-3xl dark:bg-coral/15"
       />
       <div className="relative flex items-start justify-between gap-4">
         <div>
-          <h2 className="font-display text-[22px] font-medium tracking-[-0.03em]">Get set up</h2>
+          <h2 className="font-display text-[20px] font-medium tracking-[-0.03em] sm:text-[22px]">Get set up</h2>
           <p className="mt-0.5 text-[14px] text-ink-soft">
             {done} of {steps.length} done. Each one makes your agents more useful.
           </p>
@@ -65,9 +65,10 @@ export function GetSetUp({ steps, seen }: { steps: GuideStep[]; seen: string[] }
           transition={{ type: "spring", stiffness: 200, damping: 30 }}
         />
       </div>
-      <ul className="relative mt-4 grid gap-2 sm:grid-cols-2">
+      <ul className="relative mt-3 grid gap-2 sm:mt-4 sm:grid-cols-2">
         {steps.map((s) => (
-          <li key={s.id}>
+          // On phones only what's left is listed; the bar and the count show the rest.
+          <li key={s.id} className={cn(s.done && "hidden sm:block")}>
             <Link
               href={s.href}
               aria-disabled={s.done}

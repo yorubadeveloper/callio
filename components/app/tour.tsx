@@ -4,6 +4,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { api } from "@/lib/api";
+import { cn } from "@/lib/utils";
 import type { User } from "@/lib/types";
 import { btn } from "./ui";
 
@@ -154,29 +155,32 @@ export function Tour({ user }: { user: User }) {
     height: r.height + PAD * 2,
   };
 
-  // Beside the sidebar, above the tab bar, below the top bar; centred when there's nothing to point at.
+  // Desktop: beside the sidebar. Phones: a full-width card on the other side of the screen from what we point
+  // at (above the tab bar, below the top bar). Centred when there's nothing to point at.
   let place: React.CSSProperties = {};
   if (typeof window !== "undefined") {
-    const w = Math.min(340, window.innerWidth - 32);
-    if (!hole)
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const phone = vw < 640;
+    const w = phone ? vw - 24 : Math.min(340, vw - 32);
+    const clampLeft = (x: number) => Math.min(Math.max(12, x), vw - w - 12);
+    if (!hole) {
+      place = phone
+        ? { left: 12, width: w, bottom: 96 }
+        : { left: (vw - w) / 2, width: w, top: Math.max(16, vh / 2 - 130) };
+    } else if (!phone && vw - (hole.left + hole.width) >= w + 32 && hole.left < vw * 0.4) {
+      place = { left: hole.left + hole.width + 16, width: w, top: Math.min(Math.max(16, hole.top - 12), vh - 280) };
+    } else if (hole.top + hole.height / 2 > vh / 2) {
       place = {
-        left: (window.innerWidth - w) / 2,
-        top: Math.max(16, window.innerHeight / 2 - 130),
-      };
-    else if (hole.left + hole.width < window.innerWidth * 0.4) {
-      place = {
-        left: hole.left + hole.width + 16,
-        top: Math.min(Math.max(16, hole.top - 12), window.innerHeight - 280),
-      };
-    } else if (hole.top > window.innerHeight / 2) {
-      place = {
-        left: Math.min(Math.max(16, hole.left + hole.width / 2 - w / 2), window.innerWidth - w - 16),
-        bottom: window.innerHeight - hole.top + 14,
+        left: phone ? 12 : clampLeft(hole.left + hole.width / 2 - w / 2),
+        width: w,
+        bottom: vh - hole.top + 12,
       };
     } else {
       place = {
-        left: Math.min(Math.max(16, hole.left + hole.width / 2 - w / 2), window.innerWidth - w - 16),
-        top: hole.top + hole.height + 14,
+        left: phone ? 12 : clampLeft(hole.left + hole.width / 2 - w / 2),
+        width: w,
+        top: hole.top + hole.height + 12,
       };
     }
   }
@@ -211,7 +215,7 @@ export function Tour({ user }: { user: User }) {
             aria-modal="true"
             aria-labelledby="tour-title"
             tabIndex={-1}
-            className="absolute w-[min(340px,calc(100vw-32px))] rounded-[26px] bg-plate p-5 text-ink shadow-[0_30px_80px_-30px_rgb(0_0_0/0.6)] outline-none ring-1 ring-line"
+            className="absolute max-h-[calc(100dvh-120px)] overflow-y-auto rounded-[24px] bg-plate p-4 text-ink sm:rounded-[26px] sm:p-5 shadow-[0_30px_80px_-30px_rgb(0_0_0/0.6)] outline-none ring-1 ring-line"
             style={place}
             layout={!reduce}
             transition={spring}
@@ -233,19 +237,19 @@ export function Tour({ user }: { user: User }) {
                 >
                   {step.title}
                 </h2>
-                <p className="mt-2 text-[15px] leading-relaxed text-ink-soft">
+                <p className="mt-1.5 text-[14px] leading-relaxed text-ink-soft sm:mt-2 sm:text-[15px]">
                   {target?.fallback && step.fallbackBody ? step.fallbackBody : step.body}
                 </p>
               </motion.div>
             </AnimatePresence>
-            <div className="mt-5 flex items-center gap-2">
+            <div className="mt-4 flex items-center gap-2 sm:mt-5">
               {index === 0 ? (
-                <button type="button" onClick={close} className={`${btn.soft} h-10 px-4 text-[14px]`}>
+                <button type="button" onClick={close} className={cn(btn.soft, "h-10 px-4 text-[14px]")}>
                   Skip
                 </button>
               ) : (
                 !last && (
-                  <button type="button" onClick={back} className={`${btn.soft} h-10 px-4 text-[14px]`}>
+                  <button type="button" onClick={back} className={cn(btn.soft, "h-10 px-4 text-[14px]")}>
                     Back
                   </button>
                 )
@@ -258,7 +262,7 @@ export function Tour({ user }: { user: User }) {
                   />
                 ))}
               </span>
-              <button type="button" onClick={last ? close : next} className={`${btn.primary} h-10 px-5 text-[14px]`}>
+              <button type="button" onClick={last ? close : next} className={cn(btn.primary, "h-10 px-5 text-[14px]")}>
                 {index === 0 ? "Show me" : last ? "Start talking" : "Next"}
               </button>
             </div>
