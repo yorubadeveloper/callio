@@ -110,11 +110,13 @@ export interface Schedule {
   text: string;
   repeat: "none" | "daily" | "weekdays" | "weekly";
   status: "pending" | "done" | "cancelled";
+  /** The morning call: a briefing is written just before it rings. */
+  briefing?: boolean;
 }
 
 export interface AppNotification {
   id: string;
-  kind: "recap" | "reminder" | "task" | "call";
+  kind: "recap" | "reminder" | "task" | "call" | "alert";
   title: string;
   body: string;
   created_at: string;
@@ -168,4 +170,63 @@ export interface CallStart {
   user: User;
   agent: UserAgent;
   memory: { facts: string[]; recent_calls: { when: string; summary: string }[] };
+  briefing?: Briefing | null;
+  sources?: { name: string; kind: ConnectorKind; status: Connector["status"] }[];
+}
+
+export type ConnectorKind = "analytix" | "dokploy" | "website" | "mcp";
+
+export interface SiteCheck {
+  url: string;
+  up: boolean;
+  code?: number;
+  ms?: number;
+  slow?: boolean;
+  error?: string;
+}
+
+export interface Connector {
+  id: string;
+  kind: ConnectorKind;
+  name: string;
+  url: string | null;
+  urls: string[] | null;
+  has_secret: boolean;
+  in_briefing: boolean;
+  alerts: "off" | "notify" | "call";
+  status: "ok" | "error" | "unknown";
+  summary: string | null;
+  last_checked_at: string | null;
+  last_error: string | null;
+  created_at: string;
+  tools?: { name: string; description: string; read_only: boolean; allowed: boolean }[];
+  sites?: SiteCheck[];
+}
+
+export interface BriefingItem {
+  topic: "sites" | "servers" | "day" | "news" | "weather" | "other";
+  level: "act" | "watch" | "info";
+  say: string;
+  detail: string;
+}
+
+export interface Briefing {
+  id: string;
+  created_at: string;
+  opening: string;
+  all_clear: boolean;
+  items: BriefingItem[];
+  unreachable: string[];
+  sources: Record<string, string>;
+}
+
+export interface MorningCall {
+  enabled: boolean;
+  agent_id: string | null;
+  time: string;
+  repeat: "daily" | "weekdays";
+  next_at: string | null;
+  schedule_id: string | null;
+  prefs: { calendar: boolean; weather: boolean; news: boolean };
+  topics: string[];
 }

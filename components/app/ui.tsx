@@ -204,3 +204,47 @@ export function Sheet({
     </AnimatePresence>
   );
 }
+
+/** An on/off switch with its label. The whole row is the target. */
+export function Switch({
+  checked,
+  onChange,
+  label,
+  hint,
+  disabled = false,
+}: {
+  checked: boolean;
+  onChange: (next: boolean) => void;
+  label: string;
+  hint?: string;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      disabled={disabled}
+      onClick={() => onChange(!checked)}
+      className="flex min-h-11 w-full items-center justify-between gap-4 text-left disabled:opacity-50"
+    >
+      <span className="min-w-0">
+        <span className="block text-[14px] font-semibold text-ink">{label}</span>
+        {hint && <span className="mt-0.5 block text-[13px] leading-snug text-ink-soft">{hint}</span>}
+      </span>
+      <span
+        aria-hidden
+        className={cn(
+          "relative h-7 w-12 shrink-0 rounded-full transition-colors duration-200",
+          checked ? "bg-teal" : "bg-ink/15",
+        )}
+      >
+        <motion.span
+          className="absolute top-1 left-1 size-5 rounded-full bg-white shadow-[0_2px_6px_rgb(0_0_0/0.25)]"
+          animate={{ x: checked ? 20 : 0 }}
+          transition={{ type: "spring", stiffness: 500, damping: 34 }}
+        />
+      </span>
+    </button>
+  );
+}

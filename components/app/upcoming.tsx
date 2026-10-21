@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { Bell, CalendarDots, CheckCircle, Monitor, Phone, Repeat, X } from "@phosphor-icons/react";
+import { Bell, CalendarDots, CheckCircle, Monitor, Phone, Repeat, SunHorizon, Warning, X } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { AgentFace } from "@/components/landing/agent-face";
 import type { PersonalAgent } from "@/lib/agents/personalize";
@@ -108,7 +108,9 @@ export function UpcomingView({
                     "mt-0.5 grid size-9 shrink-0 place-items-center rounded-full text-[17px]",
                     n.kind === "reminder"
                       ? "bg-amber/30"
-                      : n.kind === "call"
+                      : n.kind === "alert"
+                        ? "bg-coral/30"
+                        : n.kind === "call"
                         ? "bg-teal/25"
                         : n.kind === "task"
                           ? "bg-peri/30"
@@ -117,6 +119,8 @@ export function UpcomingView({
                 >
                   {n.kind === "reminder" ? (
                     <Bell weight="fill" />
+                  ) : n.kind === "alert" ? (
+                    <Warning weight="fill" />
                   ) : n.kind === "call" ? (
                     <Phone weight="fill" />
                   ) : n.kind === "task" ? (
@@ -188,7 +192,7 @@ function ScheduleRow({
             s.type === "call" ? "bg-teal text-[#0E0E10]" : "bg-amber text-[#0E0E10]",
           )}
         >
-          {s.type === "call" ? <Phone weight="fill" /> : <Bell weight="fill" />}
+          {s.briefing ? <SunHorizon weight="fill" /> : s.type === "call" ? <Phone weight="fill" /> : <Bell weight="fill" />}
         </span>
       </span>
       <div className="min-w-0 flex-1">
@@ -196,7 +200,7 @@ function ScheduleRow({
         <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-[14px] text-ink-soft">
           <span className="font-mono text-[13px] text-ink">{clockTime(s.when, timezone, locale)}</span>
           <span>
-            {s.type === "call" ? "Call" : "Reminder"}
+            {s.briefing ? "Morning call" : s.type === "call" ? "Call" : "Reminder"}
             {agent ? ` from ${agent.name}` : ""}
           </span>
           {repeat && (

@@ -35,11 +35,18 @@ export const SKILLS: Skill[] = [
   {
     id: "briefing",
     title: "Brief you on your day",
-    summary: "Your calendar, the weather where you are, and news on the topics you follow.",
-    examples: ["What's on today?", "Anything I should prepare for?", "Will it rain this afternoon?"],
+    summary: "Your sites, servers and calendar, the weather where you are, and news on the topics you follow.",
+    examples: ["What's on today?", "Are my sites okay?", "How's traffic this week?", "Will it rain this afternoon?"],
     instructions:
-      "When asked about the day, or on a scheduled briefing call, give the three things that matter most first, then offer detail. Read times in the person's timezone. Never read out more than three calendar items in a row without pausing for them.",
-    tools: ["get_calendar_events", "get_weather", "google_search"],
+      "When asked about the day, or on a scheduled briefing call, give the three things that matter most first, then offer detail. Use get_briefing for a full rundown and check_sources for a fresh look at their sites, servers or analytics. Read times in the person's timezone. Never read out more than three calendar items in a row without pausing for them.",
+    tools: [
+      "get_calendar_events",
+      "get_weather",
+      "google_search",
+      "get_briefing",
+      "check_sources",
+      "use_connector_tool",
+    ],
     minPlan: "free",
     status: "live",
   },

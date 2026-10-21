@@ -1,6 +1,6 @@
 import { languageName } from "@/lib/languages";
 import { plan as planById } from "@/lib/pricing";
-import type { User } from "@/lib/types";
+import type { Briefing, CallStart, User } from "@/lib/types";
 import type { PersonalAgent } from "./personalize";
 import { planAllows, SKILLS } from "./skills";
 
@@ -28,6 +28,10 @@ export interface CallContext {
   };
   /** Why this call is happening, e.g. "Scheduled morning briefing". Empty when the person called in. */
   purpose?: string;
+  /** Prepared before a morning call rang. */
+  briefing?: Briefing | null;
+  /** Sources they connected on the Connections page (sites, servers, analytics, MCP servers). */
+  sources?: CallStart["sources"];
   channel: "app" | "phone";
   now: Date;
 }
@@ -82,6 +86,26 @@ function localTime(now: Date, timezone: string, locale: string) {
 }
 
 /** Builds the system instruction for one call. Keep it compact: Live re-bills context every turn. */
+const SOURCE_KIND: Record<NonNullable<CallStart["sources"]>[number]["kind"], string> = {
+  analytix: "website analytics via Analytix",
+  dokploy: "their servers and deploys on Dokploy",
+  website: "uptime checks for their sites",
+  mcp: "a custom connector",
+};
+
+function briefingSection(b: Briefing, callName: string) {
+  const items = b.items.map((i, n) => `${n + 1}. [${i.level}] ${i.say}\n   Facts for follow-ups: ${i.detail}`);
+  return [
+    `## Today's briefing (prepared minutes ago)`,
+    `Opening: ${b.opening}`,
+    items.join("\n"),
+    b.unreachable.length ? `Couldn't reach: ${b.unreachable.join("; ")}. Mention it briefly.` : "",
+    `How to deliver it: this is a conversation, not a report. Say the opening, then the items in order, one or two sentences each, pausing after anything at "act" level so ${callName} can react. Never read the labels or numbering. After the last item, ask what they'd like to dig into first. For follow-ups about sites, servers or analytics, call check_sources or use_connector_tool for fresh numbers instead of guessing.`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
 export function buildInstructions(ctx: CallContext): string {
   const { agent, user, memory } = ctx;
   const callName = user.nickname || user.name.split(" ")[0];
@@ -128,6 +152,15 @@ export function buildInstructions(ctx: CallContext): string {
   ].filter(Boolean);
   sections.push(`## About ${callName}\n${about.join("\n")}`);
 
+  if (ctx.sources?.length) {
+    const list = ctx.sources.map((s) => `${s.name} (${SOURCE_KIND[s.kind]}${s.status === "error" ? ", not answering" : ""})`);
+    sections.push(
+      `## Their connected sources
+${list.join(", ")}.
+For anything about how these are doing right now, call check_sources; never answer from memory or from earlier in the call, because it changes. For Analytix or a custom connector, use_connector_tool lists its tools, then runs one. Before any tool marked as changing things, say what it will do and wait for a clear yes. If a source fails, say so plainly.`,
+    );
+  }
+
   if (memory.facts.length) {
     sections.push(`## What you remember\n${memory.facts.map((f) => `- ${f}`).join("\n")}`);
   }
@@ -135,8 +168,12 @@ export function buildInstructions(ctx: CallContext): string {
     sections.push(`## Recent calls\n${memory.recentCalls.map((c) => `- ${c.when}: ${c.summary}`).join("\n")}`);
   }
 
+  if (ctx.briefing) sections.push(briefingSection(ctx.briefing, callName));
+
   sections.push(
-    ctx.purpose
+    ctx.briefing
+      ? `## This call\nThis is ${callName}'s morning call. Say the opening in your own words, then go through the briefing.`
+      : ctx.purpose
       ? `## This call\nYou called them: ${ctx.purpose}. ${agent.persona.opening}`
       : `## This call\nThey called you. Greet ${callName} warmly in a few words, the way you'd answer a friend's call, and let them lead.`,
   );

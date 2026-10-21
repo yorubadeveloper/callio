@@ -10,6 +10,8 @@ interface Options {
   agentId: string;
   /** Why the call is happening, for calls the agent places. */
   purpose?: string;
+  /** The morning call's prepared briefing. */
+  briefingId?: string;
 }
 
 interface SessionGrant {
@@ -23,7 +25,7 @@ interface SessionGrant {
 // Gemini Live straight from the browser: mic → 16 kHz PCM → Live, Live's 24 kHz
 // audio → gapless playback. Our server only mints a locked, single-use token and
 // runs tools, so the conversation itself never routes through us.
-export function createGeminiEngine({ agentId, purpose }: Options): CallEngine {
+export function createGeminiEngine({ agentId, purpose, briefingId }: Options): CallEngine {
   const store = createSnapshotStore();
   const levelBuf = new Float32Array(1024);
 
@@ -232,7 +234,7 @@ export function createGeminiEngine({ agentId, purpose }: Options): CallEngine {
           fetch("/api/calls/session", {
             method: "POST",
             headers: { "content-type": "application/json" },
-            body: JSON.stringify({ agentId, purpose }),
+            body: JSON.stringify({ agentId, purpose, briefingId }),
           }).then(async (r) => {
             if (!r.ok) throw new Error((await r.json().catch(() => ({}))).detail ?? "Couldn't start the call.");
             return r.json() as Promise<SessionGrant>;

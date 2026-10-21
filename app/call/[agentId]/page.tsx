@@ -12,9 +12,9 @@ export default async function CallPage({
   searchParams,
 }: {
   params: Promise<{ agentId: string }>;
-  searchParams: Promise<{ purpose?: string }>;
+  searchParams: Promise<{ purpose?: string; briefing?: string }>;
 }) {
-  const [{ agentId }, { purpose }] = await Promise.all([params, searchParams]);
+  const [{ agentId }, { purpose, briefing }] = await Promise.all([params, searchParams]);
   const user = await currentUser();
   if (!user) redirect(`/signin?next=/call/${agentId}`);
   if (!user.onboarded) redirect("/welcome");
@@ -24,5 +24,5 @@ export default async function CallPage({
   const agent = agents.find((a) => a.id === agentId);
   if (!agent) notFound();
 
-  return <CallRoom agent={personalize(agent)} credits={user.credits.total} purpose={purpose} />;
+  return <CallRoom agent={personalize(agent)} credits={user.credits.total} purpose={purpose} briefingId={briefing} />;
 }

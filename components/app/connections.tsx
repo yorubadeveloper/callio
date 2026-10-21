@@ -15,7 +15,10 @@ import {
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { api, ApiError } from "@/lib/api";
-import type { User } from "@/lib/types";
+import type { PersonalAgent } from "@/lib/agents/personalize";
+import type { Connector, MorningCall, User } from "@/lib/types";
+import { MorningCallCard } from "./morning-call";
+import { Sources } from "./sources";
 import { btn, PageTitle } from "./ui";
 import { Spinner } from "@/components/brand/logo-loader";
 
@@ -54,26 +57,39 @@ const SOON: { name: string; what: string; icon: Icon; tint: string }[] = [
 ];
 
 /** Apps and data sources agents can use. Each connects separately from sign-in and can be removed any time. */
-export function ConnectionsView({ user, result }: { user: User; result?: string }) {
-  const connected = Boolean(user.integrations?.google_calendar?.connected);
+export function ConnectionsView({
+  user,
+  result,
+  connectors,
+  morning,
+  agents,
+}: {
+  user: User;
+  result?: string;
+  connectors: Connector[];
+  morning: MorningCall;
+  agents: PersonalAgent[];
+}) {
   return (
     <>
       <PageTitle
         title="Connections"
-        subtitle="Apps your agents can use for you. Connect only what you want, and remove it any time."
+        subtitle="What your agents can see and use. Everything is read-only unless you switch it on, and you can remove it any time."
       />
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+      <MorningCallCard morning={morning} agents={agents} connectors={connectors} user={user} />
+      <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <Sources connectors={connectors} timezone={user.timezone} locale={user.locale} />
         <section>
-          <h2 className="text-[13px] font-semibold uppercase tracking-wider text-ink-soft">
-            {connected ? "Connected" : "Available now"}
-          </h2>
+          <h2 className="text-[13px] font-semibold uppercase tracking-wider text-ink-soft">Apps</h2>
           <div className="mt-3">
             <GoogleCalendar user={user} result={result} />
           </div>
         </section>
+      </div>
+      <div className="mt-10">
         <section>
           <h2 className="text-[13px] font-semibold uppercase tracking-wider text-ink-soft">Coming soon</h2>
-          <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+          <ul className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
             {SOON.map((app) => (
               <li key={app.name} className="flex items-start gap-3 rounded-[22px] bg-plate p-4 ring-1 ring-line">
                 <span className={cn("grid size-10 shrink-0 place-items-center rounded-2xl text-[20px]", app.tint)}>
@@ -87,7 +103,7 @@ export function ConnectionsView({ user, result }: { user: User; result?: string 
             ))}
           </ul>
           <p className="mt-4 text-[13px] text-ink-soft">
-            Want something else connected?{" "}
+            Anything with an MCP server can be added as a custom connector. Want something else?{" "}
             <a
               href="mailto:hello@callio.site?subject=Connection%20request"
               className="font-semibold text-ink underline-offset-4 hover:underline"

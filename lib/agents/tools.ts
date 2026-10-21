@@ -225,6 +225,61 @@ export const TOOLS: Record<string, ToolMeta> = {
       },
     },
   },
+  get_briefing: {
+    kind: "search",
+    label: () => "Putting your briefing together",
+    scheduling: FunctionResponseScheduling.WHEN_IDLE,
+    declaration: {
+      name: "get_briefing",
+      description:
+        "Today's briefing: their sites, servers and analytics, calendar, weather and news, ranked by what matters. Use when they ask how things are, what they missed, or for their morning briefing. If none was prepared it takes a few seconds; say \"give me a sec\".",
+      behavior: Behavior.BLOCKING,
+      parametersJsonSchema: {
+        type: "object",
+        properties: { fresh: { type: "boolean", description: "True to ignore the one prepared earlier today." } },
+      },
+    },
+  },
+  check_sources: {
+    kind: "search",
+    label: (a) => (a.source ? `Checking ${str(a.source)}` : "Checking your sites and servers"),
+    scheduling: FunctionResponseScheduling.WHEN_IDLE,
+    declaration: {
+      name: "check_sources",
+      description:
+        "A fresh look at their connected sources right now: whether sites are up, which apps or deploys failed on Dokploy, and recent traffic from Analytix. Always use this instead of memory for anything about how these are doing.",
+      behavior: Behavior.BLOCKING,
+      parametersJsonSchema: {
+        type: "object",
+        properties: {
+          source: {
+            type: "string",
+            description: "A connection's name or what it covers (\"my sites\", \"Dokploy\", \"analytics\"). Empty for all.",
+          },
+        },
+      },
+    },
+  },
+  use_connector_tool: {
+    kind: "search",
+    label: (a) => (a.tool ? `Asking ${str(a.connector)}` : `Looking at what ${str(a.connector)} can do`),
+    scheduling: FunctionResponseScheduling.WHEN_IDLE,
+    declaration: {
+      name: "use_connector_tool",
+      description:
+        "Ask Analytix or a custom connector something. Call it first with just `connector` to see its tools and their inputs, then with `tool` and `arguments`. Tools marked as changing things need a clear yes from them first.",
+      behavior: Behavior.BLOCKING,
+      parametersJsonSchema: {
+        type: "object",
+        properties: {
+          connector: { type: "string", description: "The connection's name, e.g. Analytix." },
+          tool: { type: "string", description: "A tool name from the list. Leave out to list tools." },
+          arguments: { type: "object", description: "The tool's inputs, matching its input schema." },
+        },
+        required: ["connector"],
+      },
+    },
+  },
   end_call: {
     kind: "other",
     label: () => "Wrapping up",

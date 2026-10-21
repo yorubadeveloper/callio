@@ -229,6 +229,25 @@ export async function mockBackend(
       return undefined;
     case "GET notifications":
       return [];
+    // Connectors and the morning call need the real backend (they reach outside services); the mock shows
+    // the empty states so the page still renders.
+    case "GET connectors":
+      return [];
+    case "GET briefing":
+      return {
+        enabled: false,
+        agent_id: null,
+        time: "07:00",
+        repeat: "daily",
+        next_at: null,
+        schedule_id: null,
+        prefs: { calendar: true, weather: true, news: true },
+        topics: user.interests,
+      };
+    case "POST connectors":
+    case "PUT briefing":
+    case "POST briefing/preview":
+      throw new MockError(503, "Connections need the real backend. Set MOCK_BACKEND=0.");
     case "POST push/subscribe":
     case "DELETE push/subscribe":
       return undefined;

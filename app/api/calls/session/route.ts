@@ -11,7 +11,8 @@ import type { CallStart } from "@/lib/types";
 // then we mint a single-use Gemini Live token with this person's agent,
 // instructions and tools locked in. The browser talks to Gemini directly.
 export async function POST(req: Request) {
-  const body = (await req.json().catch(() => ({}))) as { agentId?: string; purpose?: string };
+  const body = (await req.json().catch(() => ({}))) as { agentId?: string; purpose?: string; briefingId?: string };
+  const briefingId = /^[0-9a-f-]{36}$/i.test(body.briefingId ?? "") ? body.briefingId : undefined;
   if (!body.agentId) return NextResponse.json({ detail: "Pick an agent to call." }, { status: 400 });
   // Check before opening a call record, so a missing key never leaves a call running (and billed).
   if (!process.env.GEMINI_API_KEY) {
@@ -23,7 +24,10 @@ export async function POST(req: Request) {
   let call: Awaited<ReturnType<typeof userBackend>>;
   try {
     call = await userBackend();
-    start = await call<CallStart>("/v1/calls/start", { method: "POST", body: { agent_id: body.agentId } });
+    start = await call<CallStart>("/v1/calls/start", {
+      method: "POST",
+      body: { agent_id: body.agentId, ...(briefingId ? { briefing_id: briefingId } : {}) },
+    });
   } catch (err) {
     const status = err instanceof BackendError ? err.status : 502;
     const detail = err instanceof Error ? err.message : "Couldn't start the call.";
@@ -37,6 +41,8 @@ export async function POST(req: Request) {
     user,
     memory: { facts: start.memory.facts, recentCalls: start.memory.recent_calls },
     purpose: body.purpose?.slice(0, 200),
+    briefing: start.briefing,
+    sources: start.sources,
     channel: "app",
     now: new Date(),
   });
