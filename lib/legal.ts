@@ -24,9 +24,9 @@ const US_SAFEGUARD =
 
 export const LEGAL = {
   /** ISO date of the last change to any legal page. */
-  lastUpdated: "2026-10-21",
+  lastUpdated: "2026-10-22",
   /** Human-readable version of lastUpdated. */
-  lastUpdatedLabel: "21 October 2026",
+  lastUpdatedLabel: "22 October 2026",
 
   product: "Callio",
   domain: "callio.site",
@@ -96,7 +96,7 @@ export const LEGAL = {
     {
       name: "Google (Gemini API)",
       purpose: "Runs the AI: live voice conversation, transcripts, summaries, memory and computer tasks",
-      data: "Call audio (streamed from your browser), conversation text, memory and context we send with a request",
+      data: "Call audio (streamed from your browser, or from a phone call through our server), conversation text, memory and context we send with a request",
       location: "USA and other Google locations",
       role: "Processor",
       safeguard: US_SAFEGUARD,
@@ -175,13 +175,23 @@ export const LEGAL = {
       status: "may be used",
     },
     {
-      name: "Telnyx LLC",
+      name: "Twilio Inc.",
       purpose: "Real phone calls to and from phone numbers",
       data: "Phone numbers, call audio in transit, call metadata",
-      location: "USA and other Telnyx locations",
+      location: "USA and other Twilio locations",
       role: "Processor",
       safeguard: US_SAFEGUARD,
-      status: "when phone calling launches",
+      status: "active",
+    },
+    {
+      name: "Spitch (spitch.app)",
+      purpose:
+        "Speech for phone calls in Yoruba, Igbo and Hausa: turns the agent's words into speech and the other person's speech into text",
+      data: "The agent's words and the other person's speech on those calls",
+      location: "[SPITCH LOCATION — confirm with Spitch]",
+      role: "Processor",
+      safeguard: "[SAFEGUARD — e.g. EU Standard Contractual Clauses; confirm with Spitch]",
+      status: "active",
     },
   ] satisfies Subprocessor[],
 

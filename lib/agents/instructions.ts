@@ -247,6 +247,8 @@ export interface ContactCallContext {
   message: string;
   maxSeconds: number;
   now: Date;
+  /** The words are written as text and spoken by a separate voice (Spitch), not spoken by the model itself. */
+  textToSpeech?: boolean;
 }
 
 /**
@@ -261,7 +263,11 @@ export function buildContactInstructions(ctx: ContactCallContext): string {
   return [
     `You are ${agent.name}, an AI assistant from Callio. You're phoning ${contact.name} on behalf of ${fullName} (${first}) to pass on a message. You are ${agent.persona.personality}.`,
     `## How you speak${HOW_TO_SPEAK}`,
-    `## Language${phoneLanguage(languageName(contactLanguage(contact, user)))}`,
+    `## Language${phoneLanguage(languageName(contactLanguage(contact, user)))}${
+      ctx.textToSpeech
+        ? `- What you write is read aloud by a ${languageName(contactLanguage(contact, user))} voice. Write only the words to say, in short sentences that each end with a full stop or question mark. No lists, symbols or stage directions.${contactLanguage(contact, user) === "yo" ? " Write Yoruba with full tone marks." : ""}\n- You've already said your opening line when the call starts. To give the message, call deliver_message: it plays the message in your voice. Don't say the message yourself.\n`
+        : ""
+    }`,
     `## ${first}\n${pronounLine(first, pronounsOf(user))} That's all you know about ${p.them} besides the message.`,
     `## The message from ${first}\n"${ctx.message.trim()}"`,
     contact.notes?.trim() ? `## About ${contact.name}, from ${first}\n${contact.notes.trim()}` : "",

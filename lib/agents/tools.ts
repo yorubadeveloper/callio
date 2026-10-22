@@ -148,7 +148,10 @@ export const TOOLS: Record<string, ToolMeta> = {
         type: "object",
         properties: {
           title: { type: "string" },
-          start: { type: "string", description: "Local ISO date-time in the person's timezone, e.g. 2026-10-23T13:00." },
+          start: {
+            type: "string",
+            description: "Local ISO date-time in the person's timezone, e.g. 2026-10-23T13:00.",
+          },
           end: { type: "string", description: "Local ISO date-time. Defaults to 30 minutes after start." },
           description: { type: "string" },
         },
@@ -232,7 +235,7 @@ export const TOOLS: Record<string, ToolMeta> = {
     declaration: {
       name: "get_briefing",
       description:
-        "Today's briefing: their sites, servers and analytics, calendar, weather and news, ranked by what matters. Use when they ask how things are, what they missed, or for their morning briefing. If none was prepared it takes a few seconds; say \"give me a sec\".",
+        'Today\'s briefing: their sites, servers and analytics, calendar, weather and news, ranked by what matters. Use when they ask how things are, what they missed, or for their morning briefing. If none was prepared it takes a few seconds; say "give me a sec".',
       behavior: Behavior.BLOCKING,
       parametersJsonSchema: {
         type: "object",
@@ -254,7 +257,7 @@ export const TOOLS: Record<string, ToolMeta> = {
         properties: {
           source: {
             type: "string",
-            description: "A connection's name or what it covers (\"my sites\", \"servers\", \"analytics\"). Empty for all.",
+            description: 'A connection\'s name or what it covers ("my sites", "servers", "analytics"). Empty for all.',
           },
         },
       },
@@ -295,7 +298,8 @@ export const TOOLS: Record<string, ToolMeta> = {
           contact: { type: "string", description: "A name from 'People you can call', e.g. Mum." },
           message: {
             type: "string",
-            description: "What to tell them, in the person's words, e.g. \"I'm doing well and I'll visit in December\".",
+            description:
+              "What to tell them, in the person's words, e.g. \"I'm doing well and I'll visit in December\".",
           },
           when: {
             type: "string",
@@ -334,6 +338,25 @@ export const TOOLS: Record<string, ToolMeta> = {
 /** On a call to one of their contacts the agent can only end the call or record an opt-out. */
 export const CONTACT_CALL_TOOLS: Tool[] = [
   { functionDeclarations: [TOOLS.stop_calls.declaration, TOOLS.end_call.declaration] },
+];
+
+/**
+ * Spitch message calls: the message is written in the contact's language and spoken before the call connects, so
+ * the agent plays it with a tool instead of saying it (no wait for speech, and the wording is the checked one).
+ */
+export const SPOKEN_MESSAGE_CONTACT_TOOLS: Tool[] = [
+  {
+    functionDeclarations: [
+      {
+        name: "deliver_message",
+        description:
+          "Play the message, already written in their language, in your voice. Call it once you know you're speaking to the right person, instead of saying the message yourself.",
+        parametersJsonSchema: { type: "object", properties: {} },
+      },
+      TOOLS.stop_calls.declaration,
+      TOOLS.end_call.declaration,
+    ],
+  },
 ];
 
 /** When each tool's result goes back to the model, for the phone bridge (it runs tools server-side). */

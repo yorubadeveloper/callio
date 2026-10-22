@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
@@ -31,7 +32,7 @@ import { Spinner } from "@/components/brand/logo-loader";
 export function YouView({ user: initial }: { user: User }) {
   const router = useRouter();
   const [user, setUser] = useState(initial);
-  const [form, setForm] = useState({
+  const [form, setForm] = useState(() => ({
     nickname: initial.nickname ?? "",
     pronouns: pronounsOf(initial),
     about: initial.about ?? "",
@@ -42,7 +43,10 @@ export function YouView({ user: initial }: { user: User }) {
     detail: initial.detail,
     languages: initial.languages,
     interests: initial.interests,
-  });
+  }));
+  // What's on the account. Pronouns worked out from About (never chosen) count as unsaved, so saving locks them in.
+  const [saved, setSaved] = useState(() => JSON.stringify({ ...form, pronouns: initial.pronouns ?? null }));
+  const dirty = JSON.stringify(form) !== saved;
   const [interest, setInterest] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -63,6 +67,7 @@ export function YouView({ user: initial }: { user: User }) {
         },
       });
       setUser(next);
+      setSaved(JSON.stringify(form));
       setMessage("Saved. Your agents will use this from your next call.");
       router.refresh();
     } catch (err) {
@@ -237,25 +242,52 @@ export function YouView({ user: initial }: { user: User }) {
               </div>
             )}
           </Field>
-          {message && (
-            <p role="status" className="text-[15px] text-ink-soft">
-              {message}
-            </p>
-          )}
-          <button type="button" onClick={save} disabled={busy} className={cn(btn.primary, "w-full sm:w-auto")}>
-            {busy && <Spinner />} Save
-          </button>
+          {/* Only there when something changed: sits above the tab bar on phones. */}
+          <AnimatePresence>
+            {dirty ? (
+              <motion.div
+                key="bar"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 12 }}
+                transition={{ duration: 0.2, ease: [0.2, 0.8, 0.2, 1] }}
+                className="sticky bottom-[calc(env(safe-area-inset-bottom)+88px)] z-20 flex items-center gap-3 rounded-full bg-ink py-2 pl-5 pr-2 text-page shadow-[0_20px_50px_-20px_rgb(0_0_0/0.6)] lg:bottom-6"
+              >
+                <span className="min-w-0 flex-1 truncate text-[15px] font-medium">
+                  {message && !busy ? message : "Unsaved changes"}
+                </span>
+                <button
+                  type="button"
+                  onClick={save}
+                  disabled={busy}
+                  className="inline-flex h-10 shrink-0 items-center gap-2 rounded-full bg-page px-5 text-[15px] font-semibold text-ink"
+                >
+                  {busy && <Spinner />} Save
+                </button>
+              </motion.div>
+            ) : (
+              message && (
+                <p key="status" role="status" className="text-[15px] text-ink-soft">
+                  {message}
+                </p>
+              )
+            )}
+          </AnimatePresence>
         </section>
 
         <aside className="space-y-8">
           <section>
-            <h2 className="text-[13px] font-semibold uppercase tracking-wider text-ink-soft">More</h2>
+            <h2 className="text-[13px] font-semibold uppercase tracking-wider text-ink-soft">
+              <span className="lg:hidden">More</span>
+              <span className="hidden lg:inline">Help</span>
+            </h2>
             <div className="mt-3 divide-y divide-line overflow-hidden rounded-[24px] bg-plate ring-1 ring-line">
               {[
                 {
                   href: "/app/contacts",
                   icon: AddressBook,
                   tint: "bg-coral/30",
+                  phoneOnly: true,
                   title: "Contacts and your phone",
                   sub: "People your agent can call, and missed-call backup",
                 },
@@ -263,6 +295,7 @@ export function YouView({ user: initial }: { user: User }) {
                   href: "/app/connections",
                   icon: PlugsConnected,
                   tint: "bg-peri/30",
+                  phoneOnly: true,
                   title: "Connections",
                   sub: user.integrations?.google_calendar?.connected
                     ? "Morning call, calendar, sites"
@@ -272,6 +305,7 @@ export function YouView({ user: initial }: { user: User }) {
                   href: "/app/tasks",
                   icon: Monitor,
                   tint: "bg-teal/30",
+                  phoneOnly: true,
                   title: "Tasks",
                   sub: "Things your agents did on the web",
                 },
@@ -286,7 +320,10 @@ export function YouView({ user: initial }: { user: User }) {
                 <Link
                   key={l.href}
                   href={l.href}
-                  className="flex items-center gap-3 px-5 py-4 transition-colors hover:bg-ink/[0.03]"
+                  className={cn(
+                    "flex items-center gap-3 px-5 py-4 transition-colors hover:bg-ink/[0.03]",
+                    "phoneOnly" in l && l.phoneOnly && "lg:hidden",
+                  )}
                 >
                   <span className={cn("grid size-10 shrink-0 place-items-center rounded-2xl text-[20px]", l.tint)}>
                     <l.icon weight="fill" />
@@ -363,17 +400,26 @@ function Account() {
   return (
     <section>
       <h2 className="text-[13px] font-semibold uppercase tracking-wider text-ink-soft">Account</h2>
-      <div className="mt-3 flex flex-col gap-2">
-        <button type="button" onClick={download} className={cn(btn.soft, "justify-start")}>
-          <DownloadSimple /> Download my data
-        </button>
-        <button type="button" onClick={() => signOut({ redirectTo: "/" })} className={cn(btn.soft, "justify-start")}>
-          <SignOut /> Sign out
-        </button>
-        <button type="button" onClick={() => setConfirm(true)} className={cn(btn.danger, "justify-start")}>
-          <Trash /> Delete account
-        </button>
-      </div>
+      <ul className="mt-3 divide-y divide-line overflow-hidden rounded-[24px] bg-plate ring-1 ring-line">
+        {[
+          { label: "Download my data", icon: DownloadSimple, onClick: download, danger: false },
+          { label: "Sign out", icon: SignOut, onClick: () => signOut({ redirectTo: "/" }), danger: false },
+          { label: "Delete account", icon: Trash, onClick: () => setConfirm(true), danger: true },
+        ].map((item) => (
+          <li key={item.label}>
+            <button
+              type="button"
+              onClick={item.onClick}
+              className={cn(
+                "flex min-h-13 w-full items-center gap-3 px-5 py-3.5 text-left text-[15px] font-medium transition-colors hover:bg-ink/[0.03]",
+                item.danger && "text-[#B0412C] dark:text-coral",
+              )}
+            >
+              <item.icon className="text-[18px]" /> {item.label}
+            </button>
+          </li>
+        ))}
+      </ul>
       <Sheet open={confirm} onClose={() => setConfirm(false)} title="Delete your account?">
         <p className="text-[15px] text-ink-soft">
           This deletes your agents, memory, call history and schedules. Unused credits are lost. If you have a paid

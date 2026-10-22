@@ -6,11 +6,11 @@ import {
   Brain,
   CalendarBlank,
   CalendarDots,
+  CaretRight,
   Monitor,
   Phone,
   PlugsConnected,
   Plus,
-  Sparkle,
 } from "@phosphor-icons/react/dist/ssr";
 import { AgentCard } from "@/components/app/agent-card";
 import { GetSetUp, type GuideStep } from "@/components/app/guide";
@@ -91,6 +91,27 @@ export default async function HomePage() {
   const suggestions = SKILLS.filter((s) => s.status === "live" && planAllows(user.plan, s.minPlan)).flatMap(
     (s) => s.examples[0],
   );
+
+  const guideShowing = !(user.seen ?? []).includes("guide") && steps.some((s) => !s.done);
+  const nudge = guideShowing
+    ? null
+    : !user.integrations?.google_calendar?.connected
+      ? {
+          href: "/app/connections",
+          icon: CalendarBlank,
+          tint: "bg-teal/20 ring-teal/40 hover:bg-teal/30",
+          title: "Connect your calendar",
+          sub: `So ${featured?.name ?? "your agents"} can brief you on your day and move meetings.`,
+        }
+      : highlights.memories < 5
+        ? {
+            href: "/app/memory?import=1",
+            icon: Brain,
+            tint: "bg-peri/25 ring-peri/40 hover:bg-peri/35",
+            title: "Help your agents know you faster",
+            sub: "Bring over what ChatGPT, Claude or Gemini already know about you.",
+          }
+        : null;
 
   return (
     <div className="space-y-10">
@@ -197,8 +218,7 @@ export default async function HomePage() {
 
       {/* Phones: the tab bar only fits five places, so the rest are one tap away here. */}
       <nav aria-label="More in Callio" className="lg:hidden">
-        <h2 className="mb-3 font-display text-[22px] font-medium tracking-[-0.03em]">Everything else</h2>
-        <ul className="grid grid-cols-2 gap-2.5">
+        <ul className="divide-y divide-line overflow-hidden rounded-[24px] bg-plate ring-1 ring-line">
           {[
             {
               href: "/app/upcoming",
@@ -206,7 +226,9 @@ export default async function HomePage() {
               icon: CalendarDots,
               tint: "bg-amber/40",
               title: "Upcoming",
-              sub: highlights.next_schedule ? when(highlights.next_schedule.when, user.timezone, user.locale) : "Nothing booked",
+              sub: highlights.next_schedule
+                ? when(highlights.next_schedule.when, user.timezone, user.locale)
+                : "Nothing booked",
             },
             {
               href: "/app/contacts",
@@ -214,7 +236,9 @@ export default async function HomePage() {
               icon: AddressBook,
               tint: "bg-coral/30",
               title: "Contacts",
-              sub: contacts.length ? `${contacts.length} ${contacts.length === 1 ? "person" : "people"}` : "Your phone and people",
+              sub: contacts.length
+                ? `${contacts.length} ${contacts.length === 1 ? "person" : "people"}`
+                : "Your phone and people",
             },
             {
               href: "/app/connections",
@@ -224,158 +248,138 @@ export default async function HomePage() {
               title: "Connections",
               sub: morning.enabled ? `Mornings at ${morning.time}` : "Morning call, calendar",
             },
-            { href: "/app/tasks", tour: "tasks", icon: Monitor, tint: "bg-teal/30", title: "Tasks", sub: "Done on the web" },
+            {
+              href: "/app/tasks",
+              tour: "tasks",
+              icon: Monitor,
+              tint: "bg-teal/30",
+              title: "Tasks",
+              sub: "Done on the web",
+            },
           ].map((l) => (
-            <li key={l.href} className="min-w-0">
+            <li key={l.href}>
               <Link
                 href={l.href}
                 data-tour={l.tour}
-                className="flex h-full min-w-0 flex-col gap-3 rounded-[22px] bg-plate p-4 ring-1 ring-line transition-transform active:scale-[0.98]"
+                className="flex min-h-16 items-center gap-3 px-4 py-3 transition-colors active:bg-ink/[0.04]"
               >
-                <span className={`grid size-10 place-items-center rounded-2xl text-[20px] ${l.tint}`}>
+                <span className={`grid size-9 shrink-0 place-items-center rounded-xl text-[18px] ${l.tint}`}>
                   <l.icon weight="fill" />
                 </span>
-                <span className="min-w-0">
-                  <span className="block text-[15px] font-semibold">{l.title}</span>
-                  <span className="block truncate text-[13px] text-ink-soft">{l.sub}</span>
-                </span>
+                <span className="min-w-0 flex-1 text-[15px] font-semibold">{l.title}</span>
+                <span className="min-w-0 truncate text-[14px] text-ink-soft">{l.sub}</span>
+                <CaretRight className="shrink-0 text-ink-soft" />
               </Link>
             </li>
           ))}
         </ul>
       </nav>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
-        <section className="rounded-[28px] bg-plate p-5 ring-1 ring-line sm:p-6">
-          <div className="flex items-center justify-between gap-4">
-            <h2 className="flex items-center gap-2 text-[13px] font-semibold uppercase tracking-wider text-ink-soft">
-              <CalendarBlank weight="bold" /> Coming up
-            </h2>
+      {/* One nudge at a time: while the setup list shows, it already asks for these. */}
+      {nudge && (
+        <Link
+          href={nudge.href}
+          className={`group flex items-center gap-3 rounded-[24px] p-4 ring-1 transition-colors ${nudge.tint}`}
+        >
+          <span className="grid size-10 shrink-0 place-items-center rounded-full bg-plate text-[20px]">
+            <nudge.icon weight="fill" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-[15px] font-semibold">{nudge.title}</span>
+            <span className="block text-[14px] text-ink-soft">{nudge.sub}</span>
+          </span>
+          <ArrowRight className="shrink-0 transition-transform group-hover:translate-x-1" />
+        </Link>
+      )}
+
+      <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] lg:gap-8">
+        <section>
+          <div className="mb-3 flex items-end justify-between">
+            <h2 className="font-display text-[22px] font-medium tracking-[-0.03em]">Coming up</h2>
             <Link href="/app/upcoming" className="text-[14px] font-semibold text-ink-soft hover:text-ink">
               See all
             </Link>
           </div>
           {highlights.next_schedule ? (
-            <div className="mt-4 flex items-center gap-3">
+            <Link
+              href="/app/upcoming"
+              className="flex items-center gap-3 rounded-[24px] bg-plate px-5 py-4 ring-1 ring-line transition-colors hover:bg-ink/[0.03]"
+            >
               {byId.get(highlights.next_schedule.agent_id) && (
-                <span className="size-11 shrink-0 overflow-hidden rounded-full">
+                <span className="size-10 shrink-0 overflow-hidden rounded-full">
                   <AgentFace agent={byId.get(highlights.next_schedule.agent_id)!} className="size-full" />
                 </span>
               )}
-              <div>
-                <p className="text-[16px] font-semibold">{highlights.next_schedule.text}</p>
-                <p className="text-[14px] text-ink-soft">
+              <span className="min-w-0">
+                <span className="block truncate text-[15px] font-semibold">{highlights.next_schedule.text}</span>
+                <span className="block text-[13px] text-ink-soft">
                   {highlights.next_schedule.contact_name
                     ? `${byId.get(highlights.next_schedule.agent_id)?.name ?? "Your agent"} calls ${highlights.next_schedule.contact_name}`
                     : highlights.next_schedule.type === "call"
                       ? "Call"
                       : "Reminder"}{" "}
-                  ·{" "}
-                  {when(highlights.next_schedule.when, user.timezone, user.locale)}
-                </p>
-              </div>
-            </div>
+                  · {when(highlights.next_schedule.when, user.timezone, user.locale)}
+                </span>
+              </span>
+            </Link>
           ) : (
-            <p className="mt-4 text-[15px] text-ink-soft">
-              Nothing scheduled. On a call, try “Call me tomorrow at 8 with my plan for the day.”
+            <p className="rounded-[24px] bg-plate px-5 py-4 text-[15px] text-ink-soft ring-1 ring-line">
+              Nothing booked. On a call, say “Call me tomorrow at 8.”
             </p>
           )}
         </section>
 
-        <section className="rounded-[28px] bg-plate p-5 ring-1 ring-line sm:p-6">
-          <h2 className="flex items-center gap-2 text-[13px] font-semibold uppercase tracking-wider text-ink-soft">
-            <Sparkle weight="bold" /> Try saying
-          </h2>
-          <ul className="mt-4 flex flex-wrap gap-2">
-            {suggestions.slice(0, 6).map((s) => (
-              <li key={s} className="rounded-full bg-ink/[0.05] px-3.5 py-2 text-[14px]">
-                “{s}”
-              </li>
-            ))}
-          </ul>
+        <section>
+          <div className="mb-3 flex items-end justify-between">
+            <h2 className="font-display text-[22px] font-medium tracking-[-0.03em]">
+              {calls.length ? "Recent calls" : "Try saying"}
+            </h2>
+            {calls.length > 0 && (
+              <Link href="/app/calls" className="text-[14px] font-semibold text-ink-soft hover:text-ink">
+                See all
+              </Link>
+            )}
+          </div>
+          {calls.length ? (
+            <ul className="divide-y divide-line overflow-hidden rounded-[24px] bg-plate ring-1 ring-line">
+              {calls.slice(0, 3).map((c) => {
+                const a = byId.get(c.agent_id);
+                return (
+                  <li key={c.id}>
+                    <Link
+                      href={`/app/calls/${c.id}`}
+                      className="flex items-center gap-3 px-5 py-4 transition-colors hover:bg-ink/[0.03]"
+                    >
+                      {a && (
+                        <span className="size-10 shrink-0 overflow-hidden rounded-full">
+                          <AgentFace agent={a} className="size-full" />
+                        </span>
+                      )}
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-[15px] font-semibold">
+                          {c.summary ?? `Call with ${a?.name ?? "your agent"}`}
+                        </span>
+                        <span className="block text-[13px] text-ink-soft">
+                          {when(c.started_at, user.timezone, user.locale)} · {duration(c.seconds)}
+                        </span>
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            // Before the first call, ideas instead of an empty list.
+            <ul className="flex flex-wrap gap-2">
+              {suggestions.slice(0, 5).map((s) => (
+                <li key={s} className="rounded-full bg-plate px-3.5 py-2 text-[14px] ring-1 ring-line">
+                  “{s}”
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
       </div>
-
-      {/* While the setup list is showing, it already asks for the calendar. */}
-      {!user.integrations?.google_calendar?.connected && (user.seen ?? []).includes("guide") && (
-        <Link
-          href="/app/you#connections"
-          className="group flex items-center gap-4 rounded-[28px] bg-teal/20 p-5 ring-1 ring-teal/40 transition-colors hover:bg-teal/30 sm:p-6"
-        >
-          <span className="grid size-12 shrink-0 place-items-center rounded-full bg-teal text-[22px] text-[#121212]">
-            <CalendarBlank weight="fill" />
-          </span>
-          <span className="flex-1">
-            <span className="block text-[16px] font-semibold">Connect your calendar</span>
-            <span className="block text-[14px] text-ink-soft">
-              So {featured?.name ?? "your agents"} can brief you on your day and move meetings when you ask.
-            </span>
-          </span>
-          <ArrowRight className="shrink-0 transition-transform group-hover:translate-x-1" />
-        </Link>
-      )}
-
-      {highlights.memories < 5 && (
-        <Link
-          href="/app/memory?import=1"
-          className="group flex items-center gap-4 rounded-[28px] bg-peri/25 p-5 ring-1 ring-peri/40 transition-colors hover:bg-peri/35 sm:p-6"
-        >
-          <span className="grid size-12 shrink-0 place-items-center rounded-full bg-peri text-[22px] text-[#121212]">
-            <Brain weight="fill" />
-          </span>
-          <span className="flex-1">
-            <span className="block text-[16px] font-semibold">Help your agents know you faster</span>
-            <span className="block text-[14px] text-ink-soft">
-              Bring over what ChatGPT, Claude or Gemini already know about you.
-            </span>
-          </span>
-          <ArrowRight className="shrink-0 transition-transform group-hover:translate-x-1" />
-        </Link>
-      )}
-
-      <section>
-        <div className="mb-3 flex items-end justify-between">
-          <h2 className="font-display text-[22px] font-medium tracking-[-0.03em]">Recent calls</h2>
-          {calls.length > 0 && (
-            <Link href="/app/calls" className="text-[14px] font-semibold text-ink-soft hover:text-ink">
-              See all
-            </Link>
-          )}
-        </div>
-        {calls.length ? (
-          <ul className="divide-y divide-line overflow-hidden rounded-[28px] bg-plate ring-1 ring-line">
-            {calls.map((c) => {
-              const a = byId.get(c.agent_id);
-              return (
-                <li key={c.id}>
-                  <Link
-                    href={`/app/calls/${c.id}`}
-                    className="flex items-center gap-3 px-5 py-4 transition-colors hover:bg-ink/[0.03]"
-                  >
-                    {a && (
-                      <span className="size-10 shrink-0 overflow-hidden rounded-full">
-                        <AgentFace agent={a} className="size-full" />
-                      </span>
-                    )}
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[15px] font-semibold">
-                        {c.summary ?? `Call with ${a?.name ?? "your agent"}`}
-                      </span>
-                      <span className="block text-[13px] text-ink-soft">
-                        {a?.name} · {when(c.started_at, user.timezone, user.locale)} · {duration(c.seconds)}
-                      </span>
-                    </span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        ) : (
-          <p className="rounded-[28px] bg-plate p-6 text-[15px] text-ink-soft ring-1 ring-line">
-            Your calls will show up here, with a summary of what you talked about.
-          </p>
-        )}
-      </section>
     </div>
   );
 }

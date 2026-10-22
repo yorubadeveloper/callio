@@ -84,5 +84,9 @@ export async function POST(req: Request) {
     model: LIVE_MODEL,
     callId: start.call_id,
     maxSeconds: start.max_seconds,
+    // Uploaded straight to the backend after the call, then transcribed properly and dropped.
+    recordingUrl: start.recording_token
+      ? `${(process.env.API_URL ?? "http://localhost:8000").replace(/\/$/, "")}/v1/recordings/${start.call_id}?token=${start.recording_token}`
+      : undefined,
   });
 }

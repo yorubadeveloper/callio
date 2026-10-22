@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Phone } from "@phosphor-icons/react/dist/ssr";
-import { btn } from "@/components/app/ui";
+import { btn } from "@/components/app/btn";
 import { AgentFace } from "@/components/landing/agent-face";
 import { personalize } from "@/lib/agents/personalize";
 import { duration, when } from "@/lib/format";
@@ -37,7 +37,9 @@ export default async function CallDetailPage({ params }: { params: Promise<{ id:
         )}
         <div>
           <h1 className="font-display text-[30px] leading-tight font-medium tracking-[-0.035em]">
-            {c.contact_name ? `${a?.name ?? "Your agent"} called ${c.contact_name}` : `Call with ${a?.name ?? "your agent"}`}
+            {c.contact_name
+              ? `${a?.name ?? "Your agent"} called ${c.contact_name}`
+              : `Call with ${a?.name ?? "your agent"}`}
           </h1>
           <p className="text-[14px] text-ink-soft">
             {c.channel === "phone" && "Phone · "}

@@ -102,8 +102,10 @@ export default function TermsPage() {
             <li>do computer tasks: control a cloud browser to fill in forms, book or compare things for you.</li>
           </ul>
           <p>
-            We plan to add real phone calls and agents that call businesses for you. Extra terms may apply when those
-            features launch, and we will show them to you before you use them.
+            On paid plans your agent can also make real phone calls: to you, and to people you added as contacts, with
+            a message from you. You may only add people who would expect a call from you, and you are responsible
+            for the messages you ask it to pass on. Calling businesses for you may come later; extra terms may apply
+            then, and we will show them to you before you use them.
           </p>
         </section>
 

@@ -72,10 +72,7 @@ export function ConnectionsView({
 }) {
   return (
     <>
-      <PageTitle
-        title="Connections"
-        subtitle="What your agents can see and use. Everything is read-only unless you switch it on, and you can remove it any time."
-      />
+      <PageTitle title="Connections" subtitle="What your agents can see and use. Read-only unless you switch it on." />
       <MorningCallCard morning={morning} agents={agents} connectors={connectors} user={user} />
       <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <Sources connectors={connectors} timezone={user.timezone} locale={user.locale} />
@@ -86,19 +83,20 @@ export function ConnectionsView({
           </div>
         </section>
       </div>
-      <div className="mt-10">
+      <div className="mt-8">
         <section>
           <h2 className="text-[13px] font-semibold uppercase tracking-wider text-ink-soft">Coming soon</h2>
-          <ul className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
+          <ul className="mt-3 flex flex-wrap gap-2">
             {SOON.map((app) => (
-              <li key={app.name} className="flex items-start gap-3 rounded-[22px] bg-plate p-4 ring-1 ring-line">
-                <span className={cn("grid size-10 shrink-0 place-items-center rounded-2xl text-[20px]", app.tint)}>
+              <li
+                key={app.name}
+                title={app.what}
+                className="inline-flex items-center gap-2 rounded-full bg-plate py-1.5 pl-1.5 pr-3.5 text-[14px] font-medium ring-1 ring-line"
+              >
+                <span className={cn("grid size-7 place-items-center rounded-full text-[15px]", app.tint)}>
                   <app.icon weight="fill" />
                 </span>
-                <div className="min-w-0">
-                  <p className="text-[15px] font-semibold">{app.name}</p>
-                  <p className="mt-0.5 text-[13px] leading-snug text-ink-soft">{app.what}</p>
-                </div>
+                {app.name}
               </li>
             ))}
           </ul>
@@ -167,46 +165,36 @@ function GoogleCalendar({ user, result }: { user: User; result?: string }) {
           {message.text}
         </p>
       )}
-      <div className={cn("rounded-[24px] bg-plate p-5 ring-1 ring-line", message && "mt-3")}>
-        <div className="flex items-start gap-3">
-          <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-peri/30 text-[22px]">
+      <div className={cn("rounded-[24px] bg-plate p-4 ring-1 ring-line", message && "mt-3")}>
+        <div className="flex items-center gap-3">
+          <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-peri/30 text-[20px]">
             <CalendarBlank weight="fill" />
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-[15px] font-semibold">Google Calendar</p>
             {calendar?.connected ? (
-              <p className="mt-0.5 flex items-center gap-1.5 truncate text-[14px] text-ink-soft">
+              <p className="flex items-center gap-1.5 truncate text-[13px] text-ink-soft">
                 <CheckCircle weight="fill" className="shrink-0 text-teal" /> {calendar.account_email ?? "Connected"}
               </p>
             ) : calendar?.needs_reconnect ? (
-              <p className="mt-0.5 text-[14px] text-ink-soft">
-                Google stopped our access to {calendar.account_email ?? "your calendar"}. Connect again to keep your
-                briefings going.
-              </p>
+              <p className="text-[13px] text-ink-soft">Google stopped our access. Connect again.</p>
             ) : (
-              <p className="mt-0.5 text-[14px] text-ink-soft">
-                So agents can brief you on your day and add or move meetings when you ask.
-              </p>
+              <p className="text-[13px] text-ink-soft">Your day in briefings; move meetings by voice.</p>
             )}
           </div>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={calendar?.connected ? disconnect : connect}
+            className={cn(calendar?.connected ? btn.soft : btn.primary, "h-10 shrink-0 px-4 text-[14px]")}
+          >
+            {busy && <Spinner />}
+            {calendar?.connected ? "Disconnect" : calendar?.needs_reconnect ? "Reconnect" : "Connect"}
+          </button>
         </div>
         {error && <p className="mt-3 text-[14px] text-[#B0412C] dark:text-coral">{error}</p>}
-        <button
-          type="button"
-          disabled={busy}
-          onClick={calendar?.connected ? disconnect : connect}
-          className={cn(calendar?.connected ? btn.soft : btn.primary, "mt-4 h-11 w-full")}
-        >
-          {busy && <Spinner />}
-          {calendar?.connected
-            ? "Disconnect"
-            : calendar?.needs_reconnect
-              ? "Reconnect Google Calendar"
-              : "Connect Google Calendar"}
-        </button>
         <p className="mt-3 text-[12px] leading-relaxed text-ink-soft">
-          Agents only look at your calendar when you ask about your schedule or before a briefing you&apos;ve set up.
-          Disconnecting deletes our access straight away.
+          Only read when you ask about your schedule or before a briefing. Disconnecting removes our access at once.
         </p>
       </div>
     </div>

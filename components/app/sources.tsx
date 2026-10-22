@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import {
   ArrowClockwise,
+  CaretDown,
   ChartLineUp,
   Globe,
   HardDrives,
@@ -92,30 +93,31 @@ export function Sources({
           </AnimatePresence>
         </ul>
       )}
-      <div className={cn("grid grid-cols-1 gap-2 sm:grid-cols-2", connectors.length > 0 && "mt-4")}>
+      <ul className="mt-3 divide-y divide-line overflow-hidden rounded-[24px] bg-plate ring-1 ring-line">
         {addable.map((kind) => {
           const k = KIND[kind];
           return (
-            <button
-              key={kind}
-              type="button"
-              onClick={() => setAdding(kind)}
-              className="group flex items-start gap-3 rounded-[22px] bg-plate p-4 text-left ring-1 ring-line transition-[box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-28px_rgb(0_0_0/0.5)]"
-            >
-              <span className={cn("grid size-10 shrink-0 place-items-center rounded-2xl text-[20px]", k.tint)}>
-                <k.icon weight="fill" />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="flex items-center justify-between gap-2 text-[15px] font-semibold">
-                  {k.name}
-                  <Plus weight="bold" className="text-ink-soft transition-transform group-hover:rotate-90" />
+            <li key={kind}>
+              <button
+                type="button"
+                onClick={() => setAdding(kind)}
+                className="group flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-ink/[0.03]"
+              >
+                <span className={cn("grid size-9 shrink-0 place-items-center rounded-xl text-[18px]", k.tint)}>
+                  <k.icon weight="fill" />
                 </span>
-                <span className="mt-0.5 block text-[13px] leading-snug text-ink-soft">{k.what}</span>
-              </span>
-            </button>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[15px] font-semibold">
+                    {connectors.some((c) => c.kind === kind) ? `Add another ${k.name.toLowerCase()}` : k.name}
+                  </span>
+                  <span className="block truncate text-[13px] text-ink-soft">{k.what}</span>
+                </span>
+                <Plus weight="bold" className="shrink-0 text-ink-soft transition-transform group-hover:rotate-90" />
+              </button>
+            </li>
           );
         })}
-      </div>
+      </ul>
       <ConnectorSheet kind={adding} onClose={() => setAdding(null)} />
       <ConnectorSheet kind={editing?.kind ?? null} existing={editing} onClose={() => setEditing(null)} />
     </section>
@@ -151,6 +153,7 @@ function ConnectorCard({
   const [error, setError] = useState<string | null>(null);
   const [confirmRemove, setConfirmRemove] = useState(false);
   const [showTools, setShowTools] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const run = async (what: string, fn: () => Promise<unknown>) => {
     setBusy(what);
@@ -200,6 +203,15 @@ function ConnectorCard({
         >
           {busy === "test" ? <Spinner /> : <ArrowClockwise weight="bold" />}
         </button>
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          aria-expanded={open}
+          aria-label={open ? `Hide ${c.name} settings` : `${c.name} settings`}
+          className={cn(btn.icon, "size-10 shrink-0 text-[18px]")}
+        >
+          <CaretDown className={cn("transition-transform duration-200", open && "rotate-180")} />
+        </button>
       </div>
 
       {c.kind === "website" && c.sites && c.sites.length > 0 && (
@@ -221,121 +233,149 @@ function ConnectorCard({
         </ul>
       )}
 
-      <div className="mt-4 space-y-3 border-t border-line pt-3">
-        <Switch
-          checked={c.in_briefing}
-          onChange={(v) => patch({ in_briefing: v })}
-          label="In my morning call"
-          hint={c.kind === "mcp" ? "Your agent can always ask it things when you do." : undefined}
-        />
-        {watched && (
-          <div>
-            <p className="text-[14px] font-semibold">When something breaks</p>
-            <div className="mt-2">
-              <Segmented
-                label="When something breaks"
-                value={c.alerts}
-                options={ALERTS}
-                onChange={(v) => patch({ alerts: v })}
+      {!open && (
+        <p className="mt-3 text-[13px] text-ink-soft">
+          {[
+            c.in_briefing && "In your morning call",
+            watched &&
+              (c.alerts === "call"
+                ? "Calls you if it breaks"
+                : c.alerts === "notify"
+                  ? "Tells you if it breaks"
+                  : null),
+          ]
+            .filter(Boolean)
+            .join(" · ") || "Not in your morning call"}
+        </p>
+      )}
+
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}
+            className="overflow-hidden"
+          >
+            <div className="mt-4 space-y-3 border-t border-line pt-3">
+              <Switch
+                checked={c.in_briefing}
+                onChange={(v) => patch({ in_briefing: v })}
+                label="In my morning call"
+                hint={c.kind === "mcp" ? "Your agent can always ask it things when you do." : undefined}
               />
-            </div>
-          </div>
-        )}
-        {c.tools && c.tools.length > 0 && (
-          <div>
-            <button
-              type="button"
-              onClick={() => setShowTools((s) => !s)}
-              aria-expanded={showTools}
-              className="min-h-11 text-[14px] font-semibold text-ink underline-offset-4 hover:underline"
-            >
-              {showTools ? "Hide tools" : `See its ${c.tools.length} tools`}
-              {changeable.length > 0 && !showTools && (
-                <span className="ml-2 font-normal text-ink-soft">
-                  {changeable.filter((t) => t.allowed).length} of {changeable.length} that change things on
-                </span>
+              {watched && (
+                <div>
+                  <p className="text-[14px] font-semibold">When something breaks</p>
+                  <div className="mt-2">
+                    <Segmented
+                      label="When something breaks"
+                      value={c.alerts}
+                      options={ALERTS}
+                      onChange={(v) => patch({ alerts: v })}
+                    />
+                  </div>
+                </div>
               )}
-            </button>
-            <AnimatePresence initial={false}>
-              {showTools && (
-                <motion.ul
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="overflow-hidden"
-                >
-                  {c.tools.map((t) => (
-                    <li key={t.name} className="border-t border-line py-1 first:border-t-0">
-                      {t.read_only ? (
-                        <div className="flex min-h-11 items-center justify-between gap-4">
-                          <span className="min-w-0">
-                            <span className="block font-mono text-[13px]">{t.name}</span>
-                            {t.description && (
-                              <span className="block truncate text-[12px] text-ink-soft">{t.description}</span>
+              {c.tools && c.tools.length > 0 && (
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => setShowTools((s) => !s)}
+                    aria-expanded={showTools}
+                    className="min-h-11 text-[14px] font-semibold text-ink underline-offset-4 hover:underline"
+                  >
+                    {showTools ? "Hide tools" : `See its ${c.tools.length} tools`}
+                    {changeable.length > 0 && !showTools && (
+                      <span className="ml-2 font-normal text-ink-soft">
+                        {changeable.filter((t) => t.allowed).length} of {changeable.length} that change things on
+                      </span>
+                    )}
+                  </button>
+                  <AnimatePresence initial={false}>
+                    {showTools && (
+                      <motion.ul
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden"
+                      >
+                        {c.tools.map((t) => (
+                          <li key={t.name} className="border-t border-line py-1 first:border-t-0">
+                            {t.read_only ? (
+                              <div className="flex min-h-11 items-center justify-between gap-4">
+                                <span className="min-w-0">
+                                  <span className="block font-mono text-[13px]">{t.name}</span>
+                                  {t.description && (
+                                    <span className="block truncate text-[12px] text-ink-soft">{t.description}</span>
+                                  )}
+                                </span>
+                                <span className="shrink-0 rounded-full bg-teal/20 px-2 py-0.5 text-[12px] font-semibold">
+                                  Reads only
+                                </span>
+                              </div>
+                            ) : (
+                              <Switch
+                                checked={t.allowed}
+                                label={t.name}
+                                hint={t.description || "Can change things. Your agent asks you before using it."}
+                                onChange={(on) =>
+                                  patch({
+                                    allowed_tools: changeable
+                                      .filter((x) => (x.name === t.name ? on : x.allowed))
+                                      .map((x) => x.name),
+                                  })
+                                }
+                              />
                             )}
-                          </span>
-                          <span className="shrink-0 rounded-full bg-teal/20 px-2 py-0.5 text-[12px] font-semibold">
-                            Reads only
-                          </span>
-                        </div>
-                      ) : (
-                        <Switch
-                          checked={t.allowed}
-                          label={t.name}
-                          hint={t.description || "Can change things. Your agent asks you before using it."}
-                          onChange={(on) =>
-                            patch({
-                              allowed_tools: changeable
-                                .filter((x) => (x.name === t.name ? on : x.allowed))
-                                .map((x) => x.name),
-                            })
-                          }
-                        />
-                      )}
-                    </li>
-                  ))}
-                </motion.ul>
+                          </li>
+                        ))}
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
+                </div>
               )}
-            </AnimatePresence>
-          </div>
+            </div>
+
+            <div className="mt-3 flex items-center gap-2">
+              <button type="button" onClick={onEdit} className={cn(btn.soft, "h-10 px-4 text-[14px]")}>
+                Edit
+              </button>
+              {confirmRemove ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setConfirmRemove(false)}
+                    className={cn(btn.soft, "h-10 px-4 text-[14px]")}
+                  >
+                    Keep
+                  </button>
+                  <button
+                    type="button"
+                    disabled={busy === "remove"}
+                    onClick={() => run("remove", () => api(`/connectors/${c.id}`, { method: "DELETE" }))}
+                    className={cn(btn.danger, "h-10 px-4 text-[14px]")}
+                  >
+                    {busy === "remove" && <Spinner />} Remove and delete the key
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setConfirmRemove(true)}
+                  aria-label={`Remove ${c.name}`}
+                  className={cn(btn.icon, "ml-auto size-10 text-[18px] text-ink-soft hover:text-[#B0412C]")}
+                >
+                  <Trash />
+                </button>
+              )}
+            </div>
+          </motion.div>
         )}
-      </div>
+      </AnimatePresence>
 
       {error && <p className="mt-3 text-[14px] text-[#B0412C] dark:text-coral">{error}</p>}
-
-      <div className="mt-3 flex items-center gap-2">
-        <button type="button" onClick={onEdit} className={cn(btn.soft, "h-10 px-4 text-[14px]")}>
-          Edit
-        </button>
-        {confirmRemove ? (
-          <>
-            <button
-              type="button"
-              onClick={() => setConfirmRemove(false)}
-              className={cn(btn.soft, "h-10 px-4 text-[14px]")}
-            >
-              Keep
-            </button>
-            <button
-              type="button"
-              disabled={busy === "remove"}
-              onClick={() => run("remove", () => api(`/connectors/${c.id}`, { method: "DELETE" }))}
-              className={cn(btn.danger, "h-10 px-4 text-[14px]")}
-            >
-              {busy === "remove" && <Spinner />} Remove and delete the key
-            </button>
-          </>
-        ) : (
-          <button
-            type="button"
-            onClick={() => setConfirmRemove(true)}
-            aria-label={`Remove ${c.name}`}
-            className={cn(btn.icon, "ml-auto size-10 text-[18px] text-ink-soft hover:text-[#B0412C]")}
-          >
-            <Trash />
-          </button>
-        )}
-      </div>
     </motion.li>
   );
 }
@@ -352,15 +392,15 @@ const HELP: Record<ConnectorKind, React.ReactNode> = {
   ),
   dokploy: (
     <>
-      In your server panel, go to Settings → Profile → API/CLI and generate a key. Callio only reads your projects, apps and
-      deploys.
+      In your server panel, go to Settings → Profile → API/CLI and generate a key. Callio only reads your projects, apps
+      and deploys.
     </>
   ),
   website: <>Add up to 10 addresses. Callio checks them every 5 minutes and tells you only if one stays down.</>,
   mcp: (
     <>
-      Any MCP server reachable over the internet. Tools that only read are on; anything that can change things stays
-      off until you switch it on.
+      Any MCP server reachable over the internet. Tools that only read are on; anything that can change things stays off
+      until you switch it on.
     </>
   ),
 };
@@ -429,7 +469,13 @@ function ConnectorForm({
       {kind === "mcp" && (
         <Field label="Name" hint="What you'll call it on a call, like “Sentry”.">
           {(id) => (
-            <input id={id} value={name} onChange={(e) => setName(e.target.value)} maxLength={80} className={inputClass} />
+            <input
+              id={id}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              maxLength={80}
+              className={inputClass}
+            />
           )}
         </Field>
       )}

@@ -76,7 +76,8 @@ export default function AcceptableUsePage() {
               </li>
               <li>If anyone asks whether they are talking to a person, the agent answers honestly.</li>
               <li>
-                We don’t record call audio. We keep text transcripts so your agent can remember what happened.
+                We don’t keep call audio. For phone calls it is held in memory until the call ends so we can make an
+                accurate transcript, then deleted. We keep text transcripts so your agent can remember what happened.
               </li>
             </ul>
           </div>

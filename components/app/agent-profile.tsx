@@ -143,54 +143,52 @@ function Skills({
 }) {
   const [locked, setLocked] = useState<Skill | null>(null);
   const ordered = [...SKILLS].sort((x, y) => Number(focus.includes(y.id)) - Number(focus.includes(x.id)));
+  const ready = ordered.filter((s) => s.status !== "soon");
+  const soon = ordered.filter((s) => s.status === "soon");
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-      <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {ordered.map((s) => {
-          const allowed = planAllows(plan, s.minPlan);
-          const soon = s.status === "soon";
-          return (
-            <li key={s.id}>
-              <button
-                type="button"
-                disabled={allowed || soon}
-                onClick={() => setLocked(s)}
-                className={cn(
-                  "flex h-full w-full flex-col rounded-[24px] bg-plate p-5 text-left ring-1 ring-line",
-                  !allowed && !soon && "transition-colors hover:ring-amber",
-                  "disabled:cursor-default",
-                )}
-              >
-                <span className="flex items-center gap-2">
-                  <span className="text-[16px] font-semibold">{s.title}</span>
-                  {soon ? (
-                    <span className="rounded-full bg-ink/[0.06] px-2 py-0.5 text-[11px] text-ink-soft">Soon</span>
-                  ) : !allowed ? (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-amber/25 px-2 py-0.5 text-[11px] font-semibold">
-                      <LockSimple weight="bold" /> {planById(s.minPlan).name}
+      <div>
+        <ul className="divide-y divide-line overflow-hidden rounded-[24px] bg-plate ring-1 ring-line">
+          {ready.map((s) => {
+            const allowed = planAllows(plan, s.minPlan);
+            return (
+              <li key={s.id}>
+                <button
+                  type="button"
+                  disabled={allowed}
+                  onClick={() => setLocked(s)}
+                  className={cn(
+                    "flex w-full flex-col gap-0.5 px-5 py-4 text-left",
+                    !allowed && "transition-colors hover:bg-amber/10",
+                    "disabled:cursor-default",
+                  )}
+                >
+                  <span className="flex items-center gap-2">
+                    <span className="text-[15px] font-semibold">{s.title}</span>
+                    {!allowed && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-amber/25 px-2 py-0.5 text-[11px] font-semibold">
+                        <LockSimple weight="bold" /> {planById(s.minPlan).name}
+                      </span>
+                    )}
+                  </span>
+                  <span className="text-[14px] text-ink-soft">{s.summary}</span>
+                  {s.examples[0] && (
+                    <span className={cn("mt-1 text-[13px] italic", allowed ? "text-ink/70" : "text-ink-soft")}>
+                      “{s.examples[0]}”
                     </span>
-                  ) : null}
-                </span>
-                <span className="mt-1 text-[14px] text-ink-soft">{s.summary}</span>
-                <span className="mt-3 flex flex-wrap gap-1.5">
-                  {s.examples.slice(0, 2).map((e) => (
-                    <span
-                      key={e}
-                      className={cn(
-                        "rounded-full px-2.5 py-1 text-[12px]",
-                        allowed && !soon ? "bg-teal/15" : "bg-ink/[0.05] text-ink-soft",
-                      )}
-                    >
-                      “{e}”
-                    </span>
-                  ))}
-                </span>
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+                  )}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+        {soon.length > 0 && (
+          <p className="mt-3 px-1 text-[13px] text-ink-soft">
+            Coming soon: {soon.map((s) => s.title.toLowerCase()).join(", ")}.
+          </p>
+        )}
+      </div>
       <aside className="self-start rounded-[24px] bg-plate p-5 ring-1 ring-line">
         <p className="text-[13px] font-semibold uppercase tracking-wider text-ink-soft">Coming up with {agentName}</p>
         {schedules.length ? (
@@ -271,7 +269,9 @@ function AgentMemory({
         <label htmlFor="teach" className="text-[15px] font-semibold">
           Teach {agentName} something
         </label>
-        <p className="mt-0.5 text-[13px] text-ink-soft">Only {agentName} will know it. They also save things as you talk.</p>
+        <p className="mt-0.5 text-[13px] text-ink-soft">
+          Only {agentName} will know it. They also save things as you talk.
+        </p>
         <div className="mt-3 flex gap-2">
           <input
             id="teach"
@@ -344,8 +344,8 @@ export function MemoryList({
       {items.length ? (
         <ul className="mt-3 divide-y divide-line overflow-hidden rounded-[24px] bg-plate ring-1 ring-line">
           {items.map((m) => (
-            <li key={m.id} className="group flex items-start gap-3 px-4 py-3">
-              <p className="flex-1 text-[15px] leading-snug">{m.text}</p>
+            <li key={m.id} className="group flex min-h-12 items-center gap-3 py-1.5 pl-4 pr-2">
+              <p className="flex-1 py-1 text-[15px] leading-snug">{m.text}</p>
               <button
                 type="button"
                 onClick={() => onRemove(m.id)}

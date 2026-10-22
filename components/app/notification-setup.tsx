@@ -114,6 +114,8 @@ export function NotificationSetup({ compact = false }: { compact?: boolean }) {
     }
   };
 
+  // Compact (on Upcoming): only a nudge when they can't be rung yet; the full controls live on the You page.
+  if (compact && (!mounted || state === "checking" || state === "on")) return null;
   if (!mounted || state === "checking") {
     return <div className="h-32 animate-pulse rounded-[28px] bg-ink/[0.05] motion-reduce:animate-none" />;
   }
@@ -122,11 +124,17 @@ export function NotificationSetup({ compact = false }: { compact?: boolean }) {
   const platform = env?.platform ?? "desktop";
 
   return (
-    <div className={cn("rounded-[28px] p-5", on ? "bg-plate ring-1 ring-line" : "bg-amber/25")}>
-      <div className="flex items-start gap-4">
+    <div
+      className={cn(
+        compact ? "rounded-[24px] p-4" : "rounded-[28px] p-5",
+        on ? "bg-plate ring-1 ring-line" : "bg-amber/25",
+      )}
+    >
+      <div className={cn("flex items-start", compact ? "gap-3" : "gap-4")}>
         <span
           className={cn(
-            "grid size-12 shrink-0 place-items-center rounded-2xl text-[24px]",
+            "grid shrink-0 place-items-center rounded-2xl",
+            compact ? "size-10 text-[20px]" : "size-12 text-[24px]",
             on ? "bg-teal/25" : "bg-amber text-[#0E0E10]",
           )}
         >
@@ -152,7 +160,7 @@ export function NotificationSetup({ compact = false }: { compact?: boolean }) {
         </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-2">
+      <div className={cn("flex flex-wrap gap-2", compact ? "mt-3 pl-[52px]" : "mt-4")}>
         {state === "off" && (
           <button type="button" onClick={turnOn} disabled={busy !== null} className={cn(btn.primary, "h-11")}>
             {busy === "toggle" && <Spinner />} Turn on notifications

@@ -2,7 +2,8 @@ import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { buildContactInstructions, buildInstructions, contactLanguage } from "@/lib/agents/instructions";
 import { personalize } from "@/lib/agents/personalize";
-import { CONTACT_CALL_TOOLS, TOOL_SCHEDULING, toolsForPlan } from "@/lib/agents/tools";
+import { CONTACT_CALL_TOOLS, SPOKEN_MESSAGE_CONTACT_TOOLS, TOOL_SCHEDULING, toolsForPlan } from "@/lib/agents/tools";
+import { VOICES } from "@/lib/agents/voices";
 import { liveConfig } from "@/lib/server/live";
 import { LIVE_MODEL } from "@/lib/server/models";
 import type { PhoneCallSetup } from "@/lib/types";
@@ -31,16 +32,19 @@ export async function POST(req: Request) {
       message: setup.message,
       maxSeconds: setup.max_seconds,
       now,
+      textToSpeech: setup.route === "spitch",
     });
     return NextResponse.json({
       model: LIVE_MODEL,
       config: liveConfig({
         systemInstruction,
         voice: agent.persona.voice,
-        tools: CONTACT_CALL_TOOLS,
+        tools: setup.route === "spitch" ? SPOKEN_MESSAGE_CONTACT_TOOLS : CONTACT_CALL_TOOLS,
         languages: [contactLanguage(setup.contact, setup.user)],
       }),
       scheduling: TOOL_SCHEDULING,
+      // Spitch calls pick a Spitch voice of the same pitch.
+      voice_pitch: VOICES.find((v) => v.id === agent.persona.voice)?.pitch ?? "higher",
     });
   }
 

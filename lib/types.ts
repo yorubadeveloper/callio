@@ -186,6 +186,8 @@ export interface CallStart {
   sources?: { name: string; kind: ConnectorKind; status: Connector["status"] }[];
   /** People the agent can phone with a message. */
   contacts?: { name: string; opted_out: boolean }[];
+  /** Signs the browser's upload of this call's recording (POST /v1/recordings/{call_id}). */
+  recording_token?: string;
 }
 
 export interface Contact {
@@ -217,6 +219,8 @@ export type PhoneCallSetup =
   | { kind: "user"; channel: "phone"; inbound: boolean; purpose: string | null; start: CallStart }
   | {
       kind: "contact";
+      /** "spitch": Spitch speaks and hears, a text model writes the words (Yoruba, Igbo, Hausa). */
+      route?: "gemini" | "spitch";
       user: Pick<User, "name" | "nickname" | "pronouns" | "about" | "languages" | "timezone" | "locale">;
       agent: UserAgent;
       contact: Pick<Contact, "name" | "language" | "notes">;

@@ -150,11 +150,18 @@ export default function PrivacyPage() {
             browser’s push service.
           </li>
         </ul>
-        <h3>Phone calls (coming later)</h3>
+        <h3>Phone calls</h3>
         <p>
-          When real phone calls launch, call audio will travel through our telephony provider, Telnyx. Agents that
-          call a business or another person on your behalf will say at the start that they are an AI. The other
-          person’s words become part of the transcript. We will update this policy before phone calling goes live.
+          On paid plans your agent can ring your own phone, and call people you added on the Contacts page with a
+          message from you. Call audio travels through our telephony provider, Twilio, to our server and on to
+          Google’s Gemini API. Calls in Yoruba, Igbo or Hausa use Spitch for speech instead. The agent always says
+          at the start that it is an AI calling for you, and the other person’s words become part of the
+          transcript, which you can read and delete.
+        </p>
+        <p>
+          To make an accurate transcript, our server holds the audio of a phone call in memory until the call ends,
+          sends it to Google once to be transcribed, then deletes it. It is never written to disk or kept. Contacts
+          can ask not to be called again, and Callio then stops calling them.
         </p>
         <h3>Sensitive topics</h3>
         <p>

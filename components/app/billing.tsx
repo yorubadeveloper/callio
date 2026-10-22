@@ -69,8 +69,9 @@ export function BillingView({
         </p>
       )}
 
-      <section className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
-        <div className="rounded-[28px] bg-[#121212] p-6 text-[#F3F2EE]">
+      {/* One summary: the plan on the left, what's left to spend on the right. */}
+      <section className="flex flex-col gap-6 rounded-[28px] bg-[#121212] p-6 text-[#F3F2EE] sm:flex-row sm:items-end sm:justify-between">
+        <div className="min-w-0">
           <p className="text-[13px] text-white/60">Your plan</p>
           <p className="mt-1 font-display text-[36px] leading-none font-medium tracking-[-0.04em]">{current.name}</p>
           <p className="mt-2 text-[14px] text-white/60">
@@ -78,19 +79,21 @@ export function BillingView({
               ? `Ends on ${date(billing.cancel_at)}. You'll move to Free after that.`
               : billing.renews_at
                 ? `Renews on ${date(billing.renews_at)}${billing.interval === "year" ? " (yearly)" : ""}`
-                : "Free forever. Upgrade for monthly credits."}
+                : billing.plan === "free"
+                  ? "Free forever. Upgrade for monthly credits."
+                  : `${current.name} is active on your account.`}
           </p>
           {billing.plan !== "free" && <ManageButton />}
         </div>
-        <div className="rounded-[28px] bg-plate p-6 ring-1 ring-line">
-          <p className="flex items-center gap-2 text-[13px] text-ink-soft">
+        <div className="shrink-0 border-t border-white/10 pt-5 sm:border-l sm:border-t-0 sm:pl-8 sm:pt-0 sm:text-right">
+          <p className="flex items-center gap-2 text-[13px] text-white/60 sm:justify-end">
             <Coins weight="fill" className="text-amber" /> Credits
           </p>
-          <p className="mt-1 font-display text-[36px] leading-none font-medium tracking-[-0.04em]">
+          <p className="mt-1 font-display text-[36px] leading-none font-medium tracking-[-0.04em] tabular-nums">
             {billing.credits.total}
           </p>
-          <p className="mt-2 text-[14px] text-ink-soft">
-            {billing.credits.plan} from your plan · {billing.credits.topup} top-up (never expire)
+          <p className="mt-2 text-[14px] text-white/60">
+            {billing.credits.plan} from your plan · {billing.credits.topup} top-up
           </p>
         </div>
       </section>

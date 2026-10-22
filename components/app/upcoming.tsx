@@ -31,6 +31,8 @@ const REPEAT: Record<Schedule["repeat"], string | null> = {
   weekly: "Every week",
 };
 
+const RECENT = 5;
+
 export function UpcomingView({
   schedules: initial,
   notifications,
@@ -45,6 +47,8 @@ export function UpcomingView({
   locale: string;
 }) {
   const [schedules, setSchedules] = useState(() => [...initial].sort((a, b) => a.when.localeCompare(b.when)));
+  const [allRecent, setAllRecent] = useState(false);
+  const recent = allRecent ? notifications : notifications.slice(0, RECENT);
   const byId = new Map(agents.map((a) => [a.id, a]));
   const unread = notifications.some((n) => !n.read);
 
@@ -63,7 +67,7 @@ export function UpcomingView({
     <>
       <PageTitle
         title="Upcoming"
-        subtitle="Calls and reminders your agents have lined up. Ask any agent to add, move or cancel one."
+        subtitle="Calls and reminders your agents lined up. Ask any agent to add, move or cancel one."
       />
       <NotificationSetup compact />
 
@@ -112,7 +116,7 @@ export function UpcomingView({
           </p>
         ) : (
           <ul className="mt-3 divide-y divide-line overflow-hidden rounded-[28px] bg-plate ring-1 ring-line">
-            {notifications.map((n) => (
+            {recent.map((n) => (
               <li key={n.id} className="flex items-start gap-3 px-4 py-3.5 sm:px-5">
                 <span
                   className={cn(
@@ -122,10 +126,10 @@ export function UpcomingView({
                       : n.kind === "alert"
                         ? "bg-coral/30"
                         : n.kind === "call"
-                        ? "bg-teal/25"
-                        : n.kind === "task"
-                          ? "bg-peri/30"
-                          : "bg-coral/20",
+                          ? "bg-teal/25"
+                          : n.kind === "task"
+                            ? "bg-peri/30"
+                            : "bg-coral/20",
                   )}
                 >
                   {n.kind === "reminder" ? (
@@ -146,11 +150,23 @@ export function UpcomingView({
                     {!n.read && <span className="size-2 rounded-full bg-coral" aria-label="New" />}
                   </p>
                   <p className="mt-0.5 text-[14px] text-ink-soft">{n.body}</p>
+                  <p className="mt-1 text-[12px] text-ink-soft sm:hidden">{when(n.created_at, timezone, locale)}</p>
                 </div>
-                <span className="shrink-0 text-[12px] text-ink-soft">{when(n.created_at, timezone, locale)}</span>
+                <span className="hidden shrink-0 text-[12px] text-ink-soft sm:block">
+                  {when(n.created_at, timezone, locale)}
+                </span>
               </li>
             ))}
           </ul>
+        )}
+        {notifications.length > RECENT && (
+          <button
+            type="button"
+            onClick={() => setAllRecent((v) => !v)}
+            className="mt-3 min-h-11 px-1 text-[14px] font-semibold text-ink-soft underline-offset-4 hover:text-ink hover:underline"
+          >
+            {allRecent ? "Show fewer" : `Show all ${notifications.length}`}
+          </button>
         )}
       </section>
     </>

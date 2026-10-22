@@ -3,6 +3,7 @@
 import { GoogleGenAI, Modality, type FunctionCall, type LiveServerMessage, type Session } from "@google/genai";
 import { TOOLS } from "@/lib/agents/tools";
 import { EARPIECE_GAIN, listOutputs, routeTo } from "./audio-out";
+import { createRecorder, type CallRecorder } from "./recorder";
 import { createSnapshotStore } from "./store";
 import type { CallEngine, Caption } from "./types";
 
@@ -20,6 +21,8 @@ interface SessionGrant {
   callId: string;
   /** Hang up after this long; the backend sets it from the credits left. */
   maxSeconds: number;
+  /** Where the recording goes after the call, for a proper transcript (signed for this call only). */
+  recordingUrl?: string;
 }
 
 // Gemini Live straight from the browser: mic → 16 kHz PCM → Live, Live's 24 kHz
@@ -44,6 +47,7 @@ export function createGeminiEngine({ agentId, purpose, briefingId }: Options): C
   let limitTimer: ReturnType<typeof setTimeout> | undefined;
   let pingTimer: ReturnType<typeof setInterval> | undefined;
   let captionSeq = 0;
+  let recorder: CallRecorder | null = null;
   const open: Partial<Record<Caption["who"], string>> = {};
 
   const rms = (a: AnalyserNode | null) => {
@@ -73,7 +77,8 @@ export function createGeminiEngine({ agentId, purpose, briefingId }: Options): C
   };
 
   const finish = () => {
-    if (store.get().status === "ended") return;
+    // Nothing started yet (React dev mode runs the call screen's unmount cleanup once on mount).
+    if (store.get().status === "ended" || store.get().status === "idle") return;
     clearTimeout(quietTimer);
     clearTimeout(limitTimer);
     clearInterval(pingTimer);
@@ -91,9 +96,14 @@ export function createGeminiEngine({ agentId, purpose, briefingId }: Options): C
     const snap = store.get();
     store.set({ status: snap.status === "error" ? "error" : "ended", endedAt: Date.now(), activity: "listening" });
     if (grant) {
-      void endOnServer(grant.callId, snap.captions, usage);
+      const { callId, recordingUrl } = grant;
+      const wav = recorder?.wav();
+      void endOnServer(callId, snap.captions, usage).then(() => {
+        if (wav && recordingUrl) void uploadRecording(recordingUrl, wav);
+      });
       grant = null;
     }
+    recorder = null;
   };
 
   const runFunction = async (fc: FunctionCall) => {
@@ -167,6 +177,7 @@ export function createGeminiEngine({ agentId, purpose, briefingId }: Options): C
     addUsage(m.usageMetadata);
     if (m.setupComplete) {
       ready = true;
+      recorder = createRecorder();
       store.set({ status: "live", startedAt: Date.now() });
       limitTimer = setTimeout(finish, (grant?.maxSeconds ?? 60) * 1000);
       // Heartbeat: the server bills an abandoned call only up to the last ping.
@@ -182,12 +193,14 @@ export function createGeminiEngine({ agentId, purpose, briefingId }: Options): C
     const sc = m.serverContent;
     if (sc?.interrupted) {
       player?.port.postMessage("flush");
+      recorder?.flush();
       closeCaption("agent");
     }
     for (const part of sc?.modelTurn?.parts ?? []) {
       const data = part.inlineData?.data;
       if (data && player) {
         const pcm = base64ToBuffer(data);
+        recorder?.agent(pcm); // before the transfer below detaches it
         player.port.postMessage(pcm, [pcm]);
       }
     }
@@ -279,6 +292,7 @@ export function createGeminiEngine({ agentId, purpose, briefingId }: Options): C
         mic.connect(capture).connect(sink).connect(captureCtx.destination);
         capture.port.onmessage = (e: MessageEvent<ArrayBuffer>) => {
           if (!ready || store.get().muted) return;
+          recorder?.mic(e.data);
           session?.sendRealtimeInput({ audio: { data: bufferToBase64(e.data), mimeType: "audio/pcm;rate=16000" } });
         };
 
@@ -352,6 +366,12 @@ function endOnServer(callId: string, captions: Caption[], usage?: CallUsage) {
       ...(usage?.reports ? { usage } : {}),
     }),
   }).catch(() => undefined);
+}
+
+/** Straight to the backend (the frontend's proxy can't take bodies this size). Best effort: if it fails, the live
+ * captions stay as the transcript. */
+function uploadRecording(url: string, wav: Blob) {
+  return fetch(url, { method: "POST", headers: { "content-type": "audio/wav" }, body: wav }).catch(() => undefined);
 }
 
 function bufferToBase64(buf: ArrayBuffer) {
