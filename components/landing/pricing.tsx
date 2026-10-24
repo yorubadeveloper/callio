@@ -5,7 +5,7 @@ import Link from "next/link";
 import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
 import { Check } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
-import { PLANS, TOP_UPS, type Plan } from "@/lib/pricing";
+import { CREDIT_COSTS, PHONE_RATES, PLANS, TOP_UPS, type Plan } from "@/lib/pricing";
 import { EASE_OUT, SplitWords } from "./motion";
 
 type Billing = "monthly" | "yearly";
@@ -40,10 +40,47 @@ export function Pricing() {
       </ul>
 
       <p className="mt-6 text-sm text-ink-soft">
-        One credit is a minute of talking. Top up any time from ${smallestTopUp.price}. Prices are the same in dollars and
-        euros; tax is added at checkout.
+        One credit is a minute of talking in the app. Top up any time from ${smallestTopUp.price}. Prices are the same in
+        dollars and euros; tax is added at checkout.
       </p>
+      <PhoneRates />
     </section>
+  );
+}
+
+/** Real phone calls cost what the carrier charges to reach the number, so the rate depends on where it goes. */
+function PhoneRates() {
+  return (
+    <details className="group mt-4 max-w-2xl rounded-2xl bg-plate ring-1 ring-line">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-4 py-3 text-sm font-semibold text-ink [&::-webkit-details-marker]:hidden">
+        Real phone calls: from {CREDIT_COSTS.phoneMinuteFrom} credits a minute, depending on where they go
+        <span aria-hidden className="text-ink-soft transition-transform group-open:rotate-45">+</span>
+      </summary>
+      <div className="px-4 pb-4">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-left text-ink-soft">
+              <th className="py-1.5 font-medium">Calling</th>
+              <th className="py-1.5 text-right font-medium">Landline</th>
+              <th className="py-1.5 text-right font-medium">Mobile</th>
+            </tr>
+          </thead>
+          <tbody className="tabular-nums">
+            {PHONE_RATES.map((r) => (
+              <tr key={r.place} className="border-t border-line">
+                <td className="py-1.5 text-ink">{r.place}</td>
+                <td className="py-1.5 text-right">{r.landline}</td>
+                <td className="py-1.5 text-right">{r.mobile}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p className="mt-3 text-[13px] leading-relaxed text-ink-soft">
+          Credits per minute. It&apos;s what the phone network charges to reach that number, plus the AI on the line.
+          Your exact rate shows next to each contact before you call.
+        </p>
+      </div>
+    </details>
   );
 }
 

@@ -22,7 +22,7 @@ export const FAQ: { q: string; a: string }[] = [
   },
   {
     q: "What's a credit?",
-    a: `One credit is one minute of talking in the app; a real phone call is ${CREDIT_COSTS.phoneMinute} credits a minute. Computer tasks start at ${CREDIT_COSTS.computerTaskFrom} credits. You get ${free.credits} free credits to start; plan credits refresh every month and top-ups never expire.`,
+    a: `One credit is one minute of talking in the app; a real phone call is from ${CREDIT_COSTS.phoneMinuteFrom} credits a minute, depending on where it goes (each contact shows its rate). Computer tasks start at ${CREDIT_COSTS.computerTaskFrom} credits. You get ${free.credits} free credits to start; plan credits refresh every month and top-ups never expire.`,
   },
   {
     q: "Can my agent actually do things for me?",

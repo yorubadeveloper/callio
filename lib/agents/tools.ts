@@ -201,15 +201,57 @@ export const TOOLS: Record<string, ToolMeta> = {
     declaration: {
       name: "start_computer_task",
       description:
-        "Start a task in a web browser for the person, e.g. finding and booking a table, filling a form, comparing prices. Runs in the background; you'll get the result later.",
+        "Start a task in a web browser for the person, e.g. finding and booking a table, filling a form, comparing prices. Runs in the background for a few minutes. When it's done, or if it needs them, you call them back.",
       behavior: Behavior.NON_BLOCKING,
       parametersJsonSchema: {
         type: "object",
         properties: {
           goal: { type: "string", description: "What done looks like, in one sentence." },
           constraints: { type: "string", description: "Budget, times, names, anything that must be respected." },
+          call_back: {
+            type: "string",
+            enum: ["app", "phone", "none"],
+            description:
+              "How to reach them when it's done or has a question. app (default): ring their Callio app. phone: ring their real phone, only if they asked for that. none: they'll check the app themselves.",
+          },
         },
         required: ["goal"],
+      },
+    },
+  },
+  get_task_status: {
+    kind: "task",
+    label: () => "Checking on the task",
+    scheduling: FunctionResponseScheduling.WHEN_IDLE,
+    declaration: {
+      name: "get_task_status",
+      description:
+        "How a browser task is going: its status, its report when done (summary, options with prices, notes), and waiting_for when it needs the person.",
+      behavior: Behavior.BLOCKING,
+      parametersJsonSchema: {
+        type: "object",
+        properties: { task_id: { type: "string" } },
+        required: ["task_id"],
+      },
+    },
+  },
+  answer_task: {
+    kind: "task",
+    label: () => "Passing on your answer",
+    scheduling: FunctionResponseScheduling.WHEN_IDLE,
+    declaration: {
+      name: "answer_task",
+      description:
+        "Pass the person's reply to a browser task that's waiting on them: their answer to its question, or approve true/false for an OK to go ahead.",
+      behavior: Behavior.BLOCKING,
+      parametersJsonSchema: {
+        type: "object",
+        properties: {
+          task_id: { type: "string" },
+          answer: { type: "string", description: "Their answer, in their words, when the task asked a question." },
+          approve: { type: "boolean", description: "For an OK to go ahead: whether they agreed." },
+        },
+        required: ["task_id"],
       },
     },
   },

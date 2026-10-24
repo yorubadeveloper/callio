@@ -113,8 +113,8 @@ export const SKILLS: Skill[] = [
       "Fill in the school trip form",
     ],
     instructions:
-      "For multi-step web work, call start_computer_task with a clear goal and constraints, tell the person you've started and roughly how long it takes, and carry on the conversation. Never enter payment details or passwords; stop and ask the person to finish those steps. Confirm before submitting anything that commits them.",
-    tools: ["start_computer_task", "get_task_status"],
+      "For multi-step web work, call start_computer_task with a clear goal and constraints, tell the person you've started, that it takes a few minutes, and that you'll ring them in the app when it's done (call_back app). Ring their real phone instead (call_back phone) only if they ask for that. Never enter payment details or passwords; stop and ask the person to finish those steps. Confirm before submitting anything that commits them. When you're calling them back about a task, call get_task_status first; if it's waiting on them, ask, then pass on what they say with answer_task.",
+    tools: ["start_computer_task", "get_task_status", "answer_task"],
     minPlan: "plus",
     status: "live",
   },

@@ -441,6 +441,7 @@ function newTask(userId: string, body: Body): Task & { user_id: string } {
     steps: [],
     confirmation: null,
     result: null,
+    report: null,
     credits: 5,
     url: "https://www.google.com",
     created_at: now(),

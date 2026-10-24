@@ -240,7 +240,7 @@ function YourPhone({ phone }: { phone: PhoneSettings }) {
               disabled={busy !== null}
               onChange={(v) => run("fallback", () => api("/phone", { method: "PATCH", body: { fallback: v } }))}
               label="Ring my phone when I miss an app call"
-              hint="After about 40 seconds without an answer. Phone calls use 2 credits a minute and last up to 2½ minutes."
+              hint={`After about 40 seconds without an answer. Calls to your number use ${phone.credits_per_minute ?? 2} credits a minute and last up to 2½ minutes.`}
             />
           </div>
         ) : waiting ? (
@@ -361,7 +361,10 @@ function ContactCard({
         </span>
         <div className="min-w-0 flex-1">
           <p className="truncate text-[17px] font-semibold">{c.name}</p>
-          <p className="font-mono text-[13px] text-ink-soft">{spaced(c.phone)}</p>
+          <p className="font-mono text-[13px] text-ink-soft">
+            {spaced(c.phone)}
+            <span className="font-body"> · {c.credits_per_minute} credits a minute</span>
+          </p>
           {(c.language || c.notes) && (
             <p className="mt-1 line-clamp-2 text-[13px] text-ink-soft">
               {[c.language && languageName(c.language), c.notes].filter(Boolean).join(" · ")}

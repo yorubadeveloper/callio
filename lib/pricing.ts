@@ -1,9 +1,10 @@
 // Single source of truth for plans and credit costs. The landing page, billing
 // screen, checkout and the backend's metering all read from here.
 //
-// Unit economics (Oct 2026 research, see memory note "callio-unit-economics"):
-// one credit is roughly $0.03–0.05 of Gemini + telephony cost in the worst case,
-// so every plan keeps ≥45% margin even if a subscriber spends every credit.
+// Unit economics: a credit may cost us at most $0.04 (backend CREDIT_COST_USD), and the cheapest credit we sell
+// (Pro yearly) brings in about 7¢, so every plan keeps ≥40% margin even if a subscriber spends every credit.
+// Phone minutes are priced per number from Twilio's rates (backend app/core/phone_rates.py); computer tasks
+// from the model tokens they use.
 
 export type PlanId = "free" | "personal" | "plus" | "pro";
 
@@ -11,8 +12,8 @@ export type PlanId = "free" | "personal" | "plus" | "pro";
 export const CREDIT_COSTS = {
   /** Per minute of an in-app (online) call. */
   onlineMinute: 1,
-  /** Per minute of a real phone call, either direction. */
-  phoneMinute: 2,
+  /** Per minute of a real phone call: the least it costs (US, Canada, most landlines). Depends on the number. */
+  phoneMinuteFrom: 2,
   /** Minimum for a computer task; longer tasks cost more. */
   computerTaskFrom: 5,
 } as const;
@@ -47,8 +48,8 @@ export const PLANS: Plan[] = [
     id: "personal",
     name: "Personal",
     tagline: "A daily briefing and the odd chat",
-    monthly: 12,
-    yearlyPerMonth: 10,
+    monthly: 15,
+    yearlyPerMonth: 12,
     credits: 120,
     agents: 2,
     features: ["120 credits a month", "2 agents", "Scheduled calls", "Text recaps after every call"],
@@ -57,8 +58,8 @@ export const PLANS: Plan[] = [
     id: "plus",
     name: "Plus",
     tagline: "Agents that run errands for you",
-    monthly: 24,
-    yearlyPerMonth: 20,
+    monthly: 29,
+    yearlyPerMonth: 24,
     credits: 300,
     agents: 5,
     features: [
@@ -66,6 +67,7 @@ export const PLANS: Plan[] = [
       "5 agents",
       "Computer tasks: booking, forms, research",
       "Real phone calls: missed-call backup, and calls to your people",
+      "10 messages by phone a day",
     ],
     highlight: true,
   },
@@ -73,15 +75,15 @@ export const PLANS: Plan[] = [
     id: "pro",
     name: "Pro",
     tagline: "For busy people and families",
-    monthly: 49,
-    yearlyPerMonth: 41,
-    credits: 700,
+    monthly: 69,
+    yearlyPerMonth: 57,
+    credits: 800,
     agents: "unlimited",
     features: [
-      "700 credits a month",
+      "800 credits a month",
       "Unlimited agents",
       "Everything in Plus",
-      "Family check-in calls with reports",
+      "30 messages by phone a day, with reports",
       "Calls up to 30 minutes long",
     ],
   },
@@ -94,9 +96,23 @@ export interface TopUp {
 }
 
 export const TOP_UPS: TopUp[] = [
-  { id: "topup-50", credits: 50, price: 6 },
-  { id: "topup-150", credits: 150, price: 15 },
-  { id: "topup-400", credits: 400, price: 35 },
+  { id: "topup-50", credits: 50, price: 8 },
+  { id: "topup-150", credits: 150, price: 21 },
+  { id: "topup-400", credits: 400, price: 48 },
+];
+
+/** Credits a minute for a phone call to a few places (landline, mobile), from our US number. A rough guide:
+ *  the exact rate depends on the number and is shown next to each contact. */
+export const PHONE_RATES: { place: string; landline: number; mobile: number }[] = [
+  { place: "US & Canada", landline: 2, mobile: 2 },
+  { place: "United Kingdom", landline: 2, mobile: 3 },
+  { place: "Germany", landline: 3, mobile: 11 },
+  { place: "France", landline: 2, mobile: 6 },
+  { place: "India", landline: 4, mobile: 3 },
+  { place: "Nigeria", landline: 8, mobile: 8 },
+  { place: "Kenya", landline: 11, mobile: 12 },
+  { place: "South Africa", landline: 14, mobile: 11 },
+  { place: "Ghana", landline: 14, mobile: 15 },
 ];
 
 export const plan = (id: PlanId) => PLANS.find((p) => p.id === id)!;

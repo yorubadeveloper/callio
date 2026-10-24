@@ -149,12 +149,21 @@ export interface Task {
   constraints: string | null;
   status: "queued" | "running" | "needs_confirmation" | "done" | "failed" | "cancelled";
   steps: TaskStep[];
-  confirmation: { question: string } | null;
+  /** Waiting on them: an OK to go ahead ("confirm") or an answer to a question ("question"). */
+  confirmation: { question: string; kind?: "confirm" | "question" } | null;
   result: string | null;
+  /** The finished answer, laid out: the short answer, the options found, and what to keep in mind. */
+  report: TaskReport | null;
   credits: number;
   url: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface TaskReport {
+  summary: string;
+  items: { title: string; detail: string; price: string; link: string }[];
+  notes: string[];
 }
 
 export interface Highlights {
@@ -198,6 +207,8 @@ export interface Contact {
   notes: string | null;
   opted_out: boolean;
   opted_out_at: string | null;
+  /** What a minute of calling this number costs, from what the phone network charges to reach it. */
+  credits_per_minute: number;
   created_at: string;
 }
 
@@ -212,6 +223,8 @@ export interface PhoneSettings {
   plan_allows: boolean;
   /** The number Callio calls from. */
   caller_id: string | null;
+  /** Credits a minute when Callio rings their own number. */
+  credits_per_minute: number | null;
 }
 
 /** What the backend sends /api/internal/live-config to set up a phone call. */

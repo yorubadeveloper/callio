@@ -207,8 +207,9 @@ export default function TermsPage() {
           <ul>
             <li>
               Callio runs on credits. One credit equals {CREDIT_COSTS.onlineMinute} minute of an in-app call. A
-              computer task costs from {CREDIT_COSTS.computerTaskFrom} credits, and longer tasks cost more. Current
-              costs are shown in the app and on our pricing page before you use them.
+              computer task costs from {CREDIT_COSTS.computerTaskFrom} credits, and longer tasks cost more. A real
+              phone call costs from {CREDIT_COSTS.phoneMinuteFrom} credits a minute, depending on the number it goes
+              to. Current costs are shown in the app and on our pricing page before you use them.
             </li>
             <li>
               The <strong>Free</strong> plan gives you a one-time starter amount of credits. Paid plans (Personal,
