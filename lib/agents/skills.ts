@@ -43,7 +43,7 @@ export const SKILLS: Skill[] = [
     tools: [
       "get_calendar_events",
       "get_weather",
-      "google_search",
+      "web_search",
       "get_briefing",
       "check_sources",
       "use_connector_tool",
@@ -98,8 +98,8 @@ export const SKILLS: Skill[] = [
     summary: "Quick answers from the web: opening hours, sports results, prices, facts.",
     examples: ["Is the pharmacy on Main Street open now?", "Who won last night?", "How long is the drive to Munich?"],
     instructions:
-      "Use Google Search for anything time-sensitive or that you are unsure of. Give the answer first, in one or two sentences, and mention the source only if asked.",
-    tools: ["google_search"],
+      "Use web_search for anything time-sensitive or that you are unsure of. Give the answer first, in one or two sentences, and mention the source only if asked.",
+    tools: ["web_search"],
     minPlan: "free",
     status: "live",
   },

@@ -194,6 +194,22 @@ export const TOOLS: Record<string, ToolMeta> = {
       },
     },
   },
+  web_search: {
+    kind: "search",
+    label: (a) => `Looking up ${str(a.query)}`,
+    scheduling: FunctionResponseScheduling.WHEN_IDLE,
+    declaration: {
+      name: "web_search",
+      description:
+        "Search the web for anything current or that you're unsure of: scores, news, opening hours, prices, facts. Returns a short answer to say in your own words.",
+      behavior: Behavior.BLOCKING,
+      parametersJsonSchema: {
+        type: "object",
+        properties: { query: { type: "string", description: "The question, complete enough to search on its own." } },
+        required: ["query"],
+      },
+    },
+  },
   start_computer_task: {
     kind: "task",
     label: (a) => `Working on: ${str(a.goal)}`,
@@ -413,7 +429,7 @@ export function toolsForPlan(plan: PlanId): Tool[] {
   const declarations = Object.values(TOOLS)
     .filter((t) => names.has(t.declaration.name!) || t.declaration.name === "end_call")
     .map((t) => t.declaration);
-  const tools: Tool[] = [{ functionDeclarations: declarations }];
-  if (names.has("google_search")) tools.push({ googleSearch: {} });
-  return tools;
+  // Search goes through web_search, not Live's built-in Google Search: after a built-in search the model starts its
+  // reply over (it greets again, and sometimes never answers).
+  return [{ functionDeclarations: declarations }];
 }

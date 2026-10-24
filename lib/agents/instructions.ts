@@ -78,6 +78,13 @@ export function contactLanguage(contact: { language: string | null }, user: { la
   return contact.language || mainLanguage(user.languages ?? []);
 }
 
+/** What a contact may speak: their set language only, or (none set) any language the person speaks, since the
+ *  people they call often share it. Steers transcription and lets the agent switch. */
+export function contactLanguages(contact: { language: string | null }, user: { languages?: string[] }) {
+  if (contact.language) return [contact.language];
+  return [...new Set([contactLanguage(contact, user), ...(user.languages ?? [])])];
+}
+
 function pronounLine(name: string, pronouns: Pronouns) {
   const p = PRONOUN_FORMS[pronouns];
   return pronouns === "they"
@@ -229,7 +236,10 @@ For anything about how these are doing right now, call check_sources; never answ
     ctx.channel === "phone"
       ? `\nThis is a real phone call${ctx.inbound ? " to the Callio number" : ", because they didn't pick up in the app"}. It lasts at most ${spokenLength(ctx.maxSeconds ?? 150)}, so keep it tight: the most important thing first, short turns, and offer to continue in the app if there's more. You'll get a note when time's nearly up; then say goodbye and call end_call.`
       : "";
-  sections.push(`## This call\n${thisCall}${onPhone}`);
+  // Live re-reads this after every web search; without the last sentence it greets again before each answer.
+  const once =
+    "\nThe greeting is for your first words only. After that, never greet again or open with their name: answer what they just said, straight away, even right after a search.";
+  sections.push(`## This call\n${thisCall}${once}${onPhone}`);
 
   return sections.join("\n\n");
 }
@@ -263,7 +273,15 @@ export function buildContactInstructions(ctx: ContactCallContext): string {
   return [
     `You are ${agent.name}, an AI assistant from Callio. You're phoning ${contact.name} on behalf of ${fullName} (${first}) to pass on a message. You are ${agent.persona.personality}.`,
     `## How you speak${HOW_TO_SPEAK}`,
-    `## Language${phoneLanguage(languageName(contactLanguage(contact, user)))}${
+    `## Language${
+      contact.language
+        ? phoneLanguage(languageName(contact.language))
+        : phoneLanguage(
+            languageName(contactLanguage(contact, user)),
+            contactLanguages(contact, user).slice(1).map(languageName),
+          ) +
+          `- If ${contact.name} speaks another language or asks if you speak it (e.g. "Ṣe o gbọ Yoruba?", "do you understand Yoruba?"), answer in that language straight away and carry on in it. Never ignore the question.\n`
+    }${
       ctx.textToSpeech
         ? `- What you write is read aloud by a ${languageName(contactLanguage(contact, user))} voice. Write only the words to say, in short sentences that each end with a full stop or question mark. No lists, symbols or stage directions.${contactLanguage(contact, user) === "yo" ? " Write Yoruba with full tone marks." : ""}\n- You've already said your opening line when the call starts. To give the message, call deliver_message: it plays the message in your voice. Don't say the message yourself.\n`
         : ""
@@ -276,7 +294,7 @@ export function buildContactInstructions(ctx: ContactCallContext): string {
 - Introduce yourself once. If they just say hello again or sound unsure, say briefly who you are and carry on. Don't repeat the whole introduction.
 - If it's someone else, ask for ${contact.name}. If ${contact.name} isn't there or it's the wrong number, apologise, don't share the message, and end the call.
 - Give the message warmly in your own words, as ${first}'s: "${first} asked me to tell you…". Turn ${p.their} "I" and "me" into ${first}, "${p.they}" and "${p.them}". Stay faithful to it: don't add news, promises or details ${first} didn't give.
-- If they reply or want something passed back, listen, then say back the gist in a sentence so they know you've got it, and that you'll pass it on to ${first}.
+- Whatever they say after the message is their reply, even if it's short, a joke or a jab back (e.g. "tell your daddy"). Say back the gist in a sentence and that you'll tell ${first}. Don't ask if they want to say anything back when they just did.
 - You only know the message. If they ask about anything else (where ${first} is, plans, money, anything private), say you don't know and that they can ask ${first} directly. Never ask for or accept bank details, codes or passwords.
 - If you reach voicemail or a recorded greeting, wait for it to finish, then leave the message in two or three sentences, say ${first} will call back, and end the call.
 - If they ask not to be called by Callio again, call stop_calls, apologise for the bother, say goodbye and end the call.
