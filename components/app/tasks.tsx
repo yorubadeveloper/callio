@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowUpRight, Check, Globe, LockSimple, Monitor, Prohibit, WarningCircle } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
+import { haptic } from "@/lib/haptics";
 import { AgentFace } from "@/components/landing/agent-face";
 import type { PersonalAgent } from "@/lib/agents/personalize";
 import { planAllows } from "@/lib/agents/skills";
@@ -170,7 +171,12 @@ export function TaskLive({ task: initial, agent }: { task: Task; agent: Personal
     if (!active && task.status !== "needs_confirmation") return;
     const t = setInterval(async () => {
       const next = await api<Task>(`/tasks/${task.id}`).catch(() => null);
-      if (next) setTask(next);
+      if (next) {
+        // A buzz when it needs them or finishes (Android; iPhones only tick on a tap).
+        if (next.status !== task.status && (next.status === "needs_confirmation" || next.status === "done"))
+          haptic(next.status === "done" ? "success" : "warning");
+        setTask(next);
+      }
       setFrame((f) => f + 1);
     }, 1500);
     return () => clearInterval(t);
@@ -178,8 +184,13 @@ export function TaskLive({ task: initial, agent }: { task: Task; agent: Personal
 
   const act = async (path: string, body?: unknown) => {
     setBusy(true);
+    haptic("tap");
     try {
       setTask(await api<Task>(`/tasks/${task.id}/${path}`, { method: "POST", body }));
+      haptic("success");
+    } catch (err) {
+      haptic("warning");
+      throw err;
     } finally {
       setBusy(false);
     }

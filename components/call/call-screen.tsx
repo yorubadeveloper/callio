@@ -17,6 +17,7 @@ import {
   WarningCircle,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
+import { haptic } from "@/lib/haptics";
 import { LogoMark } from "@/components/brand/logo";
 import { EASE_OUT } from "@/components/landing/motion";
 import type { AgentProfile } from "@/lib/agents/catalog";
@@ -39,10 +40,13 @@ export function CallScreen({
   credits,
   demo = false,
   incoming = false,
+  onStart,
 }: {
   agent: AgentProfile;
   engine: CallEngine;
   credits: number;
+  /** Starts the call; defaults to the engine's own start (the demo). */
+  onStart?: () => void;
   /** A scripted call for visitors who haven't signed up. */
   demo?: boolean;
   /** Opened from a scheduled call's notification: show it like a phone ringing, with Answer and Decline. */
@@ -63,8 +67,20 @@ export function CallScreen({
     else audio.setSpeaker(!snap.speaker);
   };
 
-  // Hang up if the person leaves the page mid-call.
-  useEffect(() => () => engine.end(), [engine]);
+  // The demo stops when the visitor leaves. A real call carries on while they look around the app (the shell shows a
+  // "Back to call" bar) and ends when they hang up or close Callio.
+  useEffect(() => (demo ? () => engine.end() : undefined), [demo, engine]);
+
+  const start =
+    onStart ??
+    (() => {
+      haptic("tap");
+      void engine.start();
+    });
+  const press = (action: () => void) => () => {
+    haptic("tap");
+    action();
+  };
 
   const { status } = snap;
   const inCall = status === "connecting" || status === "live";
@@ -130,14 +146,14 @@ export function CallScreen({
       <footer className="relative z-10 px-6 pb-[max(env(safe-area-inset-bottom),1.75rem)] pt-2">
         {status === "idle" || status === "error" ? (
           incoming && status === "idle" ? (
-            <IncomingCall agentName={agent.name} onAnswer={() => engine.start()} />
+            <IncomingCall agentName={agent.name} onAnswer={start} />
           ) : (
             <StartCall
               agentName={agent.name}
               credits={credits}
               error={snap.error}
               demo={demo}
-              onStart={() => engine.start()}
+              onStart={start}
             />
           )
         ) : inCall ? (
@@ -145,7 +161,7 @@ export function CallScreen({
             <Control
               label={snap.muted ? "Unmute" : "Mute"}
               active={snap.muted}
-              onClick={() => engine.setMuted(!snap.muted)}
+              onClick={press(() => engine.setMuted(!snap.muted))}
               icon={snap.muted ? <MicrophoneSlash weight="fill" /> : <Microphone weight="fill" />}
               level={engine.levels}
             />
@@ -153,19 +169,19 @@ export function CallScreen({
               <Control
                 label="Speaker"
                 active={snap.speaker}
-                onClick={onSpeaker}
+                onClick={press(() => void onSpeaker())}
                 icon={snap.speaker ? <SpeakerHigh weight="fill" /> : <SpeakerLow weight="fill" />}
               />
             )}
             <Control
               label="Captions"
               active={captionsOn}
-              onClick={() => setCaptionsOn((v) => !v)}
+              onClick={press(() => setCaptionsOn((v) => !v))}
               icon={<ChatText weight="fill" />}
             />
             <button
               type="button"
-              onClick={() => engine.end()}
+              onClick={press(() => engine.end())}
               className="flex flex-col items-center gap-2 text-[12px] text-white/70"
             >
               <span className="grid size-[72px] place-items-center rounded-full bg-coral text-[30px] text-white shadow-[0_10px_30px_-8px_#F17660] transition-transform active:scale-95">
@@ -179,7 +195,7 @@ export function CallScreen({
 
       <AnimatePresence>
         {status === "ended" && (
-          <CallSummary key="summary" agent={agent} snap={snap} demo={demo} onCallAgain={() => engine.start()} />
+          <CallSummary key="summary" agent={agent} snap={snap} demo={demo} onCallAgain={start} />
         )}
       </AnimatePresence>
       <SkillsSheet open={skillsOpen} onClose={() => setSkillsOpen(false)} agent={agent} />
@@ -376,7 +392,7 @@ function Control({
 function IncomingCall({ agentName, onAnswer }: { agentName: string; onAnswer: () => void }) {
   return (
     <div className="mx-auto flex max-w-sm items-start justify-between px-6">
-      <Link href="/app" className="flex flex-col items-center gap-2" aria-label="Decline">
+      <Link href="/app" onClick={() => haptic("tap")} className="flex flex-col items-center gap-2" aria-label="Decline">
         <span className="grid size-[72px] place-items-center rounded-full bg-[#E5484D] text-[30px] text-white shadow-[0_12px_40px_-10px_#E5484D] transition-transform active:scale-95">
           <PhoneDisconnect weight="fill" />
         </span>

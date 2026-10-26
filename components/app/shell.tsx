@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils";
 import { LogoMark, Wordmark } from "@/components/brand/logo";
 import { plan } from "@/lib/pricing";
 import type { User } from "@/lib/types";
+import { CallBar } from "./call-bar";
 import { Tour } from "./tour";
 
 interface NavItem {
@@ -188,6 +189,7 @@ export function AppShell({ user, children }: { user: User; children: React.React
       </div>
 
       <Tour user={user} />
+      <CallBar />
 
       {/* phone tab bar */}
       <nav
