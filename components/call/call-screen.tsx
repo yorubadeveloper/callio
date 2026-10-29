@@ -40,11 +40,14 @@ export function CallScreen({
   credits,
   demo = false,
   incoming = false,
+  note,
   onStart,
 }: {
   agent: AgentProfile;
   engine: CallEngine;
   credits: number;
+  /** The agent's own note they tapped to get here, shown above the call button. */
+  note?: string;
   /** Starts the call; defaults to the engine's own start (the demo). */
   onStart?: () => void;
   /** A scripted call for visitors who haven't signed up. */
@@ -149,6 +152,7 @@ export function CallScreen({
             <IncomingCall agentName={agent.name} onAnswer={start} />
           ) : (
             <StartCall
+              note={status === "idle" ? note : undefined}
               agentName={agent.name}
               credits={credits}
               error={snap.error}
@@ -415,12 +419,14 @@ function IncomingCall({ agentName, onAnswer }: { agentName: string; onAnswer: ()
 }
 
 function StartCall({
+  note,
   agentName,
   credits,
   error,
   demo,
   onStart,
 }: {
+  note?: string;
   agentName: string;
   credits: number;
   error?: string;
@@ -430,6 +436,16 @@ function StartCall({
   const empty = !demo && credits < CREDIT_COSTS.onlineMinute;
   return (
     <div className="mx-auto flex max-w-sm flex-col items-center gap-4">
+      {note && (
+        <motion.p
+          initial={{ opacity: 0, y: 8, scale: 0.97 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.35, ease: EASE_OUT }}
+          className="w-full rounded-[22px] rounded-bl-md bg-white/10 px-4 py-3 text-[15px] leading-snug text-white/90 ring-1 ring-white/10 backdrop-blur-md"
+        >
+          {note}
+        </motion.p>
+      )}
       {error && <p className="text-center text-sm text-coral">{error}</p>}
       <button
         type="button"

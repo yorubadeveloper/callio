@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import {
   Bell,
+  ChatCircleDots,
   CalendarDots,
   ChatCircleText,
   CheckCircle,
@@ -125,7 +126,7 @@ export function UpcomingView({
                       ? "bg-amber/30"
                       : n.kind === "alert"
                         ? "bg-coral/30"
-                        : n.kind === "call"
+                        : n.kind === "call" || n.kind === "nudge"
                           ? "bg-teal/25"
                           : n.kind === "task"
                             ? "bg-peri/30"
@@ -138,6 +139,8 @@ export function UpcomingView({
                     <Warning weight="fill" />
                   ) : n.kind === "call" ? (
                     <Phone weight="fill" />
+                  ) : n.kind === "nudge" ? (
+                    <ChatCircleDots weight="fill" />
                   ) : n.kind === "task" ? (
                     <Monitor weight="fill" />
                   ) : (

@@ -1,5 +1,6 @@
 // Callio service worker.
 // - Shows "your agent is calling" and reminder notifications, and opens the right screen when tapped.
+//   An agent's own note (kind "nudge") links to a call screen too, but shows quietly: no ringing, no Decline.
 // - Makes Callio installable, and shows a friendly offline page instead of the browser's error when
 //   there's no connection. Pages and API calls always go to the network first; nothing personal is cached.
 const CACHE = "callio-shell-v1";
@@ -37,7 +38,8 @@ self.addEventListener("push", (event) => {
     data = { title: "Callio", body: event.data ? event.data.text() : "" };
   }
   const title = data.title || "Callio";
-  const calling = Boolean(data.url && data.url.startsWith("/call/"));
+  const nudge = data.kind === "nudge";
+  const calling = Boolean(data.url && data.url.startsWith("/call/")) && !nudge;
   event.waitUntil(
     self.registration.showNotification(title, {
       body: data.body || "",
@@ -52,7 +54,9 @@ self.addEventListener("push", (event) => {
             { action: "answer", title: "Answer" },
             { action: "decline", title: "Decline" },
           ]
-        : [],
+        : nudge
+          ? [{ action: "talk", title: "Talk now" }]
+          : [],
       data: { url: data.url || "/app" },
     }),
   );

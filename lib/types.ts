@@ -21,6 +21,8 @@ export interface User {
   onboarded: boolean;
   /** One-time guides finished or dismissed: "tour", "guide". */
   seen?: string[];
+  /** Notes agents send on their own: off, now and then (up to 2 a day) or more often (up to 4). */
+  nudges?: NudgeLevel;
   nickname: string | null;
   /** How agents refer to them when talking about them. Unset: worked out from `about`, else "they". */
   pronouns?: Pronouns | null;
@@ -128,7 +130,7 @@ export interface Schedule {
 
 export interface AppNotification {
   id: string;
-  kind: "recap" | "reminder" | "task" | "call" | "alert";
+  kind: "recap" | "reminder" | "task" | "call" | "alert" | "nudge";
   title: string;
   body: string;
   created_at: string;
@@ -192,6 +194,8 @@ export interface CallStart {
   agent: UserAgent;
   memory: { facts: string[]; recent_calls: { when: string; summary: string }[] };
   briefing?: Briefing | null;
+  /** The note they tapped to open this call. */
+  nudge?: Nudge | null;
   sources?: { name: string; kind: ConnectorKind; status: Connector["status"] }[];
   /** People the agent can phone with a message. */
   contacts?: { name: string; opted_out: boolean }[];
@@ -269,6 +273,19 @@ export interface Connector {
   created_at: string;
   tools?: { name: string; description: string; read_only: boolean; allowed: boolean }[];
   sites?: SiteCheck[];
+}
+
+export type NudgeLevel = "off" | "normal" | "more";
+
+/** A note an agent sent on its own: something it found, a follow-up, a question, or a check-in. */
+export interface Nudge {
+  id: string;
+  agent_id: string | null;
+  kind: "news" | "followup" | "question" | "checkin";
+  text: string;
+  /** What the agent found, for the call the note opens. */
+  facts: string | null;
+  created_at: string;
 }
 
 export interface BriefingItem {

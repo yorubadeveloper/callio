@@ -1,7 +1,7 @@
 import { languageName } from "@/lib/languages";
 import { plan as planById } from "@/lib/pricing";
 import { PRONOUN_FORMS, pronounsOf } from "@/lib/pronouns";
-import type { Briefing, CallStart, Pronouns, User } from "@/lib/types";
+import type { Briefing, CallStart, Nudge, Pronouns, User } from "@/lib/types";
 import type { PersonalAgent } from "./personalize";
 import { planAllows, SKILLS } from "./skills";
 
@@ -32,6 +32,8 @@ export interface CallContext {
   purpose?: string;
   /** Prepared before a morning call rang. */
   briefing?: Briefing | null;
+  /** The note they tapped to open this call. */
+  nudge?: Pick<Nudge, "text" | "facts" | "kind"> | null;
   /** Sources they connected on the Connections page (sites, servers, analytics, MCP servers). */
   sources?: CallStart["sources"];
   /** People the agent can phone with a message (Contacts page). */
@@ -133,6 +135,13 @@ const SOURCE_KIND: Record<NonNullable<CallStart["sources"]>[number]["kind"], str
   mcp: "a custom connector",
 };
 
+const NUDGE_FOLLOW_UP: Record<Nudge["kind"], string> = {
+  news: "Share what you found and ask what they think. For anything newer than your note (a live score, say), use web_search.",
+  followup: "Ask how it went, then really listen.",
+  question: "Ask your question properly, then really listen, and remember what you learn about them.",
+  checkin: "Then follow their lead.",
+};
+
 function briefingSection(b: Briefing, callName: string) {
   const items = b.items.map((i, n) => `${n + 1}. [${i.level}] ${i.say}\n   Facts for follow-ups: ${i.detail}`);
   return [
@@ -226,12 +235,19 @@ For anything about how these are doing right now, call check_sources; never answ
   }
 
   if (ctx.briefing) sections.push(briefingSection(ctx.briefing, callName));
+  if (ctx.nudge) {
+    sections.push(
+      `## The note they tapped\nEarlier you sent ${callName} this notification on your own: "${ctx.nudge.text}". They tapped it, and that's why this call is happening.${ctx.nudge.facts ? `\nWhat you found: ${ctx.nudge.facts}` : ""}`,
+    );
+  }
 
   const thisCall = ctx.briefing
     ? `This is ${callName}'s morning call. Say the opening in your own words, then go through the briefing.`
-    : ctx.purpose
-      ? `You called them: ${ctx.purpose}. ${agent.persona.opening}`
-      : `They called you. Greet ${callName} warmly in a few words, the way you'd answer a friend's call, and let them lead.`;
+    : ctx.nudge
+      ? `${callName} opened this call from your note. Greet them in a few words and pick the note straight up, like carrying on a conversation, without reading it back word for word. ${NUDGE_FOLLOW_UP[ctx.nudge.kind]}`
+      : ctx.purpose
+        ? `You called them: ${ctx.purpose}. ${agent.persona.opening}`
+        : `They called you. Greet ${callName} warmly in a few words, the way you'd answer a friend's call, and let them lead.`;
   const onPhone =
     ctx.channel === "phone"
       ? `\nThis is a real phone call${ctx.inbound ? " to the Callio number" : ", because they didn't pick up in the app"}. It lasts at most ${spokenLength(ctx.maxSeconds ?? 150)}, so keep it tight: the most important thing first, short turns, and offer to continue in the app if there's more. You'll get a note when time's nearly up; then say goodbye and call end_call.`

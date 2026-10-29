@@ -21,7 +21,7 @@ import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { LANGUAGES } from "@/lib/languages";
 import { api, ApiError } from "@/lib/api";
 import { pronounsOf } from "@/lib/pronouns";
-import type { Detail, Pronouns, Tone, User } from "@/lib/types";
+import type { Detail, NudgeLevel, Pronouns, Tone, User } from "@/lib/types";
 import { CookieSettingsButton } from "@/components/analytics/analytics";
 import { CityInput } from "./city-input";
 import { NotificationSetup } from "./notification-setup";
@@ -337,7 +337,7 @@ export function YouView({ user: initial }: { user: User }) {
               ))}
             </div>
           </section>
-          <Notifications />
+          <Notifications user={user} />
           <section>
             <h2 className="text-[13px] font-semibold uppercase tracking-wider text-ink-soft">Appearance</h2>
             <div className="mt-3 flex items-center justify-between rounded-[24px] bg-plate px-5 py-3 ring-1 ring-line">
@@ -373,14 +373,54 @@ export function YouView({ user: initial }: { user: User }) {
   );
 }
 
-function Notifications() {
+function Notifications({ user }: { user: User }) {
   return (
     <section>
       <h2 className="text-[13px] font-semibold uppercase tracking-wider text-ink-soft">Notifications</h2>
-      <div className="mt-3">
+      <div className="mt-3 space-y-3">
         <NotificationSetup />
+        <Nudges initial={user.nudges ?? "normal"} />
       </div>
     </section>
+  );
+}
+
+/** How often agents reach out on their own: news on what they're into, follow-ups, questions, check-ins. */
+function Nudges({ initial }: { initial: NudgeLevel }) {
+  const [level, setLevel] = useState(initial);
+  const [error, setError] = useState(false);
+  const pick = async (next: NudgeLevel) => {
+    const before = level;
+    setLevel(next);
+    setError(false);
+    try {
+      await api<User>("/me", { method: "PATCH", body: { nudges: next } });
+    } catch {
+      setLevel(before);
+      setError(true);
+    }
+  };
+  return (
+    <div className="rounded-[24px] bg-plate p-5 ring-1 ring-line">
+      <p className="text-[15px] font-semibold">Your agents reaching out</p>
+      <p className="mt-1 text-[13px] text-ink-soft">
+        News on what you&apos;re into, how things went, a curious question, or a hello when it&apos;s been a while. Only
+        while you&apos;re awake.
+      </p>
+      <div className="mt-4">
+        <Segmented<NudgeLevel>
+          label="How often your agents reach out"
+          value={level}
+          onChange={(v) => void pick(v)}
+          options={[
+            { value: "off", label: "Off" },
+            { value: "normal", label: "Sometimes" },
+            { value: "more", label: "Often" },
+          ]}
+        />
+      </div>
+      {error && <p className="mt-2 text-[13px] text-coral">Couldn&apos;t save that. Try again.</p>}
+    </div>
   );
 }
 
