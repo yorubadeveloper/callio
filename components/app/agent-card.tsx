@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { Phone } from "@phosphor-icons/react/dist/ssr";
+import { ChatCircleDots, Phone } from "@phosphor-icons/react/dist/ssr";
 import { AgentFace } from "@/components/landing/agent-face";
 import type { PersonalAgent } from "@/lib/agents/personalize";
 import { LinkPending } from "./link-pending";
 import { HearVoice } from "./voice-preview";
 
-/** An agent in their own colours, with a voice sample and a one-tap call. The card opens their profile. */
+/** An agent in their own colours, with a voice sample, messages and a one-tap call. The card opens their profile. */
 export function AgentCard({ agent, lastTalked }: { agent: PersonalAgent; lastTalked?: string | null }) {
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-[30px] bg-plate ring-1 ring-line transition-[box-shadow,transform] duration-300 ease-[cubic-bezier(0.2,0.8,0.2,1)] hover:-translate-y-0.5 hover:shadow-[0_24px_60px_-30px_rgb(0_0_0/0.45)]">
@@ -37,6 +37,15 @@ export function AgentCard({ agent, lastTalked }: { agent: PersonalAgent; lastTal
       </div>
       <div className="relative z-[2] mt-auto flex gap-2 p-5 pt-4">
         <HearVoice voice={agent.persona.voice} name={agent.name} />
+        <Link
+          href={`/chat/${agent.id}`}
+          aria-label={`Message ${agent.name}`}
+          title={`Message ${agent.name}`}
+          className="relative grid size-11 shrink-0 place-items-center rounded-full bg-ink/[0.06] text-[19px] text-ink transition-colors hover:bg-ink/10"
+        >
+          <ChatCircleDots weight="fill" />
+          <LinkPending veil={false} className="bg-ink/10" />
+        </Link>
         <Link
           href={`/call/${agent.id}`}
           className="relative inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-full bg-teal text-[15px] font-semibold text-[#0E0E10] transition-transform duration-200 hover:-translate-y-0.5"

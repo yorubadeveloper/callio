@@ -51,7 +51,11 @@ export async function POST(req: Request) {
   const systemInstruction = buildInstructions({
     agent,
     user,
-    memory: { facts: start.memory.facts, recentCalls: start.memory.recent_calls },
+    memory: {
+      facts: start.memory.facts,
+      recentCalls: start.memory.recent_calls,
+      recentChat: start.memory.recent_chat ?? [],
+    },
     purpose: body.purpose?.slice(0, 200),
     briefing: start.briefing,
     nudge: start.nudge,

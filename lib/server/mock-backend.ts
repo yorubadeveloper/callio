@@ -2,7 +2,7 @@ import "server-only";
 import { GoogleGenAI, Type } from "@google/genai";
 import { agentProfile } from "@/lib/agents/catalog";
 import { plan as planById, type PlanId } from "@/lib/pricing";
-import type { Call, Highlights, Memory, Schedule, Task, User, UserAgent } from "@/lib/types";
+import type { Call, ChatMessage, Highlights, Memory, Schedule, Task, User, UserAgent } from "@/lib/types";
 import { geminiKey, SUMMARY_MODEL } from "./models";
 
 // Development-only stand-in for the FastAPI backend, so every screen can be
@@ -18,6 +18,7 @@ interface Db {
   calls: (Call & { user_id: string; max_seconds: number })[];
   schedules: (Schedule & { user_id: string })[];
   tasks: (Task & { user_id: string })[];
+  chats?: (ChatMessage & { user_id: string; agent_id: string })[];
 }
 
 const g = globalThis as unknown as { __callioMock?: Db };
@@ -115,6 +116,34 @@ export async function mockBackend(
       Object.assign(agent, pick(body!, ["name", "voice", "look", "personality", "instructions"]));
       return agent;
     }
+    case "GET agents/:id/chat": {
+      const rows = (db.chats ?? []).filter((m) => m.user_id === user.id && m.agent_id === rid);
+      return { messages: rows.slice(-50), has_more: rows.length > 50 };
+    }
+    case "POST agents/:id/chat": {
+      const agent = myAgents().find((a) => a.id === rid);
+      if (!agent) throw new MockError(403, "That agent isn't on your roster.");
+      if (user.credits.total < 1) throw new MockError(402, "You're out of credits. Top up or upgrade your plan to keep chatting.");
+      await new Promise((r) => setTimeout(r, 900));
+      const text = String(body!.text ?? "").trim();
+      const fact = text.match(/^remember (?:that )?(.+)/i)?.[1];
+      const tools: ChatMessage["tools"] = [];
+      if (fact) {
+        remember(user.id, { id: id(), text: fact, agent_id: agent.id, source: "call", created_at: now() });
+        tools.push({ name: "remember", args: { fact }, ok: true });
+      }
+      const reply = fact ? "Got it, I'll remember that." : `This is a preview chat with ${agent.name}. Connect the backend for real replies.`;
+      const at = Date.now();
+      const rows = [
+        { id: id(), who: "you" as const, text, tools: [], created_at: new Date(at).toISOString() },
+        { id: id(), who: "agent" as const, text: reply, tools, created_at: new Date(at + 1).toISOString() },
+      ].map((m) => ({ ...m, user_id: user.id, agent_id: agent.id }));
+      (db.chats ??= []).push(...rows);
+      return { messages: rows };
+    }
+    case "DELETE agents/:id/chat":
+      db.chats = (db.chats ?? []).filter((m) => !(m.user_id === user.id && m.agent_id === rid));
+      return undefined;
     case "DELETE agents/:id":
       db.agents = db.agents.filter((a) => a.id !== rid);
       db.memories = db.memories.filter((m) => m.agent_id !== rid);

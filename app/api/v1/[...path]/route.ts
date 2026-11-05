@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { sessionUserId } from "@/lib/server/backend";
 import { mockBackend, mockEnabled, MockError } from "@/lib/server/mock-backend";
 
+// Chat replies with tools can take a while.
+export const maxDuration = 60;
+
 // Forwards the browser's /api/v1/* requests to the backend as the signed-in user.
 // The API key and user id are added here; the browser never sees them.
 

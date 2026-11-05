@@ -13,6 +13,8 @@ interface ToolMeta {
   kind: CallAction["kind"];
   /** Label for the call screen while it runs, from the call's arguments. */
   label: (args: Record<string, unknown>) => string;
+  /** Label once it's done, for chat history. Defaults to `label`. */
+  done?: (args: Record<string, unknown>) => string;
   /** When the result is handed back to the model. */
   scheduling: FunctionResponseScheduling;
 }
@@ -53,6 +55,7 @@ export const TOOLS: Record<string, ToolMeta> = {
   schedule_call: {
     kind: "schedule",
     label: (a) => `Scheduling a call: ${str(a.purpose)}`,
+    done: (a) => `Scheduled a call: ${str(a.purpose)}`,
     scheduling: FunctionResponseScheduling.WHEN_IDLE,
     declaration: {
       name: "schedule_call",
@@ -108,6 +111,7 @@ export const TOOLS: Record<string, ToolMeta> = {
   cancel_upcoming: {
     kind: "schedule",
     label: (a) => `Cancelling: ${str(a.what)}`,
+    done: (a) => `Cancelled: ${str(a.what)}`,
     scheduling: FunctionResponseScheduling.WHEN_IDLE,
     declaration: {
       name: "cancel_upcoming",
@@ -139,6 +143,7 @@ export const TOOLS: Record<string, ToolMeta> = {
   create_calendar_event: {
     kind: "calendar",
     label: (a) => `Adding to your calendar: ${str(a.title)}`,
+    done: (a) => `Added to your calendar: ${str(a.title)}`,
     scheduling: FunctionResponseScheduling.WHEN_IDLE,
     declaration: {
       name: "create_calendar_event",
@@ -162,6 +167,7 @@ export const TOOLS: Record<string, ToolMeta> = {
   move_calendar_event: {
     kind: "calendar",
     label: (a) => `Moving ${str(a.query) || "your event"}`,
+    done: (a) => `Moved ${str(a.query) || "your event"}`,
     scheduling: FunctionResponseScheduling.WHEN_IDLE,
     declaration: {
       name: "move_calendar_event",
@@ -183,6 +189,7 @@ export const TOOLS: Record<string, ToolMeta> = {
   get_weather: {
     kind: "search",
     label: (a) => `Checking the weather${a.place ? ` in ${str(a.place)}` : ""}`,
+    done: (a) => `Checked the weather${a.place ? ` in ${str(a.place)}` : ""}`,
     scheduling: FunctionResponseScheduling.WHEN_IDLE,
     declaration: {
       name: "get_weather",
@@ -197,6 +204,7 @@ export const TOOLS: Record<string, ToolMeta> = {
   web_search: {
     kind: "search",
     label: (a) => `Looking up ${str(a.query)}`,
+    done: (a) => `Looked up ${str(a.query)}`,
     scheduling: FunctionResponseScheduling.WHEN_IDLE,
     declaration: {
       name: "web_search",
@@ -213,6 +221,7 @@ export const TOOLS: Record<string, ToolMeta> = {
   start_computer_task: {
     kind: "task",
     label: (a) => `Working on: ${str(a.goal)}`,
+    done: (a) => `Started: ${str(a.goal)}`,
     scheduling: FunctionResponseScheduling.WHEN_IDLE,
     declaration: {
       name: "start_computer_task",
@@ -304,6 +313,7 @@ export const TOOLS: Record<string, ToolMeta> = {
   check_sources: {
     kind: "search",
     label: (a) => (a.source ? `Checking ${str(a.source)}` : "Checking your sites and servers"),
+    done: (a) => (a.source ? `Checked ${str(a.source)}` : "Checked your sites and servers"),
     scheduling: FunctionResponseScheduling.WHEN_IDLE,
     declaration: {
       name: "check_sources",
@@ -324,6 +334,7 @@ export const TOOLS: Record<string, ToolMeta> = {
   use_connector_tool: {
     kind: "search",
     label: (a) => (a.tool ? `Asking ${str(a.connector)}` : `Looking at what ${str(a.connector)} can do`),
+    done: (a) => (a.tool ? `Asked ${str(a.connector)}` : `Looked at what ${str(a.connector)} can do`),
     scheduling: FunctionResponseScheduling.WHEN_IDLE,
     declaration: {
       name: "use_connector_tool",
@@ -344,6 +355,7 @@ export const TOOLS: Record<string, ToolMeta> = {
   call_contact: {
     kind: "schedule",
     label: (a) => `Booking a call to ${str(a.contact)}`,
+    done: (a) => `Booked a call to ${str(a.contact)}`,
     scheduling: FunctionResponseScheduling.WHEN_IDLE,
     declaration: {
       name: "call_contact",
@@ -421,6 +433,17 @@ export const SPOKEN_MESSAGE_CONTACT_TOOLS: Tool[] = [
 export const TOOL_SCHEDULING: Record<string, FunctionResponseScheduling> = Object.fromEntries(
   Object.entries(TOOLS).map(([name, t]) => [name, t.scheduling]),
 );
+
+// Only make sense on a call (backend tools.CALL_ONLY_TOOLS).
+const CALL_ONLY = new Set(["end_call", "stop_calls", "send_recap"]);
+
+/** The same tools for a text chat, as plain declarations the backend hands to Gemini (no Live-only fields). */
+export function chatTools(plan: PlanId) {
+  return toolsForPlan(plan)
+    .flatMap((t) => t.functionDeclarations ?? [])
+    .filter((d) => !CALL_ONLY.has(d.name!))
+    .map(({ name, description, parametersJsonSchema }) => ({ name, description, parametersJsonSchema }));
+}
 
 /** The Live API tools for a call, limited to what the person's plan includes. */
 export function toolsForPlan(plan: PlanId): Tool[] {
