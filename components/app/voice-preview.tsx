@@ -122,7 +122,18 @@ export function VoicePicker({ value, onChange }: { value: string; onChange: (id:
 }
 
 /** "Hear Laura": plays an agent's voice sample. */
-export function HearVoice({ voice, name, className }: { voice: string; name: string; className?: string }) {
+export function HearVoice({
+  voice,
+  name,
+  className,
+  labelClassName,
+}: {
+  voice: string;
+  name: string;
+  className?: string;
+  /** e.g. hide the words on narrow cards and keep the icon */
+  labelClassName?: string;
+}) {
   const isPlaying = usePlayingVoice() === voice;
   return (
     <button
@@ -130,12 +141,12 @@ export function HearVoice({ voice, name, className }: { voice: string; name: str
       onClick={() => playVoice(voice)}
       aria-label={isPlaying ? `Stop ${name}'s voice` : `Hear ${name}'s voice`}
       className={cn(
-        "relative inline-flex h-11 items-center justify-center gap-2 rounded-full bg-ink/[0.06] px-4 text-[14px] font-semibold text-ink transition-colors hover:bg-ink/10",
+        "relative inline-flex h-11 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-ink/[0.06] px-4 text-[14px] font-semibold text-ink transition-colors hover:bg-ink/10",
         className,
       )}
     >
       {isPlaying ? <Pause weight="fill" /> : <SpeakerHigh weight="fill" />}
-      {isPlaying ? "Playing" : "Hear voice"}
+      <span className={labelClassName}>{isPlaying ? "Playing" : "Hear voice"}</span>
     </button>
   );
 }

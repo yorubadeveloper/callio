@@ -8,7 +8,7 @@ import { HearVoice } from "./voice-preview";
 /** An agent in their own colours, with a voice sample, messages and a one-tap call. The card opens their profile. */
 export function AgentCard({ agent, lastTalked }: { agent: PersonalAgent; lastTalked?: string | null }) {
   return (
-    <div className="group relative flex flex-col overflow-hidden rounded-[30px] bg-plate ring-1 ring-line transition-[box-shadow,transform] duration-300 ease-[cubic-bezier(0.2,0.8,0.2,1)] hover:-translate-y-0.5 hover:shadow-[0_24px_60px_-30px_rgb(0_0_0/0.45)]">
+    <div className="group @container relative flex flex-col overflow-hidden rounded-[30px] bg-plate ring-1 ring-line transition-[box-shadow,transform] duration-300 ease-[cubic-bezier(0.2,0.8,0.2,1)] hover:-translate-y-0.5 hover:shadow-[0_24px_60px_-30px_rgb(0_0_0/0.45)]">
       <Link
         href={`/app/agents/${agent.id}`}
         className="absolute inset-0 z-[1] rounded-[30px]"
@@ -36,7 +36,12 @@ export function AgentCard({ agent, lastTalked }: { agent: PersonalAgent; lastTal
         </p>
       </div>
       <div className="relative z-[2] mt-auto flex gap-2 p-5 pt-4">
-        <HearVoice voice={agent.persona.voice} name={agent.name} />
+        <HearVoice
+          voice={agent.persona.voice}
+          name={agent.name}
+          className="@max-[19rem]:w-11 @max-[19rem]:px-0"
+          labelClassName="@max-[19rem]:sr-only"
+        />
         <Link
           href={`/chat/${agent.id}`}
           aria-label={`Message ${agent.name}`}
@@ -48,7 +53,7 @@ export function AgentCard({ agent, lastTalked }: { agent: PersonalAgent; lastTal
         </Link>
         <Link
           href={`/call/${agent.id}`}
-          className="relative inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-full bg-teal text-[15px] font-semibold text-[#0E0E10] transition-transform duration-200 hover:-translate-y-0.5"
+          className="relative inline-flex h-11 min-w-0 flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-teal text-[15px] font-semibold text-[#0E0E10] transition-transform duration-200 hover:-translate-y-0.5"
         >
           <Phone weight="fill" /> Call
           <LinkPending veil={false} className="bg-teal" />

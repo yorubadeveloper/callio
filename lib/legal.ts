@@ -49,7 +49,7 @@ export const LEGAL = {
     /** Commercial register entry once registered as a company. Null hides the section. */
     register: null as string | null,
     /** Person responsible for editorial content under §18(2) MStV. */
-    contentResponsible: "The operator named above, at the address above",
+    contentResponsible: "The operator named above",
   },
 
   backendHosting: {

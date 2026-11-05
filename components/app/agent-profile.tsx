@@ -58,7 +58,7 @@ export function AgentProfileView({
             style={{ background: a.face.tile }}
           />
         </div>
-        <div className="relative flex flex-col items-center text-center sm:flex-row sm:items-center sm:gap-8 sm:text-left">
+        <div className="relative flex flex-col items-center text-center sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-8 sm:gap-y-6 sm:text-left lg:flex-nowrap">
           <motion.span
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -76,8 +76,13 @@ export function AgentProfileView({
             </p>
             {agent.name !== base.name && <p className="mt-1 text-[13px] text-ink-soft/80">Started as {base.name}</p>}
           </div>
-          <div className="mt-6 flex w-full gap-2 sm:mt-0 sm:w-auto">
-            <HearVoice voice={a.persona.voice} name={a.name} className="h-12 px-5" />
+          <div className="mt-6 flex w-full gap-2 sm:mt-0 lg:w-auto">
+            <HearVoice
+              voice={a.persona.voice}
+              name={a.name}
+              className="h-12 px-5 max-[380px]:w-12 max-[380px]:px-0"
+              labelClassName="max-[380px]:sr-only"
+            />
             <Link
               href={`/chat/${agent.id}`}
               aria-label={`Message ${a.name}`}
@@ -86,8 +91,8 @@ export function AgentProfileView({
             >
               <ChatCircleDots weight="fill" />
             </Link>
-            <Link href={`/call/${agent.id}`} className={cn(btn.call, "flex-1 sm:flex-none sm:px-8")}>
-              <Phone weight="fill" /> Call {a.name}
+            <Link href={`/call/${agent.id}`} className={cn(btn.call, "min-w-0 flex-1 whitespace-nowrap lg:flex-none lg:px-8")}>
+              <Phone weight="fill" className="shrink-0" /> <span className="truncate">Call {a.name}</span>
             </Link>
           </div>
         </div>

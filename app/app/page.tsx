@@ -277,8 +277,8 @@ export default async function HomePage() {
                 <span className={`grid size-9 shrink-0 place-items-center rounded-xl text-[18px] ${l.tint}`}>
                   <l.icon weight="fill" />
                 </span>
-                <span className="min-w-0 flex-1 text-[15px] font-semibold">{l.title}</span>
-                <span className="min-w-0 truncate text-[14px] text-ink-soft">{l.sub}</span>
+                <span className="shrink-0 text-[15px] font-semibold">{l.title}</span>
+                <span className="min-w-0 flex-1 truncate text-right text-[14px] text-ink-soft">{l.sub}</span>
                 <CaretRight className="shrink-0 text-ink-soft" />
               </Link>
             </li>
