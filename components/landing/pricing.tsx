@@ -5,7 +5,8 @@ import Link from "next/link";
 import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
 import { Check } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
-import { CREDIT_COSTS, PHONE_RATES, PLANS, TOP_UPS, type Plan } from "@/lib/pricing";
+import { CREDIT_COSTS, PHONE_RATES, type Plan } from "@/lib/pricing";
+import { usePricing } from "@/components/providers/pricing-provider";
 import { EASE_OUT, SplitWords } from "./motion";
 
 type Billing = "monthly" | "yearly";
@@ -14,7 +15,8 @@ export function Pricing() {
   const [billing, setBilling] = useState<Billing>("monthly");
   const headingRef = useRef<HTMLHeadingElement>(null);
   const headingInView = useInView(headingRef, { once: true, amount: 0.6 });
-  const smallestTopUp = TOP_UPS[0];
+  const { plans, topUps } = usePricing();
+  const smallestTopUp = topUps[0];
 
   return (
     <section id="pricing" className="mx-auto max-w-6xl px-4 py-24 sm:px-6 md:py-32">
@@ -34,7 +36,7 @@ export function Pricing() {
       </div>
 
       <ul className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {PLANS.map((p, i) => (
+        {plans.map((p, i) => (
           <PlanCard key={p.id} plan={p} billing={billing} index={i} />
         ))}
       </ul>

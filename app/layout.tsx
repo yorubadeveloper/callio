@@ -3,6 +3,8 @@ import { Figtree, Hanken_Grotesk, Instrument_Sans, JetBrains_Mono } from "next/f
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { SessionProvider } from "@/components/providers/session-provider";
+import { PricingProvider } from "@/components/providers/pricing-provider";
+import { livePrices } from "@/lib/server/prices";
 import { Toaster } from "@/components/ui/sonner";
 import { Analytics } from "@/components/analytics/analytics";
 import { RegisterServiceWorker } from "@/components/pwa/register-sw";
@@ -105,11 +107,12 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const prices = await livePrices();
   return (
     <html
       lang="en"
@@ -119,7 +122,7 @@ export default function RootLayout({
       <body className={`${figtree.className} antialiased`}>
         <SessionProvider>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-            {children}
+            <PricingProvider live={prices}>{children}</PricingProvider>
             <Toaster />
             <Analytics />
             <RegisterServiceWorker />

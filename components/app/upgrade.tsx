@@ -4,7 +4,8 @@ import { useState } from "react";
 import { Check } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { api, ApiError } from "@/lib/api";
-import { plan as planById, type PlanId } from "@/lib/pricing";
+import type { PlanId } from "@/lib/pricing";
+import { usePricing } from "@/components/providers/pricing-provider";
 import { btn, Sheet } from "./ui";
 import { Spinner } from "@/components/brand/logo-loader";
 
@@ -52,6 +53,7 @@ export function UpgradeSheet({
   reason: string;
   plan: PlanId;
 }) {
+  const { plan: planById } = usePricing();
   const p = planById(plan);
   const { busy, error, go } = useCheckout();
   return (
