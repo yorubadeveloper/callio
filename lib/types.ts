@@ -192,7 +192,12 @@ export interface CallStart {
   max_seconds: number;
   user: User;
   agent: UserAgent;
-  memory: { facts: string[]; recent_calls: { when: string; summary: string }[] };
+  memory: {
+    facts: string[];
+    recent_calls: { when: string; summary: string }[];
+    /** The last few chat messages with this agent (last 3 days), oldest first. */
+    recent_chat?: { who: "you" | "agent"; text: string; when: string }[];
+  };
   briefing?: Briefing | null;
   /** The note they tapped to open this call. */
   nudge?: Nudge | null;
@@ -231,9 +236,20 @@ export interface PhoneSettings {
   credits_per_minute: number | null;
 }
 
-/** What the backend sends /api/internal/live-config to set up a phone call. */
+export interface ChatMessage {
+  id: string;
+  who: "you" | "agent";
+  text: string;
+  /** Tools the agent ran on the way to this reply. */
+  tools: { name: string; args: Record<string, unknown>; ok: boolean }[];
+  created_at: string;
+}
+
+/** What the backend sends /api/internal/live-config to set up a phone call (or a text chat). */
 export type PhoneCallSetup =
   | { kind: "user"; channel: "phone"; inbound: boolean; purpose: string | null; start: CallStart }
+  /** Not a call: the backend asks for the same agent's instructions and tools for a text chat. */
+  | { kind: "chat"; start: Pick<CallStart, "user" | "agent" | "memory" | "sources" | "contacts"> }
   | {
       kind: "contact";
       /** "spitch": Spitch speaks and hears, a text model writes the words (Yoruba, Igbo, Hausa). */

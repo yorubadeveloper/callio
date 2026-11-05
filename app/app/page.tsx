@@ -7,6 +7,7 @@ import {
   CalendarBlank,
   CalendarDots,
   CaretRight,
+  ChatCircleDots,
   Monitor,
   Phone,
   PlugsConnected,
@@ -169,12 +170,22 @@ export default async function HomePage() {
               </span>
               <div>
                 <p className="text-[14px] text-white/60">{featured.role}</p>
-                <Link
-                  href={`/call/${featured.id}`}
-                  className="mt-2 inline-flex h-12 items-center gap-2 rounded-full bg-teal px-6 text-[16px] font-semibold text-[#0E0E10] shadow-[0_10px_30px_-10px_#64B2AF] transition-transform duration-200 hover:-translate-y-0.5"
-                >
-                  <Phone weight="fill" /> Call {featured.name}
-                </Link>
+                <div className="mt-2 flex gap-2">
+                  <Link
+                    href={`/call/${featured.id}`}
+                    className="inline-flex h-12 items-center gap-2 rounded-full bg-teal px-6 text-[16px] font-semibold text-[#0E0E10] shadow-[0_10px_30px_-10px_#64B2AF] transition-transform duration-200 hover:-translate-y-0.5"
+                  >
+                    <Phone weight="fill" /> Call {featured.name}
+                  </Link>
+                  <Link
+                    href={`/chat/${featured.id}`}
+                    aria-label={`Message ${featured.name}`}
+                    title={`Message ${featured.name}`}
+                    className="grid size-12 place-items-center rounded-full bg-white/10 text-[20px] text-white transition-colors hover:bg-white/15"
+                  >
+                    <ChatCircleDots weight="fill" />
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

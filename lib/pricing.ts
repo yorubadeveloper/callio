@@ -16,6 +16,8 @@ export const CREDIT_COSTS = {
   phoneMinuteFrom: 2,
   /** Minimum for a computer task; longer tasks cost more. */
   computerTaskFrom: 5,
+  /** Text chat: replies per credit (backend CHAT_REPLIES_PER_CREDIT). */
+  chatRepliesPerCredit: 5,
 } as const;
 
 export interface Plan {

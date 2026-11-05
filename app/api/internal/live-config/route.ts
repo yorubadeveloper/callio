@@ -2,7 +2,13 @@ import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { buildContactInstructions, buildInstructions, contactLanguages } from "@/lib/agents/instructions";
 import { personalize } from "@/lib/agents/personalize";
-import { CONTACT_CALL_TOOLS, SPOKEN_MESSAGE_CONTACT_TOOLS, TOOL_SCHEDULING, toolsForPlan } from "@/lib/agents/tools";
+import {
+  chatTools,
+  CONTACT_CALL_TOOLS,
+  SPOKEN_MESSAGE_CONTACT_TOOLS,
+  TOOL_SCHEDULING,
+  toolsForPlan,
+} from "@/lib/agents/tools";
 import { VOICES } from "@/lib/agents/voices";
 import { liveConfig } from "@/lib/server/live";
 import { LIVE_MODEL } from "@/lib/server/models";
@@ -10,7 +16,8 @@ import type { PhoneCallSetup } from "@/lib/types";
 
 // Server-to-server: the backend bridges phone calls itself (Twilio ⇄ Gemini Live) and asks here for the
 // agent's instructions and tools, so a phone call sounds like the same agent as an app call. Authenticated
-// with the shared backend key; it reads nothing and stores nothing.
+// with the shared backend key; it reads nothing and stores nothing. A text chat asks here too, for the same agent
+// written for text.
 export async function POST(req: Request) {
   const expected = Buffer.from(process.env.API_KEY ?? "");
   const given = Buffer.from(req.headers.get("x-api-key") ?? "");
@@ -18,11 +25,26 @@ export async function POST(req: Request) {
     return NextResponse.json({ detail: "Not allowed." }, { status: 401 });
   }
   const setup = (await req.json().catch(() => null)) as PhoneCallSetup | null;
-  if (!setup || (setup.kind !== "user" && setup.kind !== "contact")) {
+  if (!setup || (setup.kind !== "user" && setup.kind !== "contact" && setup.kind !== "chat")) {
     return NextResponse.json({ detail: "Unknown call." }, { status: 400 });
   }
 
   const now = new Date();
+  if (setup.kind === "chat") {
+    const { start } = setup;
+    return NextResponse.json({
+      system_instruction: buildInstructions({
+        agent: personalize(start.agent),
+        user: start.user,
+        memory: { facts: start.memory.facts, recentCalls: start.memory.recent_calls },
+        sources: start.sources,
+        contacts: start.contacts,
+        channel: "chat",
+        now,
+      }),
+      tools: chatTools(start.user.plan),
+    });
+  }
   if (setup.kind === "contact") {
     const agent = personalize(setup.agent);
     const systemInstruction = buildContactInstructions({
@@ -53,7 +75,11 @@ export async function POST(req: Request) {
   const systemInstruction = buildInstructions({
     agent,
     user: start.user,
-    memory: { facts: start.memory.facts, recentCalls: start.memory.recent_calls },
+    memory: {
+      facts: start.memory.facts,
+      recentCalls: start.memory.recent_calls,
+      recentChat: start.memory.recent_chat ?? [],
+    },
     purpose: setup.purpose?.slice(0, 200) || undefined,
     briefing: start.briefing,
     sources: start.sources,

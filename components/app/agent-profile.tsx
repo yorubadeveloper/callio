@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
-import { LockSimple, Phone, Plus, Trash } from "@phosphor-icons/react";
+import { ChatCircleDots, LockSimple, Phone, Plus, Trash } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { AgentFace } from "@/components/landing/agent-face";
 import { agentProfile } from "@/lib/agents/catalog";
@@ -78,6 +78,14 @@ export function AgentProfileView({
           </div>
           <div className="mt-6 flex w-full gap-2 sm:mt-0 sm:w-auto">
             <HearVoice voice={a.persona.voice} name={a.name} className="h-12 px-5" />
+            <Link
+              href={`/chat/${agent.id}`}
+              aria-label={`Message ${a.name}`}
+              title={`Message ${a.name}`}
+              className={cn(btn.soft, "w-12 shrink-0 px-0 text-[20px]")}
+            >
+              <ChatCircleDots weight="fill" />
+            </Link>
             <Link href={`/call/${agent.id}`} className={cn(btn.call, "flex-1 sm:flex-none sm:px-8")}>
               <Phone weight="fill" /> Call {a.name}
             </Link>

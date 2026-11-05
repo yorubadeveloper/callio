@@ -422,6 +422,17 @@ export const TOOL_SCHEDULING: Record<string, FunctionResponseScheduling> = Objec
   Object.entries(TOOLS).map(([name, t]) => [name, t.scheduling]),
 );
 
+// Only make sense on a call (backend tools.CALL_ONLY_TOOLS).
+const CALL_ONLY = new Set(["end_call", "stop_calls", "send_recap"]);
+
+/** The same tools for a text chat, as plain declarations the backend hands to Gemini (no Live-only fields). */
+export function chatTools(plan: PlanId) {
+  return toolsForPlan(plan)
+    .flatMap((t) => t.functionDeclarations ?? [])
+    .filter((d) => !CALL_ONLY.has(d.name!))
+    .map(({ name, description, parametersJsonSchema }) => ({ name, description, parametersJsonSchema }));
+}
+
 /** The Live API tools for a call, limited to what the person's plan includes. */
 export function toolsForPlan(plan: PlanId): Tool[] {
   const skills = SKILLS.filter((s) => s.status === "live" && planAllows(plan, s.minPlan));

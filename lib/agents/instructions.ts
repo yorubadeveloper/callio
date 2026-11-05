@@ -27,6 +27,8 @@ export interface CallContext {
   memory: {
     facts: string[];
     recentCalls: { when: string; summary: string }[];
+    /** The last few text-chat messages with this agent, for calls to carry on from. */
+    recentChat?: { who: "you" | "agent"; text: string; when: string }[];
   };
   /** Why this call is happening, e.g. "Scheduled morning briefing". Empty when the person called in. */
   purpose?: string;
@@ -38,7 +40,8 @@ export interface CallContext {
   sources?: CallStart["sources"];
   /** People the agent can phone with a message (Contacts page). */
   contacts?: CallStart["contacts"];
-  channel: "app" | "phone";
+  /** "chat": not a call but a text chat in the app. */
+  channel: "app" | "phone" | "chat";
   /** Phone calls: they rang the Callio number, rather than us ringing them. */
   inbound?: boolean;
   /** Phone calls are capped (2.5 minutes). */
@@ -54,6 +57,14 @@ const HOW_TO_SPEAK = `
 - Before a tool that takes a moment, say a few words ("one sec, let me check") so there's no dead air.
 - Never use lists, headings, markdown, emoji or URLs. Say numbers, dates and times the way people say them aloud.
 - If they interrupt, stop and listen. If you didn't catch something, ask once, briefly. Short pauses are fine; don't rush to fill them.
+`;
+
+const HOW_TO_WRITE = `
+- This is a text chat in the Callio app. Write the way a friend texts: warm, natural, short. Usually one to three sentences; go longer only when they ask for detail.
+- Plain text. No headings or tables; a short list only when it really helps. An emoji now and then is fine if it suits them.
+- Vary how you start and finish. Never use stock lines like "Great question", "Certainly!" or "Is there anything else I can help you with?"
+- Write dates and times plainly ("Thursday at 7pm"). Where an instruction says to say something out loud or confirm it aloud, write it instead.
+- Use a tool straight away when you need one; don't announce it first.
 `;
 
 const LANGUAGE = `
@@ -165,7 +176,9 @@ export function buildInstructions(ctx: CallContext): string {
 
   const sections = [
     `You are ${agent.name}, ${callName}'s personal ${agent.role.toLowerCase()} agent on Callio. You are ${agent.persona.personality}. You mostly help with ${focus.join(", ")}, but you can use any skill below. Call them ${callName}.`,
-    `## How you speak${HOW_TO_SPEAK}- ${TONE[user.tone]}\n- ${DETAIL[user.detail]}`,
+    ctx.channel === "chat"
+      ? `## How you write${HOW_TO_WRITE}- ${TONE[user.tone]}\n- ${DETAIL[user.detail]}`
+      : `## How you speak${HOW_TO_SPEAK}- ${TONE[user.tone]}\n- ${DETAIL[user.detail]}`,
     ctx.channel === "phone"
       ? `## Language${phoneLanguage(
           languageName(mainLanguage(user.languages)),
@@ -194,12 +207,14 @@ export function buildInstructions(ctx: CallContext): string {
 
   const about = [
     `It's ${localTime(ctx.now, user.timezone, user.locale)} for ${callName} (${user.timezone}${user.city ? `, ${user.city}` : ""}).`,
-    `They're talking to you ${ctx.channel === "app" ? "in the Callio app" : "on the phone"}.`,
+    ctx.channel === "chat"
+      ? "They're messaging you in the Callio app."
+      : `They're talking to you ${ctx.channel === "app" ? "in the Callio app" : "on the phone"}.`,
     user.about?.trim() && `Who they are: ${user.about.trim()}`,
     pronounLine(callName, pronounsOf(user)),
     user.style?.trim() && `How they talk and like to be spoken to: ${user.style.trim()} Match it.`,
     user.interests.length > 0 && `They're into: ${user.interests.join(", ")}.`,
-    ctx.channel === "app" &&
+    ctx.channel !== "phone" &&
       user.languages.length > 1 &&
       `They speak ${user.languages.map(languageName).join(", ")}, and may mix them in one sentence.`,
     user.integrations?.google_calendar?.connected
@@ -232,6 +247,20 @@ For anything about how these are doing right now, call check_sources; never answ
   }
   if (memory.recentCalls.length) {
     sections.push(`## Recent calls\n${memory.recentCalls.map((c) => `- ${c.when}: ${c.summary}`).join("\n")}`);
+  }
+
+  if (ctx.channel !== "chat" && memory.recentChat?.length) {
+    const lines = memory.recentChat.map((m) => `- ${m.who === "you" ? callName : "You"}: ${m.text}`);
+    sections.push(
+      `## Your recent messages\nYou and ${callName} were texting in the app:\n${lines.join("\n")}\nCarry on from it if it's relevant; don't recap it unprompted.`,
+    );
+  }
+
+  if (ctx.channel === "chat") {
+    sections.push(
+      `## This chat\nEarlier messages in this chat come before their latest one: carry on from them. Say hello only if it's the very first message; after that, never greet again or open with their name. If something would be easier to talk through, or they'd like to hear you, suggest they tap Call.`,
+    );
+    return sections.join("\n\n");
   }
 
   if (ctx.briefing) sections.push(briefingSection(ctx.briefing, callName));
