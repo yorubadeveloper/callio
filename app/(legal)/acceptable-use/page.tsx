@@ -104,7 +104,7 @@ export default function AcceptableUsePage() {
           <ul>
             <li>Claim to be human, or impersonate a real person or organisation.</li>
             <li>Enter passwords, card numbers or other payment details.</li>
-            <li>Call emergency services. In an emergency, call 112 (EU) or 911 (US) yourself.</li>
+            <li>Call emergency services. In an emergency, call your local emergency number yourself.</li>
             <li>Give medical, legal or financial advice in place of a professional.</li>
             <li>Make robocalls, spam, bulk calls or telemarketing.</li>
             <li>Harass, threaten or deceive anyone, or help with anything illegal.</li>
@@ -120,7 +120,7 @@ export default function AcceptableUsePage() {
             <li>Only ask agents to do things you are allowed to do yourself.</li>
             <li>
               Only have agents contact people or businesses who would expect it, and get consent where the law
-              requires it (for example for marketing calls, or under the US TCPA for automated calls).
+              requires it (for example for marketing or automated calls).
             </li>
             <li>Don’t share other people’s private information with your agent unless you have a right to.</li>
             <li>Respect the terms of websites your agent visits during computer tasks.</li>

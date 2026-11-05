@@ -23,8 +23,6 @@ const SECTIONS = [
   { id: "automated-decisions", title: "Automated decisions" },
   { id: "children", title: "Children" },
   { id: "security", title: "Security" },
-  { id: "us", title: "If you live in the United States" },
-  { id: "nigeria", title: "If you live in Nigeria" },
   { id: "changes", title: "Changes to this policy" },
 ] as const;
 
@@ -103,8 +101,8 @@ export default function PrivacyPage() {
           Email: <a href={`mailto:${operator.privacyEmail}`}>{operator.privacyEmail}</a>
         </p>
         <p>
-          For anything about your data, write to the email above. Full contact details are in our{" "}
-          <Link href="/imprint">imprint</Link>.
+          For anything about your data, write to the email above. Full contact details are on our{" "}
+          <Link href="/contact">contact page</Link>.
         </p>
       </section>
 
@@ -403,9 +401,9 @@ export default function PrivacyPage() {
       <section id="transfers">
         <Heading id="transfers" />
         <p>
-          Some providers above process data in the United States or other countries outside the EU/EEA. For transfers
-          to the US, we rely on the EU-US Data Privacy Framework where the provider is certified under it
-          (Art. 45 GDPR). Otherwise, we use the European Commission’s Standard Contractual Clauses (Art. 46(2)(c)
+          Some providers above process data outside the EU/EEA. Where the European Commission has found a country’s
+          protection adequate, we rely on that decision, including the Data Privacy Framework where the provider is
+          certified under it (Art. 45 GDPR). Otherwise, we use the European Commission’s Standard Contractual Clauses (Art. 46(2)(c)
           GDPR), plus extra safeguards where needed. You can ask us for a copy of the relevant safeguards.
         </p>
         <div className="table-wrap">
@@ -494,45 +492,6 @@ export default function PrivacyPage() {
           connections (HTTPS), access controls, and keeping our software up to date. Sign-in happens through
           Google, so we never store a password for you. No system is perfectly secure. If a breach puts your rights at
           high risk, we will tell you without undue delay.
-        </p>
-      </section>
-
-      <section id="us">
-        <Heading id="us" />
-        <p>
-          If you live in California or another US state with a consumer privacy law, here is what you should know:
-        </p>
-        <ul>
-          <li>
-            <strong>We don’t sell or share your personal information</strong>, including for cross-context
-            behavioural advertising, and we haven’t done so in the past 12 months.
-          </li>
-          <li>
-            The categories of personal information we collect and why are described above under{" "}
-            <a href="#what-we-collect">What we collect</a> and <a href="#purposes">Why we use it</a>.
-          </li>
-          <li>
-            We only use sensitive personal information to provide the service you requested, not to infer
-            characteristics about you.
-          </li>
-          <li>
-            You can ask to know, access, correct or delete your personal information, and we won’t treat you
-            differently for using these rights. Email{" "}
-            <a href={`mailto:${operator.privacyEmail}`}>{operator.privacyEmail}</a>. You may use an authorised agent;
-            we may need to verify your request.
-          </li>
-        </ul>
-      </section>
-
-      <section id="nigeria">
-        <Heading id="nigeria" />
-        <p>
-          If you live in Nigeria, the Nigeria Data Protection Act 2023 (NDPA) gives you rights similar to those
-          above. You can ask to be informed about, access, correct or delete your data, receive it in a portable
-          format, object to processing, withdraw consent, and not be subject to decisions based solely on automated
-          processing. Contact us at <a href={`mailto:${operator.privacyEmail}`}>{operator.privacyEmail}</a>. You can
-          also complain to the Nigeria Data Protection Commission (NDPC). Transfers of your data outside Nigeria use
-          the safeguards described under <a href="#transfers">International transfers</a>.
         </p>
       </section>
 

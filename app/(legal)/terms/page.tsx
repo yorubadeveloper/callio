@@ -134,8 +134,7 @@ export default function TermsPage() {
           <ul>
             <li>
               <strong>Not for emergencies.</strong> Callio cannot call emergency services and is not an emergency
-              service. If you or someone else is in danger, call your local emergency number (112 in the EU, 911 in
-              the US) directly.
+              service. If you or someone else is in danger, call your local emergency number directly.
             </li>
             <li>
               <strong>Not professional advice.</strong> Agents don’t give medical, legal, financial, tax or
@@ -398,7 +397,7 @@ export default function TermsPage() {
           <Heading id="contact" />
           <p>
             Questions about these terms? Email <a href={`mailto:${operator.email}`}>{operator.email}</a> or write to{" "}
-            {operator.legalName}, {operatorAddress}. More details are in our <Link href="/imprint">imprint</Link>.
+            {operator.legalName}, {operatorAddress}. More details are on our <Link href="/contact">contact page</Link>.
           </p>
         </section>
       </div>

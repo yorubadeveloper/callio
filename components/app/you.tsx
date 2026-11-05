@@ -19,6 +19,7 @@ import {
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { LANGUAGES } from "@/lib/languages";
+import { LEGAL } from "@/lib/legal";
 import { api, ApiError } from "@/lib/api";
 import { pronounsOf } from "@/lib/pronouns";
 import type { Detail, NudgeLevel, Pronouns, Tone, User } from "@/lib/types";
@@ -349,13 +350,7 @@ export function YouView({ user: initial }: { user: User }) {
           <section>
             <h2 className="text-[13px] font-semibold uppercase tracking-wider text-ink-soft">Legal</h2>
             <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-[14px]">
-              {[
-                ["/privacy", "Privacy"],
-                ["/terms", "Terms"],
-                ["/refunds", "Refunds"],
-                ["/acceptable-use", "Acceptable use"],
-                ["/imprint", "Imprint"],
-              ].map(([href, label]) => (
+              {LEGAL.pages.map(({ href, label }) => (
                 <li key={href}>
                   <Link href={href} className="text-ink-soft underline-offset-4 hover:text-ink hover:underline">
                     {label}

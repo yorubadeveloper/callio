@@ -1,5 +1,5 @@
 // Single source of truth for Callio's legal pages (privacy, terms, refunds,
-// imprint, acceptable use). Every value in [SQUARE BRACKETS] is a placeholder
+// contact, acceptable use). Every value in [SQUARE BRACKETS] is a placeholder
 // the founder must replace before launch. Search the repo for "[" in this file.
 
 export type SubprocessorStatus = "active" | "may be used" | "when phone calling launches";
@@ -19,8 +19,8 @@ export interface Subprocessor {
   status: SubprocessorStatus;
 }
 
-const US_SAFEGUARD =
-  "EU-US Data Privacy Framework where the provider is certified, otherwise EU Standard Contractual Clauses";
+const TRANSFER_SAFEGUARD =
+  "Data Privacy Framework where the provider is certified, otherwise EU Standard Contractual Clauses";
 
 export const LEGAL = {
   /** ISO date of the last change to any legal page. */
@@ -35,7 +35,7 @@ export const LEGAL = {
   operator: {
     legalName: "[YOUR FULL NAME]",
     legalForm: "Sole proprietor (Einzelunternehmer)",
-    /** Companies only (the managing director). Null hides the line on the imprint. */
+    /** Companies only (the managing director). Null hides the line on the contact page. */
     representedBy: null as string | null,
     street: "[STREET AND NUMBER]",
     postcodeCity: "[POSTCODE CITY]",
@@ -97,27 +97,27 @@ export const LEGAL = {
       name: "Google (Gemini API)",
       purpose: "Runs the AI: live voice conversation, transcripts, summaries, memory and computer tasks",
       data: "Call audio (streamed from your browser, or from a phone call through our server), conversation text, memory and context we send with a request",
-      location: "USA and other Google locations",
+      location: "Google locations worldwide",
       role: "Processor",
-      safeguard: US_SAFEGUARD,
+      safeguard: TRANSFER_SAFEGUARD,
       status: "active",
     },
     {
       name: "Google (Sign-In)",
       purpose: "Lets you sign in with your Google account",
       data: "Your name, email address, profile picture and Google account ID",
-      location: "USA and other Google locations",
+      location: "Google locations worldwide",
       role: "Independent controller",
-      safeguard: US_SAFEGUARD,
+      safeguard: TRANSFER_SAFEGUARD,
       status: "active",
     },
     {
       name: "Vercel Inc.",
       purpose: "Hosts the Callio website and web app",
       data: "IP address, browser details and request logs",
-      location: "USA and global edge network",
+      location: "Global edge network",
       role: "Processor",
-      safeguard: US_SAFEGUARD,
+      safeguard: TRANSFER_SAFEGUARD,
       status: "active",
     },
     {
@@ -133,9 +133,9 @@ export const LEGAL = {
       name: "Stripe (via Link), merchant of record",
       purpose: "Sells you plans and top-ups, takes payment, handles tax, invoices and refunds",
       data: "Name, email, billing address, payment details, purchase history",
-      location: "Ireland, USA",
+      location: "EU and worldwide",
       role: "Independent controller",
-      safeguard: US_SAFEGUARD,
+      safeguard: TRANSFER_SAFEGUARD,
       status: "active",
     },
     {
@@ -151,9 +151,9 @@ export const LEGAL = {
       name: "Google Ireland Limited (Google Analytics 4)",
       purpose: "Counting visits and seeing how people use the website, only if you allow it",
       data: "Pages viewed, device and browser type, approximate location, and a random ID stored in a cookie",
-      location: "EU and USA",
+      location: "EU and worldwide",
       role: "Processor",
-      safeguard: US_SAFEGUARD,
+      safeguard: TRANSFER_SAFEGUARD,
       status: "active",
     },
     {
@@ -169,18 +169,18 @@ export const LEGAL = {
       name: "Cloudflare, Inc.",
       purpose: "AI and cloud browser services for computer tasks",
       data: "Task instructions and the web pages the agent works on",
-      location: "USA and global network",
+      location: "Global network",
       role: "Processor",
-      safeguard: US_SAFEGUARD,
+      safeguard: TRANSFER_SAFEGUARD,
       status: "may be used",
     },
     {
       name: "Twilio Inc.",
       purpose: "Real phone calls to and from phone numbers",
       data: "Phone numbers, call audio in transit, call metadata",
-      location: "USA and other Twilio locations",
+      location: "Twilio locations worldwide",
       role: "Processor",
-      safeguard: US_SAFEGUARD,
+      safeguard: TRANSFER_SAFEGUARD,
       status: "active",
     },
     {
@@ -197,11 +197,11 @@ export const LEGAL = {
 
   /** Links shown in the legal nav and footer. */
   pages: [
-    { href: "/privacy", label: "Privacy" },
     { href: "/terms", label: "Terms" },
+    { href: "/privacy", label: "Privacy" },
     { href: "/refunds", label: "Refunds" },
+    { href: "/contact", label: "Contact" },
     { href: "/acceptable-use", label: "Acceptable use" },
-    { href: "/imprint", label: "Imprint" },
   ],
 } as const;
 

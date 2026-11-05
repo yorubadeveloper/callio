@@ -17,17 +17,17 @@ const COLUMNS = [
   {
     title: "Company",
     links: [
-      { href: `mailto:${LEGAL.operator.email}`, label: "Contact" },
-      { href: "/imprint", label: "Imprint" },
-      { href: "/acceptable-use", label: "Acceptable use" },
+      { href: "/contact", label: "Contact" },
+      { href: `mailto:${LEGAL.operator.email}`, label: LEGAL.operator.email },
     ],
   },
   {
     title: "Legal",
     links: [
-      { href: "/privacy", label: "Privacy" },
       { href: "/terms", label: "Terms" },
+      { href: "/privacy", label: "Privacy" },
       { href: "/refunds", label: "Refunds" },
+      { href: "/acceptable-use", label: "Acceptable use" },
     ],
   },
 ];
