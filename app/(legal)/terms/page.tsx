@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { LEGAL, operatorAddress } from "@/lib/legal";
+import { LEGAL, operatorLine } from "@/lib/legal";
 import { CREDIT_COSTS } from "@/lib/pricing";
 
 export const metadata: Metadata = {
@@ -76,7 +76,7 @@ export default function TermsPage() {
         <section id="agreement">
           <Heading id="agreement" />
           <p>
-            Callio ({LEGAL.domain}) is run by {operator.legalName}, {operatorAddress} (“we”, “us”). By creating an
+            Callio ({LEGAL.domain}) is run by {operatorLine} (“we”, “us”). By creating an
             account or using Callio, you agree to these terms, our{" "}
             <Link href="/acceptable-use">Acceptable use policy</Link> and our{" "}
             <Link href="/refunds">Refund and cancellation policy</Link>. Our{" "}
@@ -396,8 +396,7 @@ export default function TermsPage() {
         <section id="contact">
           <Heading id="contact" />
           <p>
-            Questions about these terms? Email <a href={`mailto:${operator.email}`}>{operator.email}</a> or write to{" "}
-            {operator.legalName}, {operatorAddress}. More details are on our <Link href="/contact">contact page</Link>.
+            Questions about these terms? Email <a href={`mailto:${operator.email}`}>{operator.email}</a>. More details are on our <Link href="/contact">contact page</Link>.
           </p>
         </section>
       </div>

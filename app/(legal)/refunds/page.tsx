@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { LEGAL, operatorAddress } from "@/lib/legal";
+import { LEGAL, operatorLine } from "@/lib/legal";
 
 export const metadata: Metadata = {
   title: "Refunds and cancellation",
@@ -167,9 +167,9 @@ export default function RefundsPage() {
               without giving any reason. The withdrawal period is 14 days from the day the contract is concluded.
             </p>
             <p>
-              To exercise your right of withdrawal, you must inform us ({operator.legalName}, {operatorAddress},
+              To exercise your right of withdrawal, you must inform us ({operatorLine},
               email: {operator.email}) of your decision to withdraw from this contract by a clear statement (for
-              example, a letter sent by post or an email). You can also use the withdrawal button in the app at{" "}
+              example, an email). You can also use the withdrawal button in the app at{" "}
               {app.withdrawButton}, and we will confirm receipt without delay on a durable medium, such as email. You
               may use the <a href="#form">model withdrawal form</a> below, but you don’t have to.
             </p>
@@ -229,7 +229,7 @@ export default function RefundsPage() {
           <p>If you want to withdraw from the contract, you can fill in and send this form. You don’t have to use it.</p>
           <div className="callout font-mono text-[14px] leading-[1.8]">
             <p>
-              To: {operator.legalName}, {operatorAddress}, email: {operator.email}
+              To: {operatorLine}, email: {operator.email}
             </p>
             <p>
               I/We (*) hereby give notice that I/We (*) withdraw from my/our (*) contract for the provision of the

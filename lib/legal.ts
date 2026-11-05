@@ -33,30 +33,23 @@ export const LEGAL = {
   url: "https://callio.site",
 
   operator: {
-    legalName: "[YOUR FULL NAME]",
+    legalName: "Oyelekan Oluwabukunmi",
     legalForm: "Sole proprietor (Einzelunternehmer)",
     /** Companies only (the managing director). Null hides the line on the contact page. */
     representedBy: null as string | null,
-    street: "[STREET AND NUMBER]",
-    postcodeCity: "[POSTCODE CITY]",
-    country: "Germany",
+    /** Postal address. Null keeps it off the site; email is the contact route. */
+    address: null as string | null,
     email: "hello@callio.site",
     privacyEmail: "privacy@callio.site",
     abuseEmail: "abuse@callio.site",
     /** §5 DDG requires a fast, direct way to reach you besides email. */
-    phone: "[PHONE NUMBER — or another fast, direct contact route]",
+    phone: null as string | null,
     /** USt-IdNr. once you have one. Null hides the section (small business without a VAT ID). */
     vatId: null as string | null,
     /** Commercial register entry once registered as a company. Null hides the section. */
     register: null as string | null,
     /** Person responsible for editorial content under §18(2) MStV. */
     contentResponsible: "The operator named above, at the address above",
-  },
-
-  /** The data protection authority of the founder's German Land. */
-  supervisoryAuthority: {
-    name: "[DATA PROTECTION AUTHORITY of your Land — e.g. Berliner Beauftragte für Datenschutz und Informationsfreiheit]",
-    url: "[AUTHORITY WEBSITE URL]",
   },
 
   backendHosting: {
@@ -160,7 +153,7 @@ export const LEGAL = {
       name: "Open-Meteo",
       purpose: "Weather lookups when you ask an agent about the weather",
       data: "Only the place name. No account details are sent",
-      location: "[OPEN-METEO LOCATION — confirm]",
+      location: "Europe",
       role: "Processor",
       safeguard: "No personal data is sent",
       status: "active",
@@ -205,5 +198,5 @@ export const LEGAL = {
   ],
 } as const;
 
-/** One-line postal address. */
-export const operatorAddress = `${LEGAL.operator.street}, ${LEGAL.operator.postcodeCity}, ${LEGAL.operator.country}`;
+/** Who we are in one line: the name, plus the postal address when there is one. */
+export const operatorLine = [LEGAL.operator.legalName, LEGAL.operator.address].filter(Boolean).join(", ");

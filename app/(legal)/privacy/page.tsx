@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { LEGAL, operatorAddress } from "@/lib/legal";
+import { LEGAL } from "@/lib/legal";
 
 export const metadata: Metadata = {
   title: "Privacy policy",
@@ -54,7 +54,7 @@ function Contents() {
   );
 }
 
-const { operator, supervisoryAuthority, retention, app, age } = LEGAL;
+const { operator, retention, app, age } = LEGAL;
 
 export default function PrivacyPage() {
   return (
@@ -96,8 +96,12 @@ export default function PrivacyPage() {
         <p>
           {operator.legalName}
           <br />
-          {operatorAddress}
-          <br />
+          {operator.address && (
+            <>
+              {operator.address}
+              <br />
+            </>
+          )}
           Email: <a href={`mailto:${operator.privacyEmail}`}>{operator.privacyEmail}</a>
         </p>
         <p>
@@ -450,7 +454,7 @@ export default function PrivacyPage() {
           </li>
           <li>
             <strong>Complain</strong> to a data protection authority (Art. 77). You can contact the authority where
-            you live or work, or ours: {supervisoryAuthority.name} ({supervisoryAuthority.url}).
+            you live or work.
           </li>
         </ul>
         <div className="callout">

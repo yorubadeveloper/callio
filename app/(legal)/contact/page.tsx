@@ -33,7 +33,7 @@ export default function ContactPage() {
             <li>
               Reporting misuse: <a href={`mailto:${operator.abuseEmail}`}>{operator.abuseEmail}</a>
             </li>
-            <li>Phone: {operator.phone}</li>
+            {operator.phone && <li>Phone: {operator.phone}</li>}
           </ul>
         </section>
 
@@ -47,12 +47,12 @@ export default function ContactPage() {
             {operator.legalForm}
             <br />
             Trading as {LEGAL.product}
-            <br />
-            {operator.street}
-            <br />
-            {operator.postcodeCity}
-            <br />
-            {operator.country}
+            {operator.address && (
+              <>
+                <br />
+                {operator.address}
+              </>
+            )}
           </p>
           {operator.representedBy && <p>Represented by: {operator.representedBy}</p>}
           {operator.register && <p>Register entry: {operator.register}</p>}
