@@ -53,7 +53,7 @@ const SPLASH: [number, number, number][] = [
 export const metadata: Metadata = {
   metadataBase: new URL("https://callio.site"),
   title: {
-    default: "Callio · Call it. Consider it done.",
+    default: "Callio · Agents that pick up the phone",
     template: "%s · Callio",
   },
   description,
@@ -73,14 +73,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "Callio",
-    title: "Callio · Call it. Consider it done.",
+    title: "Callio · Agents that pick up the phone",
     description,
     url: "https://callio.site",
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Callio · Call it. Consider it done.",
+    title: "Callio · Agents that pick up the phone",
     description,
   },
   robots: { index: true, follow: true },

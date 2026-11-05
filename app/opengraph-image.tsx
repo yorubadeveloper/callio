@@ -63,16 +63,14 @@ export default async function OpengraphImage() {
               fontSize: 76,
               lineHeight: 1.02,
               letterSpacing: -3.2,
-              display: "flex",
-              flexDirection: "column",
+              maxWidth: 560,
               color: "#121212",
             }}
           >
-            <span>Call it.</span>
-            <span>Consider it done.</span>
+            Agents that pick up the phone.
           </span>
           <span style={{ marginTop: 26, fontSize: 28, lineHeight: 1.35, color: "#5E5C57", maxWidth: 520 }}>
-            They call you, answer when you call and remember what matters.
+            They call you, answer when you call, remember what matters and get things done.
           </span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>

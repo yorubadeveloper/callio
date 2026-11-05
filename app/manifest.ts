@@ -7,7 +7,7 @@ export default function manifest(): MetadataRoute.Manifest {
     id: "/app",
     name: "Callio",
     short_name: "Callio",
-    description: "Call it. Consider it done.",
+    description: "Agents that pick up the phone.",
     start_url: "/app?source=pwa",
     scope: "/",
     display: "standalone",
