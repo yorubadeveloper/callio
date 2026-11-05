@@ -1,12 +1,14 @@
 "use client";
 
 import { motion } from "motion/react";
-import { Eyeglasses, Shuffle } from "@phosphor-icons/react";
+import { DiceFive, Eyeglasses, Shuffle } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { AgentFace } from "@/components/landing/agent-face";
 import type { HairStyle } from "@/components/landing/agents";
 import { agentProfile } from "@/lib/agents/catalog";
+import NAMES from "@/lib/agents/names.json";
 import { PERSONALITIES } from "@/lib/agents/personalize";
+import { VOICES } from "@/lib/agents/voices";
 import type { AgentLook, PersonalityId } from "@/lib/types";
 import { Field, inputClass } from "./ui";
 import { VoicePicker } from "./voice-preview";
@@ -51,6 +53,13 @@ const HAIRS: HairStyle[] = ["bob", "bun", "curls", "flat", "puffs", "swoop", "no
 
 const pick = <T,>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
 
+/** A name from lib/agents/names.json that suits the voice's pitch, never the one they already have. */
+function pickName(voice: string, current: string) {
+  const pitch = VOICES.find((v) => v.id === voice)?.pitch ?? "higher";
+  const options = [...NAMES[pitch], ...NAMES.any].filter((n) => n.toLowerCase() !== current.trim().toLowerCase());
+  return pick(options);
+}
+
 export function AgentPreview({ draft, size = "lg" }: { draft: AgentDraft; size?: "sm" | "lg" }) {
   const base = agentProfile(draft.template)!;
   return (
@@ -79,15 +88,25 @@ export function AgentEditor({ draft, onChange }: { draft: AgentDraft; onChange: 
     <div className="space-y-8">
       <Field label="Name" hint={`Call them anything. "${base.name}" is just where they started.`}>
         {(id) => (
-          <input
-            id={id}
-            value={draft.name}
-            maxLength={24}
-            onChange={(e) => set({ name: e.target.value })}
-            placeholder={base.name}
-            className={inputClass}
-            autoComplete="off"
-          />
+          <div className="relative">
+            <input
+              id={id}
+              value={draft.name}
+              maxLength={24}
+              onChange={(e) => set({ name: e.target.value })}
+              placeholder={base.name}
+              className={cn(inputClass, "pr-36")}
+              autoComplete="off"
+            />
+            <button
+              type="button"
+              onClick={() => set({ name: pickName(draft.voice, draft.name || base.name) })}
+              className="group absolute inset-y-1.5 right-1.5 inline-flex items-center gap-1.5 rounded-xl px-3 text-[14px] font-medium text-ink transition-colors hover:bg-ink/[0.06] active:scale-[0.97]"
+            >
+              <DiceFive size={20} weight="fill" className="text-coral transition-transform duration-300 group-active:rotate-180" />
+              Pick for me
+            </button>
+          </div>
         )}
       </Field>
 
