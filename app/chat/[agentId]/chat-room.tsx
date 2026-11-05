@@ -410,7 +410,7 @@ function ToolChip({ tool }: { tool: ChatMessage["tools"][number] }) {
   const Glyph = tool.ok ? KIND_ICON[meta?.kind ?? "other"] : WarningCircle;
   let label = tool.name.replaceAll("_", " ");
   try {
-    if (meta) label = meta.label(tool.args);
+    if (meta) label = (meta.done ?? meta.label)(tool.args);
   } catch {
     // a label that can't read these args falls back to the tool's name
   }
