@@ -143,6 +143,8 @@ export function AfterIntro({
 export interface TextPart {
   text: string;
   italic?: boolean;
+  /** start a new line after this part */
+  br?: boolean;
 }
 
 /** Headline that rises word by word out of a mask. */
@@ -158,12 +160,14 @@ export function SplitWords({
   stagger?: number;
 }) {
   const reduce = useReducedMotion();
-  const words = parts.flatMap((p) => p.text.split(" ").map((w) => ({ w, italic: p.italic })));
+  const words = parts.flatMap((p) =>
+    p.text.split(" ").map((w, j, all) => ({ w, italic: p.italic, br: p.br && j === all.length - 1 })),
+  );
   return (
     <>
       <span className="sr-only">{parts.map((p) => p.text).join(" ")}</span>
       <span aria-hidden>
-        {words.map(({ w, italic }, i) => (
+        {words.map(({ w, italic, br }, i) => (
           <Fragment key={i}>
             <span className="-mx-[0.06em] -mb-[0.12em] inline-block overflow-hidden px-[0.06em] pb-[0.12em] align-bottom">
               <motion.span
@@ -175,7 +179,7 @@ export function SplitWords({
                 {w}
               </motion.span>
             </span>
-            {i < words.length - 1 && " "}
+            {br ? <br /> : i < words.length - 1 && " "}
           </Fragment>
         ))}
       </span>
