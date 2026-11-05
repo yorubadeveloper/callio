@@ -128,11 +128,11 @@ export function DialHero() {
 
         {/* centre label */}
         <div className="absolute inset-[24%] flex flex-col items-center justify-center text-center">
-          <h1 className="text-balance font-display text-[clamp(1.45rem,6vw,3.6rem)] leading-[1.04] font-medium tracking-[-0.04em] text-ink">
+          <h1 className="text-balance font-display text-[clamp(1.3rem,5.2vw,3.1rem)] leading-[1.04] font-medium tracking-[-0.04em] text-ink">
             <SplitWords
               show={done}
               delay={0.45}
-              parts={[{ text: "Agents that" }, { text: "pick up", italic: true }, { text: "the phone" }]}
+              parts={[{ text: "Call it.", br: true }, { text: "Consider it" }, { text: "done.", italic: true }]}
             />
           </h1>
           <AfterIntro delay={0.95}>
