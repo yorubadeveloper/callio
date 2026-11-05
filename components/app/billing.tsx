@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { Check, Coins } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { api, ApiError } from "@/lib/api";
-import { plan as planById, PLANS, TOP_UPS, type PlanId } from "@/lib/pricing";
+import type { PlanId } from "@/lib/pricing";
+import { usePricing } from "@/components/providers/pricing-provider";
 import type { Billing } from "@/lib/types";
 import { btn, Field, inputClass, PageTitle, Segmented, Sheet } from "./ui";
 import { useCheckout } from "./upgrade";
@@ -41,6 +42,7 @@ export function BillingView({
   const [interval, setInterval] = useState<"month" | "year">(intent?.interval ?? billing.interval ?? "month");
   const { busy, error, go } = useCheckout();
   const started = useRef(false);
+  const { plans, topUps, plan: planById } = usePricing();
   const current = planById(billing.plan);
   const date = (iso: string) =>
     new Intl.DateTimeFormat(locale, { day: "numeric", month: "long", year: "numeric", timeZone: timezone }).format(
@@ -114,7 +116,7 @@ export function BillingView({
           </div>
         </div>
         <ul className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          {PLANS.filter((p) => p.id !== "free").map((p) => {
+          {plans.filter((p) => p.id !== "free").map((p) => {
             const isCurrent = p.id === billing.plan;
             const price = interval === "year" ? p.yearlyPerMonth : p.monthly;
             return (
@@ -161,7 +163,7 @@ export function BillingView({
           One-off packs. They never expire and are used after your plan credits.
         </p>
         <ul className="grid grid-cols-3 gap-3">
-          {TOP_UPS.map((t) => (
+          {topUps.map((t) => (
             <li key={t.id}>
               <button
                 type="button"

@@ -117,5 +117,26 @@ export const PHONE_RATES: { place: string; landline: number; mobile: number }[] 
 
 export const plan = (id: PlanId) => PLANS.find((p) => p.id === id)!;
 
+/** Prices from the backend, keyed like "plus:month" and "topup-50" (whole units). */
+export type LivePrices = Record<string, number>;
+
+/** The plans and top-ups with today's prices from Stripe; the numbers above are the defaults. */
+export function withLivePrices(live: LivePrices | null): { plans: Plan[]; topUps: TopUp[] } {
+  if (!live) return { plans: PLANS, topUps: TOP_UPS };
+  const round = (n: number) => Math.round(n * 100) / 100;
+  return {
+    plans: PLANS.map((p) =>
+      p.monthly === 0
+        ? p
+        : {
+            ...p,
+            monthly: live[`${p.id}:month`] ?? p.monthly,
+            yearlyPerMonth: live[`${p.id}:year`] ? round(live[`${p.id}:year`] / 12) : p.yearlyPerMonth,
+          },
+    ),
+    topUps: TOP_UPS.map((t) => ({ ...t, price: live[t.id] ?? t.price })),
+  };
+}
+
 /** Rough minutes of online calling a credit balance buys, for display. */
 export const onlineMinutes = (credits: number) => Math.floor(credits / CREDIT_COSTS.onlineMinute);
