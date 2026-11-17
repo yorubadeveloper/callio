@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "site.callio.app",
+      "sha256_cert_fingerprints": [
+        "8B:CF:F0:35:BA:E3:5D:FA:DF:59:B4:93:15:0E:46:EE:FB:B5:CA:15:91:A9:D2:CB:12:C3:12:C8:0D:A8:FA:F9"
+      ]
+    }
+  }
+]
