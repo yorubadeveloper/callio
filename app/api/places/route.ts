@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { sessionUserId } from "@/lib/server/backend";
 
 // City suggestions for the "Where are you?" field. Runs on our server so only the typed place name reaches
 // Open-Meteo, never the visitor's IP (see the privacy policy). Each place carries its time zone.
 export async function GET(req: Request) {
-  if (!(await auth())?.userId) return NextResponse.json({ detail: "Sign in to continue." }, { status: 401 });
+  if (!(await sessionUserId())) return NextResponse.json({ detail: "Sign in to continue." }, { status: 401 });
   const q = new URL(req.url).searchParams.get("q")?.trim() ?? "";
   if (q.length < 2 || q.length > 80) return NextResponse.json([]);
 
