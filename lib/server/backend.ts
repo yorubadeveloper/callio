@@ -1,8 +1,10 @@
 import "server-only";
 import { cache } from "react";
+import { headers } from "next/headers";
 import { auth } from "@/auth";
 import type { User } from "@/lib/types";
 import { mockBackend, mockEnabled, MockError } from "./mock-backend";
+import { userIdFromMobileToken } from "./mobile-auth";
 
 // The FastAPI backend (voice-bot repo, on our own server) is only reachable from this
 // server: every request carries the shared API key and, for user data, the
@@ -61,8 +63,12 @@ export const syncUser = (body: {
   locale: string | null;
 }) => backend<User>("/v1/users/sync", { method: "POST", body });
 
-/** The signed-in user's backend id, or null when signed out. */
-export const sessionUserId = cache(async () => (await auth())?.userId ?? null);
+/** The signed-in user's backend id, or null when signed out. The mobile app sends a bearer token instead of a cookie. */
+export const sessionUserId = cache(async () => {
+  const bearer = (await headers()).get("authorization");
+  if (bearer?.startsWith("Bearer ")) return userIdFromMobileToken(bearer.slice(7));
+  return (await auth())?.userId ?? null;
+});
 
 /** The signed-in user, fetched once per request. Null when signed out. */
 export const currentUser = cache(async (): Promise<User | null> => {
