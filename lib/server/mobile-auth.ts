@@ -19,8 +19,9 @@ function googleAudiences() {
 }
 
 function signingKey() {
-  const secret = process.env.AUTH_SECRET;
-  if (!secret) throw new Error("AUTH_SECRET is not set");
+  // Auth.js accepts either name; production may only have the older NEXTAUTH_SECRET.
+  const secret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET;
+  if (!secret) throw new Error("AUTH_SECRET (or NEXTAUTH_SECRET) is not set");
   // Derived, so a mobile token can never pass as an Auth.js cookie or the other way round.
   return new TextEncoder().encode(`callio-mobile:${secret}`);
 }
