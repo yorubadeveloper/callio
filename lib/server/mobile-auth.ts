@@ -45,6 +45,27 @@ export async function verifyGoogleIdToken(idToken: string): Promise<GoogleProfil
   }
 }
 
+// Sign in with Apple (iOS). The app sends the identity token Apple gave it; it's issued to the app's bundle id.
+const APPLE_KEYS = createRemoteJWKSet(new URL("https://appleid.apple.com/auth/keys"));
+const APPLE_AUDIENCES = (process.env.APPLE_BUNDLE_IDS ?? "site.callio.app").split(",").map((id) => id.trim()).filter(Boolean);
+
+export interface AppleProfile {
+  sub: string;
+  email?: string;
+  email_verified?: boolean | "true" | "false";
+  is_private_email?: boolean | "true" | "false";
+}
+
+export async function verifyAppleIdToken(idToken: string): Promise<AppleProfile | null> {
+  try {
+    const { payload } = await jwtVerify(idToken, APPLE_KEYS, { issuer: "https://appleid.apple.com", audience: APPLE_AUDIENCES });
+    if (typeof payload.sub !== "string") return null;
+    return payload as unknown as AppleProfile;
+  } catch {
+    return null;
+  }
+}
+
 export function mobileToken(userId: string) {
   return new SignJWT({})
     .setProtectedHeader({ alg: "HS256" })
